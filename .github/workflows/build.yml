@@ -1,0 +1,27 @@
+name: macOS Vulkan CI
+
+on:
+  push:
+    branches:
+      - build-mac
+  pull_request:
+    branches:
+      - build-mac
+
+jobs:
+  build:
+    runs-on: macos-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install dependencies
+        run: |
+          brew install cmake glfw glm vulkan-sdk
+
+      - name: Configure CMake
+        run: cmake -B build
+
+      - name: Build project
+        run: cmake --build build --config Release
