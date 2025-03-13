@@ -44,7 +44,7 @@ if(APPLE)
     target_link_libraries(exe PRIVATE Vulkan::Vulkan glfw Threads::Threads)
 
     # Shader setup for macOS
-    file(GLOB SPIRV_SOURCE_FILES "${CMAKE_SOURCE_DIR}/shaders/*.spv")
+    file(GLOB SPIRV_SOURCE_FILES "${CMAKE_SOURCE_DIR}/assets/shaders/*.spv")
 
     # Debug: print the found SPIR-V files
     message(STATUS "Found SPIR-V files: ${SPIRV_SOURCE_FILES}")
@@ -102,7 +102,7 @@ elseif(WIN32)
 
     file(MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/shaders)
 
-    file(GLOB GLSL_SOURCE_FILES "${CMAKE_SOURCE_DIR}/shaders/*.vert" "${CMAKE_SOURCE_DIR}/shaders/*.frag")
+    file(GLOB GLSL_SOURCE_FILES "${CMAKE_SOURCE_DIR}/assets/shaders/*.vert" "${CMAKE_SOURCE_DIR}/assets/shaders/*.frag")
 
     set(SPIRV_BINARY_FILES "")
     foreach(GLSL ${GLSL_SOURCE_FILES})
@@ -155,7 +155,7 @@ elseif(UNIX AND NOT APPLE)
 
     file(MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/shaders)
 
-    file(GLOB GLSL_SOURCE_FILES "${CMAKE_SOURCE_DIR}/shaders/*.vert" "${CMAKE_SOURCE_DIR}/shaders/*.frag")
+    file(GLOB GLSL_SOURCE_FILES "${CMAKE_SOURCE_DIR}/assets/shaders/*.vert" "${CMAKE_SOURCE_DIR}/assets/shaders/*.frag")
 
     set(SPIRV_BINARY_FILES "")
     foreach(GLSL ${GLSL_SOURCE_FILES})
