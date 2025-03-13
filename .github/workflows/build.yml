@@ -1,4 +1,4 @@
-name: macOS Vulkan CI
+name: Linux Vulkan CI
 
 on:
   push:
@@ -10,7 +10,7 @@ on:
 
 jobs:
   build:
-    runs-on: macos-latest
+    runs-on: ubuntu-latest
 
     steps:
       - name: Checkout repository
@@ -18,10 +18,18 @@ jobs:
 
       - name: Install dependencies
         run: |
-          brew install cmake glfw glm vulkan-sdk
+          wget -qO- https://packages.lunarg.com/lunarg-signing-key-pub.asc | sudo tee /etc/apt/trusted.gpg.d/lunarg.asc
+          sudo wget -qO /etc/apt/sources.list.d/lunarg-vulkan-noble.list http://packages.lunarg.com/vulkan/lunarg-vulkan-noble.list
+          sudo apt update
+          sudo apt install vulkan-sdk
+          sudo apt install cmake
+          sudo apt install ninja-build
+          sudo apt install libglfw3-dev
+          sudo apt install libglm-dev
 
       - name: Configure CMake
-        run: cmake -B build
+        run: cmake -G Ninja ..
 
       - name: Build project
-        run: cmake --build build --config Release
+        run: cmake --build .
+
