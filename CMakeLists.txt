@@ -139,6 +139,8 @@ elseif(UNIX AND NOT APPLE)
     target_include_directories(${PROJECT_NAME} PRIVATE ${GLM_INCLUDE_DIRS})
 
     target_include_directories(${PROJECT_NAME} PRIVATE ${CMAKE_SOURCE_DIR}/include)
+    target_include_directories(${PROJECT_NAME} PRIVATE ${CMAKE_SOURCE_DIR}/third_party)
+
     target_link_libraries(${PROJECT_NAME} Vulkan::Vulkan glfw)
 
     foreach(dir IN LISTS Vulkan_INCLUDE_DIR INCLUDE_DIRS)
