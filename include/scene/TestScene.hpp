@@ -7,6 +7,8 @@ class TestScene : public Scene {
 public:
     TestScene();
     ~TestScene() = default;
+private:
+    std::shared_ptr<Object> createRoot();
 };
 
 #endif // TESTSCENE_HPP

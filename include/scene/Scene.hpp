@@ -14,11 +14,12 @@ public:
     Scene() = default;
     ~Scene() = default;
 
-    void setup(std::vector<std::shared_ptr<Object>> models, std::shared_ptr<Camera> camera, const glm::vec3& ambientLight);
-
+    void setup(std::shared_ptr<Object> root, std::shared_ptr<Camera> camera, const glm::vec3& ambientLight);
     void run();                                                 // Run the scene
+
+    std::shared_ptr<Object> getRoot() const { return root; }    // Get the root object
 private:
-    std::vector<std::shared_ptr<Object>> models;                // List of models in the scene
+    std::shared_ptr<Object> root;                               // Root object of the scene
     std::shared_ptr<Camera> camera;                             // Camera of the scene
     glm::vec3 ambientLight;                                     // Global ambient light color
 

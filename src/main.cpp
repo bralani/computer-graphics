@@ -1,13 +1,10 @@
-﻿#include "scene/TestScene.hpp"
+﻿#include <iostream>
+#include "scene/TestScene.hpp"
 
 int main() {
 
-    try {
-        TestScene app;
-        app.run();
-    } catch (const std::exception& e) {
-        return EXIT_FAILURE;
-    }
+    TestScene app;
+    app.run();
 
-    return EXIT_SUCCESS;
+    return 0;
 }

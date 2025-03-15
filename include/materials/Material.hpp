@@ -7,13 +7,8 @@
 class Material
 {
 public:
-  Material(
-      const std::optional<std::string> &albedoPath = std::nullopt,
-      const std::optional<std::string> &normalPath = std::nullopt,
-      const std::optional<std::string> &metallicPath = std::nullopt,
-      const std::optional<std::string> &roughnessPath = std::nullopt,
-      const std::optional<std::string> &aoPath = std::nullopt);
-  ~Material();
+  Material() = default;
+  ~Material() = default;
 
   void loadTextures();
   void cleanup();
@@ -25,8 +20,6 @@ public:
   const std::optional<std::string> &getAOMap() const { return aoMap; }
 
 private:
-  void loadTextureFromFile(const std::string &path);
-
   std::optional<std::string> albedoMap;
   std::optional<std::string> normalMap;
   std::optional<std::string> metallicMap;
