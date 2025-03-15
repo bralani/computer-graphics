@@ -3,8 +3,8 @@
 
 class Camera {
   public:
-    Camera();
-    ~Camera();
+    Camera() = default;
+    ~Camera() = default;
 };
 
 #endif // CAMERA_HPP

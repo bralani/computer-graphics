@@ -3,31 +3,26 @@
 
 #include <vector>
 #include <memory>
+#include <optional>
 
 #include "camera/Camera.hpp"
 #include "objects/Object.hpp"
-#include "api/ApiVulkan.hpp"
+#include "scene/api/ApiVulkan.hpp"
 
 class Scene {
 public:
     Scene() = default;
     ~Scene() = default;
 
-    // Add a model to the scene
-    /*void addModel(std::shared_ptr<Model> model);
+    void setup(std::vector<std::shared_ptr<Object>> models, std::shared_ptr<Camera> camera, const glm::vec3& ambientLight);
 
-    // Set the scene's camera
-    void setCamera(std::shared_ptr<Camera> camera);
-
-    // Return the list of models in the scene
-    const std::vector<std::shared_ptr<Model>>& getModels() const;*/
-
+    void run();                                                 // Run the scene
 private:
-    /*std::vector<std::shared_ptr<Object>> models;          // List of models in the scene
-    std::shared_ptr<Camera> camera;                         // Camera of the scene
-    glm::vec3 ambientLight;                                 // Global ambient light color*/
+    std::vector<std::shared_ptr<Object>> models;                // List of models in the scene
+    std::shared_ptr<Camera> camera;                             // Camera of the scene
+    glm::vec3 ambientLight;                                     // Global ambient light color
 
-    ApiVulkan app;                                          // ApiVulkan
+    std::optional<ApiVulkan> app;                               // ApiVulkan
 };
 
 #endif // SCENE_HPP

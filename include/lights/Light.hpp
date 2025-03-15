@@ -3,8 +3,8 @@
 
 class Light {
   public:
-    Light();
-    ~Light();
+    Light() = default;
+    ~Light() = default;
 };
 
 #endif // LIGHT_HPP

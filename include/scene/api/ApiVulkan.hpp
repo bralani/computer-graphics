@@ -1,6 +1,8 @@
 #ifndef APIVULKAN_HPP
 #define APIVULKAN_HPP
 
+class Scene;  // Forward declaration
+
 #include <glm/glm.hpp>
 
 struct UniformBufferObject {
@@ -24,8 +26,10 @@ struct Vertex {
 
 class ApiVulkan {
 public:
-    ApiVulkan();
+    ApiVulkan(Scene *scene);
     ~ApiVulkan() = default;
+private:
+    Scene *scene;
 };
   
 
