@@ -2,6 +2,7 @@
 #define OBJECT_HPP
 
 #include <vector>
+#include <memory>
 #include "objects/Transform.hpp"
 #include "objects/Mesh.hpp"
 
