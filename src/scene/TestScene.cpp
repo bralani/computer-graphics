@@ -19,17 +19,33 @@ TestScene::TestScene()
 
 std::shared_ptr<Object> TestScene::createRoot()
 {
-  std::vector<std::shared_ptr<Mesh>> meshes;
+  std::vector<std::shared_ptr<Mesh>> meshes1, meshes2;
+  std::vector<std::shared_ptr<Object>> children;
 
-  for (int j = 0; j < 3; j++)
+  for (int j = 0; j < 2; j++)
   {
     for (int i = 0; i < 5; i++)
     {
       auto mesh = std::make_shared<Mesh>("assets/models/P" + std::to_string(j) + std::to_string(i) + ".obj");
-      meshes.push_back(mesh);
+      meshes1.push_back(mesh);
     }
   }
+  auto child1 = std::make_shared<Object>(meshes1);
 
-  auto root = std::make_shared<Object>(meshes);
+  for (int j = 2; j < 3; j++)
+  {
+    for (int i = 0; i < 5; i++)
+    {
+      auto mesh = std::make_shared<Mesh>("assets/models/P" + std::to_string(j) + std::to_string(i) + ".obj");
+      meshes2.push_back(mesh);
+    }
+  }
+  auto child2 = std::make_shared<Object>(meshes2);
+
+  children.push_back(child1);
+  children.push_back(child2);
+
+  auto root = std::make_shared<Object>(children);
+
   return root;
 }

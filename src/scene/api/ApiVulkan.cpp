@@ -113,7 +113,7 @@ protected:
 
 		// Models, textures and Descriptors (values assigned to the uniforms)
 		auto root = this->scene->getRoot();
-		auto meshes = root->getMeshes();
+		auto meshes = root->getRecursiveMeshes();
 		
 		// allocate the models
 		M.resize(meshes.size());
@@ -129,8 +129,6 @@ protected:
 		// Create the textures
 		T1.init(this, "assets/textures/Picasso.jpg");
 		T2.init(this, "assets/textures/Textures.png");
-
-		std::cout << "Local Init done\n";
 	}
 
 	// Here you create your pipelines and Descriptor Sets!
@@ -146,42 +144,6 @@ protected:
 		}
 	}
 
-	// Here you destroy your pipelines and Descriptor Sets!
-	// All the object classes defined in Starter.hpp have a method .cleanup() for this purpose
-	void pipelinesAndDescriptorSetsCleanup()
-	{
-		// Cleanup pipelines
-		P.cleanup();
-
-		// Cleanup datasets
-		for (int i = 0; i < DS.size(); i++)
-		{
-			DS[i].cleanup();
-		}
-		DS.clear();
-	}
-
-	// Here you destroy all the Models, Texture and Desc. Set Layouts you created!
-	// All the object classes defined in Starter.hpp have a method .cleanup() for this purpose
-	// You also have to destroy the pipelines: since they need to be rebuilt, they have two different
-	// methods: .cleanup() recreates them, while .destroy() delete them completely
-	void localCleanup()
-	{
-		// Cleanup textures
-		T1.cleanup();
-		T2.cleanup();
-
-		// Cleanup models
-		for (int i = 0; i < M.size(); i++)
-			M[i].cleanup();
-		M.clear();
-
-		// Cleanup descriptor set layouts
-		DSL.cleanup();
-
-		// Destroies the pipelines
-		P.destroy();
-	}
 
 	// Here it is the creation of the command buffer:
 	// You send to the GPU all the objects you want to draw,
@@ -288,6 +250,42 @@ protected:
 		ubo.mMat = baseTr * AxTr * glm::rotate(glm::mat4(1.0f), glm::radians(-90.0f), glm::vec3(0.0f, 1.0f, 0.0f));
 		ubo.mvpMat = ViewPrj * ubo.mMat;
 		ubo.nMat = glm::inverse(glm::transpose(ubo.mMat));
+	}
+
+
+	// Here you destroy your pipelines and Descriptor Sets!
+	// All the object classes defined in Starter.hpp have a method .cleanup() for this purpose
+	void pipelinesAndDescriptorSetsCleanup()
+	{
+		// Cleanup pipelines
+		P.cleanup();
+
+		// Cleanup datasets
+		for (int i = 0; i < DS.size(); i++)
+			DS[i].cleanup();
+		DS.clear();
+	}
+
+	// Here you destroy all the Models, Texture and Desc. Set Layouts you created!
+	// All the object classes defined in Starter.hpp have a method .cleanup() for this purpose
+	// You also have to destroy the pipelines: since they need to be rebuilt, they have two different
+	// methods: .cleanup() recreates them, while .destroy() delete them completely
+	void localCleanup()
+	{
+		// Cleanup textures
+		T1.cleanup();
+		T2.cleanup();
+
+		// Cleanup models
+		for (int i = 0; i < M.size(); i++)
+			M[i].cleanup();
+		M.clear();
+
+		// Cleanup descriptor set layouts
+		DSL.cleanup();
+
+		// Destroies the pipelines
+		P.destroy();
 	}
 };
 

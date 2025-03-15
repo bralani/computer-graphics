@@ -18,14 +18,34 @@ public:
   const glm::vec3 &getPosition() const { return position; }
   const glm::vec3 &getRotation() const { return rotation; }
   const glm::vec3 &getScale() const { return scale; }
+  glm::mat4 getTransform() { return updateTransform(); }
 
-  void setPosition(const glm::vec3 &pos) { position = pos; }
-  void setRotation(const glm::vec3 &rot) { rotation = rot; }
-  void setScale(const glm::vec3 &scl) { scale = scl; }
+  void setPosition(const glm::vec3 &pos) { 
+    position = pos;
+    dirty = true;
+  }
+  void setRotation(const glm::vec3 &rot) { 
+    rotation = rot; 
+    dirty = true;
+  }
+  void setScale(const glm::vec3 &scl) { 
+    scale = scl; 
+    dirty = true;
+  }
 
-  glm::mat4 getTransform() const
+private:
+  glm::vec3 position;
+  glm::vec3 rotation;
+  glm::vec3 scale;
+
+  bool dirty = true;
+  glm::mat4 transform;
+
+  glm::mat4 updateTransform()
   {
-    glm::mat4 transform = glm::mat4(1.0f);
+    if(!dirty) return transform;
+
+    transform = glm::mat4(1.0f);
 
     // Translation
     transform = glm::translate(transform, position);
@@ -38,13 +58,10 @@ public:
     // Scaling
     transform = glm::scale(transform, scale);
 
+    dirty = false;
+
     return transform;
   }
-
-private:
-  glm::vec3 position;
-  glm::vec3 rotation;
-  glm::vec3 scale;
 };
 
 #endif // TRANSFORM_HPP
