@@ -113,7 +113,7 @@ protected:
 
 		// Models, textures and Descriptors (values assigned to the uniforms)
 		auto root = this->scene->getRoot();
-		auto meshes = root->getRecursiveMeshes();
+		auto meshes = root->getRecursiveMeshesTransform();
 		
 		// allocate the models
 		M.resize(meshes.size());
@@ -121,9 +121,9 @@ protected:
 
 		for (int i = 0; i < meshes.size(); i++)
 		{
-			std::shared_ptr<Mesh> mesh = meshes[i];
+			std::shared_ptr<Mesh> mesh = meshes[i].first;
 			M[i].init(this, &VD, mesh->getFilename(), OBJ);
-			trans_mat.push_back(mesh->transform.getTransform());
+			trans_mat.push_back(meshes[i].second.getTransform());
 		}
 
 		// Create the textures

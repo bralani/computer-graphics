@@ -27,10 +27,12 @@ std::shared_ptr<Object> TestScene::createRoot()
     for (int i = 0; i < 5; i++)
     {
       auto mesh = std::make_shared<Mesh>("assets/models/P" + std::to_string(j) + std::to_string(i) + ".obj");
+      mesh.get()->transform.setRotation(glm::vec3(90.0f, 0.0f, 0.0f));
       meshes1.push_back(mesh);
     }
   }
   auto child1 = std::make_shared<Object>(meshes1);
+  child1.get()->transform.setPosition(glm::vec3(5.0f, 0.0f, 0.0f));
 
   for (int j = 2; j < 3; j++)
   {

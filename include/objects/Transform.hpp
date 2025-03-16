@@ -3,8 +3,14 @@
 
 #include <vector>
 #include <string>
+
+#define GLM_ENABLE_EXPERIMENTAL
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtx/matrix_decompose.hpp>
+#include <glm/gtc/quaternion.hpp>
+#include <glm/gtx/quaternion.hpp>
+
 
 class Transform
 {
@@ -31,6 +37,28 @@ public:
   void setScale(const glm::vec3 &scl) { 
     scale = scl; 
     dirty = true;
+  }
+
+  Transform operator*(Transform &other)
+  {
+    Transform newTransform;
+
+    // Compute the global transform matrices
+    glm::mat4 thisMatrix = getTransform();
+    glm::mat4 otherMatrix = other.getTransform();
+
+    // Multiply the matrices to get the new global transform
+    glm::mat4 combinedMatrix = thisMatrix * otherMatrix;
+
+    // Decompose the resulting matrix into position, rotation, and scale
+    glm::vec3 skew;
+    glm::vec4 perspective;
+    glm::quat rotationQuat;
+    glm::decompose(combinedMatrix, newTransform.scale, rotationQuat, newTransform.position, skew, perspective);
+    
+    newTransform.rotation = glm::degrees(glm::eulerAngles(rotationQuat));
+
+    return newTransform;
   }
 
 private:

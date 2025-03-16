@@ -41,18 +41,24 @@ public:
   const std::vector<std::shared_ptr<Object>> &getChildrenObjects() const { return childrenObjects; }
   const std::vector<std::shared_ptr<Mesh>> &getMeshes() const { return meshes; }
 
-  const std::vector<std::shared_ptr<Mesh>> getRecursiveMeshes()
-  {
-    std::vector<std::shared_ptr<Mesh>> allMeshes = meshes;
+  std::vector<std::pair<std::shared_ptr<Mesh>, Transform>> getRecursiveMeshesTransform() {
+    std::vector<std::pair<std::shared_ptr<Mesh>, Transform>> allMeshesTransform;
 
-    for (auto &child : childrenObjects)
-    {
-      auto childMeshes = child->getRecursiveMeshes();
-      allMeshes.insert(allMeshes.end(), childMeshes.begin(), childMeshes.end());
+    // Collect all meshes from the current node
+    for (const auto& mesh : meshes) {
+        auto transformedMesh = transform * mesh->transform;
+        allMeshesTransform.emplace_back(mesh, transformedMesh);
     }
 
-    return allMeshes;
-  }
+    // Recursively collect meshes from children
+    for (const auto& child : childrenObjects) {
+        auto childMeshesTransform = child->getRecursiveMeshesTransform();
+        allMeshesTransform.insert(allMeshesTransform.end(), childMeshesTransform.begin(), childMeshesTransform.end());
+    }
+
+    return allMeshesTransform;
+}
+
 
 private:
   std::vector<std::shared_ptr<Object>> childrenObjects;
