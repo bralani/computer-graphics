@@ -233,7 +233,7 @@ class Model {
   	void bind(VkCommandBuffer commandBuffer);
 };
 
-struct Texture {
+struct TextureVulkan {
 	BaseProject *BP;
 	uint32_t mipLevels;
 	VkImage textureImage;
@@ -310,7 +310,7 @@ struct DescriptorSetElement {
 	int binding;
 	DescriptorSetElementType type;
 	int size;
-	Texture *tex;
+	TextureVulkan *tex;
 };
 
 struct DescriptorSet {
@@ -334,7 +334,7 @@ struct DescriptorSet {
 class BaseProject {
 	friend class VertexDescriptor;
 	template <class Vert> friend class Model;
-	friend class Texture;
+	friend class TextureVulkan;
 	friend class Pipeline;
 	friend class DescriptorSetLayout;
 	friend class DescriptorSet;
@@ -2796,7 +2796,7 @@ void Model<Vert>::bind(VkCommandBuffer commandBuffer) {
 
 
 
-void Texture::createTextureImage(const char *const files[], VkFormat Fmt = VK_FORMAT_R8G8B8A8_SRGB) {
+void TextureVulkan::createTextureImage(const char *const files[], VkFormat Fmt = VK_FORMAT_R8G8B8A8_SRGB) {
 	int texWidth, texHeight, texChannels;
 	int curWidth = -1, curHeight = -1, curChannels = -1;
 	stbi_uc* pixels[maxImgs];
@@ -2864,7 +2864,7 @@ void Texture::createTextureImage(const char *const files[], VkFormat Fmt = VK_FO
 	vkFreeMemory(BP->device, stagingBufferMemory, nullptr);
 }
 
-void Texture::createTextureImageView(VkFormat Fmt = VK_FORMAT_R8G8B8A8_SRGB) {
+void TextureVulkan::createTextureImageView(VkFormat Fmt = VK_FORMAT_R8G8B8A8_SRGB) {
 	textureImageView = BP->createImageView(textureImage,
 									   Fmt,
 									   VK_IMAGE_ASPECT_COLOR_BIT,
@@ -2873,7 +2873,7 @@ void Texture::createTextureImageView(VkFormat Fmt = VK_FORMAT_R8G8B8A8_SRGB) {
 									   imgs);
 }
 	
-void Texture::createTextureSampler(
+void TextureVulkan::createTextureSampler(
 							 VkFilter magFilter = VK_FILTER_LINEAR,
 							 VkFilter minFilter = VK_FILTER_LINEAR,
 							 VkSamplerAddressMode addressModeU = VK_SAMPLER_ADDRESS_MODE_REPEAT,
@@ -2911,7 +2911,7 @@ void Texture::createTextureSampler(
 	
 
 
-void Texture::init(BaseProject *bp, const char *  file, VkFormat Fmt = VK_FORMAT_R8G8B8A8_SRGB, bool initSampler = true) {
+void TextureVulkan::init(BaseProject *bp, const char *  file, VkFormat Fmt = VK_FORMAT_R8G8B8A8_SRGB, bool initSampler = true) {
 	const char *files[1] = {file};
 	BP = bp;
 	imgs = 1;
@@ -2923,7 +2923,7 @@ void Texture::init(BaseProject *bp, const char *  file, VkFormat Fmt = VK_FORMAT
 }
 
 
-void Texture::initCubic(BaseProject *bp, const char * files[6]) {
+void TextureVulkan::initCubic(BaseProject *bp, const char * files[6]) {
 	BP = bp;
 	imgs = 6;
 	createTextureImage(files);
@@ -2932,7 +2932,7 @@ void Texture::initCubic(BaseProject *bp, const char * files[6]) {
 }
 
 
-void Texture::cleanup() {
+void TextureVulkan::cleanup() {
    	vkDestroySampler(BP->device, textureSampler, nullptr);
    	vkDestroyImageView(BP->device, textureImageView, nullptr);
 	vkDestroyImage(BP->device, textureImage, nullptr);

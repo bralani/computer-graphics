@@ -61,7 +61,7 @@ protected:
 	std::vector<DescriptorSet> DS;
 
 	// Textures
-	Texture T1, T2;
+	std::vector<std::vector<TextureVulkan>> textures;
 
 	// Other application parameters
 	glm::vec3 CamPos = glm::vec3(0.0, 1.5, 7.0);
@@ -118,17 +118,27 @@ protected:
 		// allocate the models
 		M.resize(meshes.size());
 		DS.resize(meshes.size());
+		textures.resize(meshes.size());
 
 		for (int i = 0; i < meshes.size(); i++)
 		{
+			// load mesh
 			std::shared_ptr<Mesh> mesh = meshes[i].first;
 			M[i].init(this, &VD, mesh->getFilename(), OBJ);
+			
+			// apply transform
 			trans_mat.push_back(meshes[i].second.getTransform());
+
+			// load material and textures
+			auto material = mesh->getMaterial();
+			std::vector<Texture> textures_mesh = material.getTextures();
+			textures[i].resize(textures_mesh.size());
+			for (int j = 0; j < textures_mesh.size(); j++)
+			{
+				textures[i][j].init(this, textures_mesh[j].getPath().c_str());
+			}
 		}
 
-		// Create the textures
-		T1.init(this, "assets/textures/Picasso.jpg");
-		T2.init(this, "assets/textures/Textures.png");
 	}
 
 	// Here you create your pipelines and Descriptor Sets!
@@ -140,7 +150,9 @@ protected:
 		// Models, textures and Descriptors (values assigned to the uniforms)
 		for (int i = 0; i < DS.size(); i++)
 		{
-			DS[i].init(this, &DSL, {{0, UNIFORM, sizeof(UniformBufferObject), nullptr}, {1, TEXTURE, 0, &T1}, {2, UNIFORM, sizeof(GlobalUniformBufferObject), nullptr}});
+			// ! pay attention that textures are now given as a pointer to the first texture
+			// ! in the array of textures
+			DS[i].init(this, &DSL, {{0, UNIFORM, sizeof(UniformBufferObject), nullptr}, {1, TEXTURE, 0, &textures[i][0]}, {2, UNIFORM, sizeof(GlobalUniformBufferObject), nullptr}});
 		}
 	}
 
@@ -266,15 +278,21 @@ protected:
 		DS.clear();
 	}
 
-	// Here you destroy all the Models, Texture and Desc. Set Layouts you created!
+	// Here you destroy all the Models, TextureVulkan and Desc. Set Layouts you created!
 	// All the object classes defined in Starter.hpp have a method .cleanup() for this purpose
 	// You also have to destroy the pipelines: since they need to be rebuilt, they have two different
 	// methods: .cleanup() recreates them, while .destroy() delete them completely
 	void localCleanup()
 	{
 		// Cleanup textures
-		T1.cleanup();
-		T2.cleanup();
+		for (int i = 0; i < textures.size(); i++)
+		{
+			for (int j = 0; j < textures[i].size(); j++)
+			{
+				textures[i][j].cleanup();
+			}
+		}
+		textures.clear();
 
 		// Cleanup models
 		for (int i = 0; i < M.size(); i++)
