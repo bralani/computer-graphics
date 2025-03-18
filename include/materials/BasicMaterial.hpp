@@ -10,8 +10,10 @@
 class BasicMaterial : public Material {
 
 public:
-    BasicMaterial(const std::vector<Texture>& textures)
-        : Material(textures) {}
+    BasicMaterial(Texture diffuseTexture) {
+        textures.push_back(diffuseTexture);
+    }
+
 };
 
 #endif // BASICMATERIAL_HPP

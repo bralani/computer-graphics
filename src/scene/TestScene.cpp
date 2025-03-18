@@ -25,7 +25,7 @@ std::shared_ptr<Object> TestScene::createRoot()
   std::vector<std::shared_ptr<Object>> children;
   
   Texture texture1("assets/textures/Checker.png", TextureType::Diffuse);
-  BasicMaterial material1({texture1});
+  BasicMaterial material1(texture1);
   
   for (int j = 0; j < 2; j++)
   {

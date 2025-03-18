@@ -11,17 +11,17 @@ layout(binding = 0) uniform UniformBufferObject {
 	mat4 mvpMat;
 	mat4 mMat;
 	mat4 nMat;
-	vec4 color;
 } ubo;
 
-layout(binding = 1) uniform sampler2D texSampler;
-
-layout(binding = 2) uniform GlobalUniformBufferObject {
+layout(binding = 1) uniform GlobalUniformBufferObject {
 	vec3 lightDir;
 	vec4 lightColor;
 	vec3 eyePos;
 	} gubo;
 	
+layout(binding = 2) uniform sampler2D textDiffuse;
+layout(binding = 3) uniform sampler2D textDiffuse2;
+
 vec3 direct_light_dir(vec3 pos, int i) {
 	return gubo.lightDir;
 }
@@ -45,7 +45,7 @@ vec3 BRDF(vec3 Albedo, vec3 Norm, vec3 EyeDir, vec3 LD) {
 void main() {
 	vec3 Norm = normalize(fragNorm);
 	vec3 EyeDir = normalize(gubo.eyePos - fragPos);
-	vec3 Albedo = texture(texSampler, fragTexCoord).rgb;
+	vec3 Albedo = texture(textDiffuse, fragTexCoord).rgb;
 
 	vec3 LD;	// light direction
 	vec3 LC;	// light color

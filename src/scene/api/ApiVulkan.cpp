@@ -10,7 +10,6 @@ struct UniformBufferObject
 	alignas(16) glm::mat4 mvpMat;
 	alignas(16) glm::mat4 mMat;
 	alignas(16) glm::mat4 nMat;
-	alignas(16) glm::vec4 overColor;
 };
 
 struct GlobalUniformBufferObject
@@ -80,7 +79,7 @@ protected:
 
 		// Descriptor pool sizes
 		uniformBlocksInPool = 15 * 2 + 2;
-		texturesInPool = 15 + 1 + 1;
+		texturesInPool = 50;
 		setsInPool = 15 + 1 + 1;
 
 		Ar = 4.0f / 3.0f;
@@ -98,9 +97,12 @@ protected:
 	void localInit()
 	{
 		// Descriptor Layouts [what will be passed to the shaders]
-		DSL.init(this, {{0, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, VK_SHADER_STAGE_ALL_GRAPHICS},
-										{1, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT},
-										{2, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, VK_SHADER_STAGE_ALL_GRAPHICS}});
+		DSL.init(this, {
+			{0, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, VK_SHADER_STAGE_ALL_GRAPHICS},
+			{1, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, VK_SHADER_STAGE_ALL_GRAPHICS},
+			{2, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT},
+			{3, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT},
+		});
 
 		// Vertex descriptors
 		VD.init(this, 
@@ -155,13 +157,15 @@ protected:
 		// Models, textures and Descriptors (values assigned to the uniforms)
 		for (int i = 0; i < DS.size(); i++)
 		{
-			// ! pay attention that textures are now given as a pointer to the first texture
-			// ! in the array of textures
-			DS[i].init(this, &DSL, {
-				{0, UNIFORM, sizeof(UniformBufferObject), nullptr}, 
-				{1, TEXTURE, 0, &textures[i][0]}, 
-				{2, UNIFORM, sizeof(GlobalUniformBufferObject), nullptr}
-			});
+			std::vector<DescriptorSetElement> E;
+			E.resize(2 + textures[i].size());
+			E[0] = {0, UNIFORM, sizeof(UniformBufferObject), nullptr};
+			E[1] = {1, UNIFORM, sizeof(GlobalUniformBufferObject), nullptr};
+			for(int j = 0; j < textures[i].size(); j++)
+			{
+				E[j + 2] = {j + 2, TEXTURE, 0, &textures[i][j]};
+			}
+			DS[i].init(this, &DSL, E);
 		}
 	}
 
@@ -264,9 +268,8 @@ protected:
 			ubo.mMat = baseTr * trans_mat[i];
 			ubo.mvpMat = ViewPrj * ubo.mMat;
 			ubo.nMat = glm::inverse(glm::transpose(ubo.mMat));
-			ubo.overColor = glm::vec4(0.0f, 0.0f, 0.0f, 0.0f);
 			DS[i].map(currentImage, &ubo, sizeof(ubo), 0);
-			DS[i].map(currentImage, &gubo, sizeof(gubo), 2);
+			DS[i].map(currentImage, &gubo, sizeof(gubo), 1);
 		}
 		ubo.mMat = baseTr * AxTr * glm::rotate(glm::mat4(1.0f), glm::radians(-90.0f), glm::vec3(0.0f, 1.0f, 0.0f));
 		ubo.mvpMat = ViewPrj * ubo.mMat;

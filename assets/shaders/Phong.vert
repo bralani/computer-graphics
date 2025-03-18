@@ -5,7 +5,6 @@ layout(binding = 0) uniform UniformBufferObject {
 	mat4 mvpMat;
 	mat4 mMat;
 	mat4 nMat;
-	vec4 color;
 } ubo;
 
 layout(location = 0) in vec3 inPosition;
