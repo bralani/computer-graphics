@@ -1,9 +1,9 @@
 #include "scene/Scene.hpp"
 
-void Scene::setup(std::shared_ptr<Object> root, std::shared_ptr<Camera> camera, const glm::vec3& ambientLight) {
+void Scene::setup(std::shared_ptr<Object> root, std::shared_ptr<Camera> camera, Shader &shader) {
     this->root = root;
     this->camera = camera;
-    this->ambientLight = ambientLight;
+    this->shader = shader;
 }
 
 void Scene::run() {

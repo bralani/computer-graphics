@@ -1,6 +1,7 @@
 #include "scene/TestScene.hpp"
 #include "materials/Texture.hpp"
 #include "materials/BasicMaterial.hpp"
+#include "shaders/PhongShader.hpp"
 #include <iostream>
 
 // constructor
@@ -9,14 +10,13 @@ TestScene::TestScene()
   // create the camera
   auto camera = std::make_shared<Camera>();
 
-  // create the ambient light
-  glm::vec3 ambientLight = glm::vec3(0.1f, 0.1f, 0.1f);
+  PhongShader shader;
 
   // create the models
   auto root = createRoot();
 
   // setup the scene
-  setup(root, camera, ambientLight);
+  setup(root, camera, shader);
 }
 
 std::shared_ptr<Object> TestScene::createRoot()

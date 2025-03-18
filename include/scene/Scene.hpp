@@ -7,6 +7,7 @@
 
 #include "camera/Camera.hpp"
 #include "objects/Object.hpp"
+#include "shaders/Shader.hpp"
 #include "scene/api/ApiVulkan.hpp"
 
 class Scene {
@@ -14,14 +15,18 @@ public:
     Scene() = default;
     ~Scene() = default;
 
-    void setup(std::shared_ptr<Object> root, std::shared_ptr<Camera> camera, const glm::vec3& ambientLight);
+    void setup(
+            std::shared_ptr<Object> root, 
+            std::shared_ptr<Camera> camera, 
+            Shader &shader);
     void run();                                                 // Run the scene
 
     std::shared_ptr<Object> getRoot() const { return root; }    // Get the root object
+    Shader getShader() const { return shader; }                 // Get the shader
 private:
     std::shared_ptr<Object> root;                               // Root object of the scene
     std::shared_ptr<Camera> camera;                             // Camera of the scene
-    glm::vec3 ambientLight;                                     // Global ambient light color
+    Shader shader;                                              // Shader of the scene
 
     std::optional<ApiVulkan> app;                               // ApiVulkan
 };

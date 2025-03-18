@@ -42,24 +42,43 @@ if(APPLE)
 
     # Link libraries
     target_link_libraries(exe PRIVATE Vulkan::Vulkan glfw Threads::Threads)
+    
+    file(GLOB GLSL_SOURCE_FILES "${CMAKE_SOURCE_DIR}/assets/shaders/*.vert" "${CMAKE_SOURCE_DIR}/assets/shaders/*.frag")
 
-    # Shader setup for macOS
-    file(GLOB SPIRV_SOURCE_FILES "${CMAKE_SOURCE_DIR}/assets/shaders/*.spv")
-
-    # Debug: print the found SPIR-V files
-    message(STATUS "Found SPIR-V files: ${SPIRV_SOURCE_FILES}")
-
-    # Create the directory 'shaders' in the build directory
+    # Create the 'shaders' directory in the build directory
     file(MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/shaders)
 
-    # Copy the SPIR-V files from the source 'shaders' directory to the build directory
-    foreach(SPV_FILE ${SPIRV_SOURCE_FILES})
-        message(STATUS "Copying SPIR-V file: ${SPV_FILE}")
-        file(COPY ${SPV_FILE} DESTINATION ${CMAKE_BINARY_DIR}/shaders)
+    # Compile GLSL shaders into SPIR-V
+    set(SPIRV_BINARY_FILES "")
+    foreach(GLSL_FILE ${GLSL_SOURCE_FILES})
+        get_filename_component(FILENAME_WE ${GLSL_FILE} NAME_WE)
+        get_filename_component(FILE_EXT ${GLSL_FILE} EXT)
+
+        # Convert the extension to the desired suffix
+        if(FILE_EXT STREQUAL ".frag")
+            set(SUFFIX "Frag")
+        elseif(FILE_EXT STREQUAL ".vert")
+            set(SUFFIX "Vert")
+        else()
+            set(SUFFIX "")
+        endif()
+
+        # Construct the new SPIR-V file name
+        set(SPIRV_FILE "${CMAKE_BINARY_DIR}/shaders/${FILENAME_WE}${SUFFIX}.spv")
+
+        add_custom_command(
+            OUTPUT ${SPIRV_FILE}
+            COMMAND ${Vulkan_GLSLC_EXECUTABLE} ${GLSL_FILE} -o ${SPIRV_FILE}
+            DEPENDS ${GLSL_FILE}
+            COMMENT "Compiling shader: ${GLSL_FILE} -> ${SPIRV_FILE}"
+        )
+
+        list(APPEND SPIRV_BINARY_FILES ${SPIRV_FILE})
     endforeach()
 
-    # Add shader target
-    add_custom_target(Shaders DEPENDS ${SPIRV_SOURCE_FILES})
+
+    # Add custom target for shaders
+    add_custom_target(Shaders DEPENDS ${SPIRV_BINARY_FILES})
 
     # Ensure that exe depends on the SPIR-V files
     add_dependencies(exe Shaders)
@@ -100,29 +119,46 @@ elseif(WIN32)
     target_include_directories(${PROJECT_NAME} PRIVATE ${CMAKE_SOURCE_DIR}/third_party)
 
 
-    file(MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/shaders)
-
     file(GLOB GLSL_SOURCE_FILES "${CMAKE_SOURCE_DIR}/assets/shaders/*.vert" "${CMAKE_SOURCE_DIR}/assets/shaders/*.frag")
 
+    # Create the 'shaders' directory in the build directory
+    file(MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/shaders)
+
+    # Compile GLSL shaders into SPIR-V
     set(SPIRV_BINARY_FILES "")
-    foreach(GLSL ${GLSL_SOURCE_FILES})
-        get_filename_component(FILE_NAME ${GLSL} NAME_WE)
-        set(SPV_FILE ${CMAKE_BINARY_DIR}/shaders/${FILE_NAME}.spv)
+    foreach(GLSL_FILE ${GLSL_SOURCE_FILES})
+        get_filename_component(FILENAME_WE ${GLSL_FILE} NAME_WE)
+        get_filename_component(FILE_EXT ${GLSL_FILE} EXT)
+
+        # Convert the extension to the desired suffix
+        if(FILE_EXT STREQUAL ".frag")
+            set(SUFFIX "Frag")
+        elseif(FILE_EXT STREQUAL ".vert")
+            set(SUFFIX "Vert")
+        else()
+            set(SUFFIX "")
+        endif()
+
+        # Construct the new SPIR-V file name
+        set(SPIRV_FILE "${CMAKE_BINARY_DIR}/shaders/${FILENAME_WE}${SUFFIX}.spv")
 
         add_custom_command(
-                OUTPUT ${SPV_FILE}
-                COMMAND glslangValidator -V ${GLSL} -o ${SPV_FILE}
-                DEPENDS ${GLSL}
-                COMMENT "Compiling shader: ${GLSL}"
+            OUTPUT ${SPIRV_FILE}
+            COMMAND ${Vulkan_GLSLC_EXECUTABLE} ${GLSL_FILE} -o ${SPIRV_FILE}
+            DEPENDS ${GLSL_FILE}
+            COMMENT "Compiling shader: ${GLSL_FILE} -> ${SPIRV_FILE}"
         )
-        list(APPEND SPIRV_BINARY_FILES ${SPV_FILE})
+
+        list(APPEND SPIRV_BINARY_FILES ${SPIRV_FILE})
     endforeach()
 
-    add_custom_target(Shaders DEPENDS ${SPIRV_BINARY_FILES})
-    add_dependencies(${PROJECT_NAME} Shaders)
 
-    file(GLOB SHADER_SPV_FILES "${CMAKE_SOURCE_DIR}/shaders/*.spv")
-    file(COPY ${SHADER_SPV_FILES} DESTINATION ${CMAKE_BINARY_DIR}/shaders)
+    # Add custom target for shaders
+    add_custom_target(Shaders DEPENDS ${SPIRV_BINARY_FILES})
+
+    # Ensure that exe depends on the SPIR-V files
+    add_dependencies(exe Shaders)
+
     file(COPY ${CMAKE_SOURCE_DIR}/assets/textures DESTINATION ${CMAKE_BINARY_DIR}/assets)
     file(COPY ${CMAKE_SOURCE_DIR}/assets/models DESTINATION ${CMAKE_BINARY_DIR}/assets)
 elseif(UNIX AND NOT APPLE)
@@ -153,31 +189,47 @@ elseif(UNIX AND NOT APPLE)
 
     target_include_directories(${PROJECT_NAME} PRIVATE ${CMAKE_SOURCE_DIR}/include)
 
-    file(MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/shaders)
-
     file(GLOB GLSL_SOURCE_FILES "${CMAKE_SOURCE_DIR}/assets/shaders/*.vert" "${CMAKE_SOURCE_DIR}/assets/shaders/*.frag")
 
+    # Create the 'shaders' directory in the build directory
+    file(MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/shaders)
+
+    # Compile GLSL shaders into SPIR-V
     set(SPIRV_BINARY_FILES "")
-    foreach(GLSL ${GLSL_SOURCE_FILES})
-        get_filename_component(FILE_NAME ${GLSL} NAME_WE)
-        set(SPV_FILE ${CMAKE_BINARY_DIR}/shaders/${FILE_NAME}.spv)
+    foreach(GLSL_FILE ${GLSL_SOURCE_FILES})
+        get_filename_component(FILENAME_WE ${GLSL_FILE} NAME_WE)
+        get_filename_component(FILE_EXT ${GLSL_FILE} EXT)
+
+        # Convert the extension to the desired suffix
+        if(FILE_EXT STREQUAL ".frag")
+            set(SUFFIX "Frag")
+        elseif(FILE_EXT STREQUAL ".vert")
+            set(SUFFIX "Vert")
+        else()
+            set(SUFFIX "")
+        endif()
+
+        # Construct the new SPIR-V file name
+        set(SPIRV_FILE "${CMAKE_BINARY_DIR}/shaders/${FILENAME_WE}${SUFFIX}.spv")
 
         add_custom_command(
-                OUTPUT ${SPV_FILE}
-                COMMAND glslangValidator -V ${GLSL} -o ${SPV_FILE}
-                DEPENDS ${GLSL}
-                COMMENT "Compiling shader: ${GLSL}"
+            OUTPUT ${SPIRV_FILE}
+            COMMAND ${Vulkan_GLSLC_EXECUTABLE} ${GLSL_FILE} -o ${SPIRV_FILE}
+            DEPENDS ${GLSL_FILE}
+            COMMENT "Compiling shader: ${GLSL_FILE} -> ${SPIRV_FILE}"
         )
-        list(APPEND SPIRV_BINARY_FILES ${SPV_FILE})
+
+        list(APPEND SPIRV_BINARY_FILES ${SPIRV_FILE})
     endforeach()
 
+
+    # Add custom target for shaders
     add_custom_target(Shaders DEPENDS ${SPIRV_BINARY_FILES})
-    add_dependencies(${PROJECT_NAME} Shaders)
 
-    file(GLOB SHADER_SPV_FILES "${CMAKE_SOURCE_DIR}/shaders/*.spv")
-    file(COPY ${SHADER_SPV_FILES} DESTINATION ${CMAKE_BINARY_DIR}/shaders)
+    # Ensure that exe depends on the SPIR-V files
+    add_dependencies(exe Shaders)
+
     file(COPY ${CMAKE_SOURCE_DIR}/assets/textures DESTINATION ${CMAKE_BINARY_DIR}/assets)
-
     file(COPY ${CMAKE_SOURCE_DIR}/assets/models DESTINATION ${CMAKE_BINARY_DIR}/assets)
 else()
     message(FATAL_ERROR "Unsupported platform: ${CMAKE_SYSTEM_NAME}")

@@ -9,6 +9,9 @@ private:
     std::string fragmentPath;
 
 public:
+    Shader() = default;
+    ~Shader() = default;
+
     Shader(const std::string& vertexPath, const std::string& fragmentPath)
         : vertexPath(vertexPath), fragmentPath(fragmentPath) {}
 

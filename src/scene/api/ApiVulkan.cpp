@@ -5,7 +5,6 @@
 #define GLM_ENABLE_EXPERIMENTAL
 #include <glm/gtx/transform2.hpp>
 
-// The uniform buffer object used in this example
 struct UniformBufferObject
 {
 	alignas(16) glm::mat4 mvpMat;
@@ -104,10 +103,16 @@ protected:
 										{2, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, VK_SHADER_STAGE_ALL_GRAPHICS}});
 
 		// Vertex descriptors
-		VD.init(this, {{0, sizeof(Vertex), VK_VERTEX_INPUT_RATE_VERTEX}}, {{0, 0, VK_FORMAT_R32G32B32_SFLOAT, offsetof(Vertex, pos), sizeof(glm::vec3), POSITION}, {0, 1, VK_FORMAT_R32G32_SFLOAT, offsetof(Vertex, UV), sizeof(glm::vec2), UV}, {0, 2, VK_FORMAT_R32G32B32_SFLOAT, offsetof(Vertex, norm), sizeof(glm::vec3), NORMAL}});
+		VD.init(this, 
+			{{0, sizeof(Vertex), VK_VERTEX_INPUT_RATE_VERTEX}}, 
+			{
+				{0, 0, VK_FORMAT_R32G32B32_SFLOAT, offsetof(Vertex, pos), sizeof(glm::vec3), POSITION}, 
+				{0, 1, VK_FORMAT_R32G32_SFLOAT, offsetof(Vertex, UV), sizeof(glm::vec2), UV}, 
+				{0, 2, VK_FORMAT_R32G32B32_SFLOAT, offsetof(Vertex, norm), sizeof(glm::vec3), NORMAL}
+			});
 
 		// Pipelines [Shader couples]
-		P.init(this, &VD, "shaders/PhongVert.spv", "shaders/PhongFrag.spv", {&DSL});
+		P.init(this, &VD, this->scene->getShader().getVertexPath(), this->scene->getShader().getFragmentPath(), {&DSL});
 		P.setAdvancedFeatures(VK_COMPARE_OP_LESS_OR_EQUAL, VK_POLYGON_MODE_FILL,
 													VK_CULL_MODE_NONE, false);
 
@@ -152,7 +157,11 @@ protected:
 		{
 			// ! pay attention that textures are now given as a pointer to the first texture
 			// ! in the array of textures
-			DS[i].init(this, &DSL, {{0, UNIFORM, sizeof(UniformBufferObject), nullptr}, {1, TEXTURE, 0, &textures[i][0]}, {2, UNIFORM, sizeof(GlobalUniformBufferObject), nullptr}});
+			DS[i].init(this, &DSL, {
+				{0, UNIFORM, sizeof(UniformBufferObject), nullptr}, 
+				{1, TEXTURE, 0, &textures[i][0]}, 
+				{2, UNIFORM, sizeof(GlobalUniformBufferObject), nullptr}
+			});
 		}
 	}
 
@@ -245,7 +254,7 @@ protected:
 
 		// updates global uniforms
 		GlobalUniformBufferObject gubo{};
-		gubo.lightDir = glm::vec3(cos(glm::radians(135.0f)), sin(glm::radians(135.0f)), 0.0f);
+		gubo.lightDir = glm::vec3(cos(glm::radians(135.0f)), sin(glm::radians(135.0f)), sin(glm::radians(135.0f)));
 		gubo.lightColor = glm::vec4(1.0f, 1.0f, 1.0f, 1.0f);
 		gubo.eyePos = CamPos;
 
