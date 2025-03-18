@@ -8,7 +8,12 @@ class PhongShader : public Shader {
 
 public:
     PhongShader()
-        : Shader("shaders/PhongVert.spv", "shaders/PhongFrag.spv") {}
+        : Shader("shaders/PhongVert.spv", "shaders/PhongFrag.spv") {
+            int num_textures = 1;
+
+            this->texture_types.resize(num_textures);
+            this->texture_types[0] = TextureType::Diffuse;
+        }
 
 };
 

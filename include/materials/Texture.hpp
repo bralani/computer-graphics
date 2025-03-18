@@ -10,6 +10,7 @@ enum class TextureType {
     Diffuse,
     Normal,
     Roughness,
+    Metallic,
     Specular,
     AmbientOcclusion,
     Emissive,
@@ -23,6 +24,7 @@ private:
     TextureType type;
 
 public:
+    Texture() = default;
     Texture(const std::string& path, TextureType type) : path(path), type(type) {}
 
     std::string getPath() const { return path; }

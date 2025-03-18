@@ -2,21 +2,26 @@
 #define MATERIAL_HPP
 
 #include <string>
-#include <vector>
+#include <map>
 #include <iostream>
 #include "materials/Texture.hpp"
 
 class Material {
 protected:
-    std::vector<Texture> textures;
+    std::map<TextureType, Texture> textures;
 
 public:
-    Material(const std::vector<Texture>& textures)
+    Material(const std::map<TextureType, Texture>& textures)
         : textures(textures) {}
+
     Material() = default;
     virtual ~Material() = default;
-    
-    std::vector<Texture> getTextures() const { return textures; }
+
+    Texture* getTexture(TextureType type) {
+        auto it = textures.find(type);
+        return (it != textures.end()) ? &it->second : nullptr;
+    }
+
 };
 
 #endif // MATERIAL_HPP

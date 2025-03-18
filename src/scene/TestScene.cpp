@@ -1,7 +1,9 @@
 #include "scene/TestScene.hpp"
 #include "materials/Texture.hpp"
 #include "materials/BasicMaterial.hpp"
+#include "materials/PBRMaterial.hpp"
 #include "shaders/PhongShader.hpp"
+#include "shaders/PBRShader.hpp"
 #include <iostream>
 
 // constructor
@@ -10,7 +12,7 @@ TestScene::TestScene()
   // create the camera
   auto camera = std::make_shared<Camera>();
 
-  PhongShader shader;
+  PBRShader shader;
 
   // create the models
   auto root = createRoot();
@@ -24,8 +26,10 @@ std::shared_ptr<Object> TestScene::createRoot()
   std::vector<std::shared_ptr<Mesh>> meshes1, meshes2;
   std::vector<std::shared_ptr<Object>> children;
   
-  Texture texture1("assets/textures/Checker.png", TextureType::Diffuse);
-  BasicMaterial material1(texture1);
+  Texture texture1("assets/textures/Picasso.jpg", TextureType::Diffuse);
+  Texture texture2("assets/textures/Picasso.jpg", TextureType::Metallic);
+  Texture texture3("assets/textures/Picasso.jpg", TextureType::Roughness);
+  PBRMaterial material1(texture1, texture3, texture2);
   
   for (int j = 0; j < 2; j++)
   {

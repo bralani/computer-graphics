@@ -96,13 +96,19 @@ protected:
 	// Here you also create your Descriptor set layouts and load the shaders for the pipelines
 	void localInit()
 	{
+		auto textures_types = this->scene->getShader().getTextureTypes();
+		int num_textures = textures_types.size();
+
 		// Descriptor Layouts [what will be passed to the shaders]
-		DSL.init(this, {
-			{0, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, VK_SHADER_STAGE_ALL_GRAPHICS},
-			{1, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, VK_SHADER_STAGE_ALL_GRAPHICS},
-			{2, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT},
-			{3, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT},
-		});
+		std::vector<DescriptorSetLayoutBinding> B;
+		B.resize(2 + num_textures);
+		B[0] = {0, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, VK_SHADER_STAGE_ALL_GRAPHICS};
+		B[1] = {1, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, VK_SHADER_STAGE_ALL_GRAPHICS};
+		for (int i = 0; i < num_textures; i++)
+		{
+			B[i+2] = {static_cast<uint32_t>(2 + i), VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT};
+		}
+		DSL.init(this, B);
 
 		// Vertex descriptors
 		VD.init(this, 
@@ -138,11 +144,12 @@ protected:
 
 			// load material and textures
 			auto material = mesh->getMaterial();
-			std::vector<Texture> textures_mesh = material.getTextures();
-			textures[i].resize(textures_mesh.size());
-			for (int j = 0; j < textures_mesh.size(); j++)
+			textures[i].resize(num_textures);
+			for (int j = 0; j < num_textures; j++)
 			{
-				textures[i][j].init(this, textures_mesh[j].getPath().c_str());
+				auto texture = material.getTexture(textures_types[j]);
+				std::cout << "Loading texture: " << texture->getPath() << "\n";
+				textures[i][j].init(this, texture->getPath().c_str());
 			}
 		}
 

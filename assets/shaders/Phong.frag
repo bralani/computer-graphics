@@ -20,7 +20,6 @@ layout(binding = 1) uniform GlobalUniformBufferObject {
 	} gubo;
 	
 layout(binding = 2) uniform sampler2D textDiffuse;
-layout(binding = 3) uniform sampler2D textDiffuse2;
 
 vec3 direct_light_dir(vec3 pos, int i) {
 	return gubo.lightDir;
@@ -32,13 +31,16 @@ vec3 direct_light_color(vec3 pos, int i) {
 
 
 vec3 BRDF(vec3 Albedo, vec3 Norm, vec3 EyeDir, vec3 LD) {
-// Compute the BRDF, with a given color <Albedo>, in a given position characterized bu a given normal vector <Norm>,
-// for a light direct according to <LD>, and viewed from a direction <EyeDir>
-	vec3 Diffuse;
-	vec3 Specular;
-	Diffuse = Albedo * max(dot(Norm, LD),0.0f);
-	Specular = vec3(pow(max(dot(EyeDir, -reflect(LD, Norm)),0.0f), 160.0f));
-	
+
+	// Phong BRDF components
+	float diff = max(dot(Norm, LD), 0.0);
+	vec3 Diffuse = Albedo * diff;
+
+	// Specular component (Phong model)
+	vec3 ReflectDir = reflect(-LD, Norm);
+	float spec = pow(max(dot(EyeDir, ReflectDir), 0.0), 5.0); // Shininess = 5
+	vec3 Specular = vec3(0.05) * spec; // 30% white specular light
+
 	return Diffuse + Specular;
 }
 

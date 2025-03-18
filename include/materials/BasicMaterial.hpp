@@ -11,7 +11,13 @@ class BasicMaterial : public Material {
 
 public:
     BasicMaterial(Texture diffuseTexture) {
-        textures.push_back(diffuseTexture);
+
+        if (diffuseTexture.getType() != TextureType::Diffuse) {
+            std::cout << "Error: texture is not a diffuse texture" << std::endl;
+            return;
+        }
+
+        textures[TextureType::Diffuse] = diffuseTexture;
     }
 
 };
