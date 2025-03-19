@@ -18,7 +18,8 @@ public:
     void setup(
             std::shared_ptr<Object> root, 
             std::shared_ptr<Camera> camera, 
-            Shader &shader);
+            Shader &shader
+        );                                                      // Setup the scene
     void run();                                                 // Run the scene
 
     std::shared_ptr<Object> getRoot() const { return root; }    // Get the root object

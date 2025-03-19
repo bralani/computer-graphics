@@ -4,30 +4,13 @@
 #include <vector>
 #include <memory>
 #include "objects/Transform.hpp"
+#include "lights/Light.hpp"
 #include "objects/Mesh.hpp"
 
 class Object
 {
 public:
   Transform transform;
-
-  Object(std::vector<std::shared_ptr<Object>> childrenObjects,
-         std::vector<std::shared_ptr<Mesh>> meshes) : childrenObjects(childrenObjects), meshes(meshes)
-  {
-    transform = Transform();
-  }
-
-  Object(std::vector<std::shared_ptr<Mesh>> meshes) : meshes(meshes)
-  {
-    childrenObjects = std::vector<std::shared_ptr<Object>>();
-    transform = Transform();
-  }
-
-  Object(std::vector<std::shared_ptr<Object>> childrenObjects) : childrenObjects(childrenObjects)
-  {
-    meshes = std::vector<std::shared_ptr<Mesh>>();
-    transform = Transform();
-  }
 
   Object()
   {
@@ -40,6 +23,11 @@ public:
 
   const std::vector<std::shared_ptr<Object>> &getChildrenObjects() const { return childrenObjects; }
   const std::vector<std::shared_ptr<Mesh>> &getMeshes() const { return meshes; }
+  const std::vector<std::shared_ptr<Light>> &getLights() const { return lights; }
+
+  void setChildrenObjects(const std::vector<std::shared_ptr<Object>> &childrenObjects) { this->childrenObjects = childrenObjects; }
+  void setMeshes(const std::vector<std::shared_ptr<Mesh>> &meshes) { this->meshes = meshes; }
+  void setLights(const std::vector<std::shared_ptr<Light>> &lights) { this->lights = lights; }
 
   std::vector<std::pair<std::shared_ptr<Mesh>, Transform>> getRecursiveMeshesTransform() {
     std::vector<std::pair<std::shared_ptr<Mesh>, Transform>> allMeshesTransform;
@@ -57,12 +45,31 @@ public:
     }
 
     return allMeshesTransform;
-}
+  }
+
+  std::vector<std::pair<std::shared_ptr<Light>, Transform>> getRecursiveLightsTransform() {
+    std::vector<std::pair<std::shared_ptr<Light>, Transform>> allLightsTransform;
+
+    // Collect all lights from the current node
+    for (const auto& light : lights) {
+        auto transformedLight = transform * light->transform;
+        allLightsTransform.emplace_back(light, transformedLight);
+    }
+
+    // Recursively collect lights from children
+    for (const auto& child : childrenObjects) {
+        auto childLightsTransform = child->getRecursiveLightsTransform();
+        allLightsTransform.insert(allLightsTransform.end(), childLightsTransform.begin(), childLightsTransform.end());
+    }
+
+    return allLightsTransform;
+  }
 
 
 private:
   std::vector<std::shared_ptr<Object>> childrenObjects;
   std::vector<std::shared_ptr<Mesh>> meshes;
+  std::vector<std::shared_ptr<Light>> lights;
 };
 
 #endif // OBJECT_HPP

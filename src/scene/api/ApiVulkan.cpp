@@ -1,9 +1,11 @@
 #include "scene/api/ApiVulkan.hpp"
 #include "scene/Scene.hpp"
+#include "lights/Light.hpp"
 #include "StarterVulkan.hpp"
 
 #define GLM_ENABLE_EXPERIMENTAL
 #include <glm/gtx/transform2.hpp>
+#define MAX_LIGHTS 20
 
 struct UniformBufferObject
 {
@@ -14,9 +16,23 @@ struct UniformBufferObject
 
 struct GlobalUniformBufferObject
 {
-	alignas(16) glm::vec3 lightDir;
-	alignas(16) glm::vec4 lightColor;
+	// Directional light
+	struct {
+		alignas(16) glm::vec3 v;
+	} lightDir[MAX_LIGHTS];
+	alignas(16) glm::vec4 lightColor[MAX_LIGHTS];
+
+
+	// Point light
+	struct {
+		alignas(16) glm::vec3 v;
+	} lightPosPoint[MAX_LIGHTS];
+	alignas(16) glm::vec4 lightColorPoint[MAX_LIGHTS];
+
+
 	alignas(16) glm::vec3 eyePos;
+	alignas(4) int numLightsDir;
+	alignas(4) int numLightsPoint;
 };
 
 // The vertices data structures
@@ -55,6 +71,10 @@ protected:
 	std::vector<Model<Vertex>> M;
 	std::vector<glm::mat4> trans_mat;
 
+	// Lights
+	std::vector<std::shared_ptr<Light>> lights;
+	std::vector<glm::mat4> trans_lights;
+
 	// Descriptor sets
 	std::vector<DescriptorSet> DS;
 
@@ -71,15 +91,15 @@ protected:
 	void setWindowParameters()
 	{
 		// window size, titile and initial background
-		windowWidth = 800;
-		windowHeight = 600;
+		windowWidth = 1024;
+		windowHeight = 768;
 		windowTitle = "VulkanApp - 3D Transformations";
 		windowResizable = GLFW_TRUE;
 		initialBackgroundColor = {0.0f, 0.005f, 0.01f, 1.0f};
 
 		// Descriptor pool sizes
 		uniformBlocksInPool = 15 * 2 + 2;
-		texturesInPool = 50;
+		texturesInPool = 100;
 		setsInPool = 15 + 1 + 1;
 
 		Ar = 4.0f / 3.0f;
@@ -151,6 +171,18 @@ protected:
 				std::cout << "Loading texture: " << texture->getPath() << "\n";
 				textures[i][j].init(this, texture->getPath().c_str());
 			}
+		}
+
+		auto lights_current = root->getRecursiveLightsTransform();
+		lights.resize(lights_current.size());
+		trans_lights.resize(lights_current.size());
+
+		for (int i = 0; i < lights_current.size(); i++)
+		{
+			lights[i] = lights_current[i].first;
+
+			// apply transform
+			trans_lights.push_back(lights_current[i].second.getTransform());
 		}
 
 	}
@@ -265,8 +297,28 @@ protected:
 
 		// updates global uniforms
 		GlobalUniformBufferObject gubo{};
-		gubo.lightDir = glm::vec3(cos(glm::radians(135.0f)), sin(glm::radians(135.0f)), sin(glm::radians(135.0f)));
-		gubo.lightColor = glm::vec4(1.0f, 1.0f, 1.0f, 1.0f);
+		int numDir = 0;
+		int numPoint = 0;
+		for (int i = 0; i < lights.size(); i++)
+		{
+			switch (lights[i]->getType())
+			{
+				case TypeLight::DIRECTIONAL:
+					gubo.lightDir[numDir].v = lights[i]->getDirection();
+					gubo.lightColor[numDir] = glm::vec4(lights[i]->getColor(), lights[i]->getIntensity());
+					numDir++;
+					break;
+			
+				case TypeLight::POINT:
+					gubo.lightPosPoint[numPoint].v = lights[i]->getPosition();
+					gubo.lightColorPoint[numPoint] = glm::vec4(lights[i]->getColor(), lights[i]->getIntensity());
+					numPoint++;
+					break;
+			}
+			
+		}
+		gubo.numLightsDir = numDir;
+		gubo.numLightsPoint = numPoint;
 		gubo.eyePos = CamPos;
 
 		glm::mat4 AxTr = glm::scale(glm::mat4(1.0f), glm::vec3(0.0f));

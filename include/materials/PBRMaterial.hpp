@@ -11,7 +11,13 @@ class PBRMaterial : public Material
 {
 
 public:
-  PBRMaterial(Texture diffuseTexture, Texture roughnessTexture, Texture metallicTexture)
+  PBRMaterial(
+    Texture diffuseTexture, 
+    Texture roughnessTexture, 
+    Texture metallicTexture, 
+    Texture normalTexture, 
+    Texture ambientOcclusionTexture
+  )
   {
 
     if (diffuseTexture.getType() != TextureType::Diffuse) {
@@ -34,6 +40,20 @@ public:
     }
 
     textures[TextureType::Metallic] = metallicTexture;
+
+    if (normalTexture.getType() != TextureType::Normal) {
+        std::cout << "Error: texture is not a normal texture" << std::endl;
+        return;
+    }
+
+    textures[TextureType::Normal] = normalTexture;
+
+    if (ambientOcclusionTexture.getType() != TextureType::AmbientOcclusion) {
+        std::cout << "Error: texture is not an ambient occlusion texture" << std::endl;
+        return;
+    }
+
+    textures[TextureType::AmbientOcclusion] = ambientOcclusionTexture;
   }
 
 };

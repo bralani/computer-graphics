@@ -13,20 +13,35 @@ layout(binding = 0) uniform UniformBufferObject {
 	mat4 nMat;
 } ubo;
 
+#define MAX_LIGHTS 20
 layout(binding = 1) uniform GlobalUniformBufferObject {
-	vec3 lightDir;
-	vec4 lightColor;
+	vec3 lightDir[MAX_LIGHTS];
+	vec4 lightColor[MAX_LIGHTS];
+
+	vec3 lightPosPoint[MAX_LIGHTS];
+	vec4 lightColorPoint[MAX_LIGHTS];
+
 	vec3 eyePos;
-	} gubo;
+	int numLightsDir;
+	int numLightsPoint;
+} gubo;
 	
 layout(binding = 2) uniform sampler2D textDiffuse;
 
-vec3 direct_light_dir(vec3 pos, int i) {
-	return gubo.lightDir;
+vec3 direct_light_dir(int i) {
+	return gubo.lightDir[i];
 }
 
-vec3 direct_light_color(vec3 pos, int i) {
-	return gubo.lightColor.rgb;
+vec3 direct_light_color(int i) {
+	return gubo.lightColor[i].rgb;
+}
+
+vec3 point_light_dir(vec3 pos, int i) {
+	return normalize(gubo.lightPosPoint[i] - pos);
+}
+
+vec3 point_light_color(vec3 pos, int i) {
+	return pow(gubo.lightColorPoint[i].a / length(gubo.lightPosPoint[i] - pos), 2.0) * gubo.lightColorPoint[i].rgb;
 }
 
 
@@ -54,10 +69,17 @@ void main() {
 
 	vec3 RendEqSol = vec3(0);
 
-	// Fourth light
-	LD = direct_light_dir(fragPos, 3);
-	LC = direct_light_color(fragPos, 3);
-	RendEqSol += BRDF(Albedo, Norm, EyeDir, LD) * LC;
+	for (int i = 0; i < gubo.numLightsDir; i++) {
+		LD = direct_light_dir(i);
+		LC = direct_light_color(i);
+		RendEqSol += BRDF(Albedo, Norm, EyeDir, LD) * LC;
+	}
+
+	for (int i = 0; i < gubo.numLightsPoint; i++) {
+		LD = point_light_dir(fragPos, i);
+		LC = point_light_color(fragPos, i);
+		RendEqSol += BRDF(Albedo, Norm, EyeDir, LD) * LC;
+	}
 	
 	// Output color
 	outColor = vec4(RendEqSol, 1.0f);
