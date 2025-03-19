@@ -5,7 +5,7 @@
 
 enum TypeLight {
   DIRECTIONAL,
-  POINT,
+  POINT_LIGHT,
   SPOT
 };
 

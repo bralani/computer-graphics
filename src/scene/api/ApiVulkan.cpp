@@ -309,7 +309,7 @@ protected:
 					numDir++;
 					break;
 			
-				case TypeLight::POINT:
+				case TypeLight::POINT_LIGHT:
 					gubo.lightPosPoint[numPoint].v = lights[i]->getPosition();
 					gubo.lightColorPoint[numPoint] = glm::vec4(lights[i]->getColor(), lights[i]->getIntensity());
 					numPoint++;

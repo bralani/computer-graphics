@@ -8,7 +8,7 @@ class PointLight : public Light {
     PointLight() : Light() {}
 
     PointLight(glm::vec3 color, glm::vec3 position, float intensity = 1.0f) : Light() {
-        this->type = TypeLight::POINT;
+        this->type = TypeLight::POINT_LIGHT;
         this->color = color;
         this->transform.setPosition(position);
         this->intensity = intensity;
