@@ -25,8 +25,8 @@ layout(binding = 1) uniform GlobalUniformBufferObject {
 	int numLightsDir;
 	int numLightsPoint;
 } gubo;
-	
-layout(binding = 2) uniform sampler2D textDiffuse;
+
+layout(binding = 3) uniform sampler2D textDiffuse;
 
 vec3 direct_light_dir(int i) {
 	return gubo.lightDir[i];

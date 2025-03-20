@@ -25,9 +25,18 @@ TestScene::TestScene()
 
   // create the models
   auto root = createRoot();
+  
+  const std::array<const char*, 6>& hdri_textures = {
+    "assets/textures/hdri/posx.jpg",
+    "assets/textures/hdri/negx.jpg",
+    "assets/textures/hdri/posy.jpg",
+    "assets/textures/hdri/negy.jpg",
+    "assets/textures/hdri/posz.jpg",
+    "assets/textures/hdri/negz.jpg"
+  };
 
   // setup the scene
-  setup(root, camera, shader);
+  setup(root, camera, shader, hdri_textures);
 }
 
 std::shared_ptr<Object> TestScene::createRoot()

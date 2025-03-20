@@ -56,30 +56,36 @@ public:
 
 protected:
 
-	// Descriptor Layouts ["classes" of what will be passed to the shaders]
-	DescriptorSetLayout DSL;
 
 	// Vertex formats
 	VertexDescriptor VD;
 
 	// Pipelines [Shader couples]
 	Pipeline P;
+	Pipeline P_background;
+
+	// Descriptor Layouts ["classes" of what will be passed to the shaders]
+	DescriptorSetLayout DSL_P;
+	DescriptorSetLayout DSL_P_background;
 
 	// Models, textures and Descriptors (values assigned to the uniforms)
 	// Please note that Model objects depends on the corresponding vertex structure
 	// Models
 	std::vector<Model<Vertex>> M;
 	std::vector<glm::mat4> trans_mat;
+	Model<Vertex> M_background;
 
 	// Lights
 	std::vector<std::shared_ptr<Light>> lights;
 	std::vector<glm::mat4> trans_lights;
 
 	// Descriptor sets
-	std::vector<DescriptorSet> DS;
+	std::vector<DescriptorSet> DS_P;
+	DescriptorSet DS_P_background;
 
 	// Textures
 	std::vector<std::vector<TextureVulkan>> textures;
+	TextureVulkan textures_hdri;
 
 	// Other application parameters
 	float Ar;
@@ -116,16 +122,25 @@ protected:
 		auto textures_types = this->scene->getShader().getTextureTypes();
 		int num_textures = textures_types.size();
 
-		// Descriptor Layouts [what will be passed to the shaders]
+		// Descriptor Layouts P
 		std::vector<DescriptorSetLayoutBinding> B;
-		B.resize(2 + num_textures);
+		B.resize(3 + num_textures);
 		B[0] = {0, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, VK_SHADER_STAGE_ALL_GRAPHICS};
 		B[1] = {1, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, VK_SHADER_STAGE_ALL_GRAPHICS};
+		B[2] = {2, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT};
 		for (int i = 0; i < num_textures; i++)
 		{
-			B[i+2] = {static_cast<uint32_t>(2 + i), VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT};
+			B[i+3] = {static_cast<uint32_t>(3 + i), VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT};
 		}
-		DSL.init(this, B);
+		DSL_P.init(this, B);
+
+
+		std::vector<DescriptorSetLayoutBinding> B_background;
+		B_background.resize(2);
+		B_background[0] = {0, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, VK_SHADER_STAGE_ALL_GRAPHICS};
+		B_background[1] = {1, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT};
+		DSL_P_background.init(this, B_background);
+
 
 		// Vertex descriptors
 		VD.init(this, 
@@ -137,8 +152,12 @@ protected:
 			});
 
 		// Pipelines [Shader couples]
-		P.init(this, &VD, this->scene->getShader().getVertexPath(), this->scene->getShader().getFragmentPath(), {&DSL});
+		P.init(this, &VD, this->scene->getShader().getVertexPath(), this->scene->getShader().getFragmentPath(), {&DSL_P});
 		P.setAdvancedFeatures(VK_COMPARE_OP_LESS_OR_EQUAL, VK_POLYGON_MODE_FILL,
+													VK_CULL_MODE_NONE, false);
+
+		P_background.init(this, &VD, "shaders/hdriVert.spv", "shaders/hdriFrag.spv", {&DSL_P_background});
+		P_background.setAdvancedFeatures(VK_COMPARE_OP_LESS_OR_EQUAL, VK_POLYGON_MODE_FILL,
 													VK_CULL_MODE_NONE, false);
 
 		// Models, textures and Descriptors (values assigned to the uniforms)
@@ -147,7 +166,7 @@ protected:
 		
 		// allocate the models
 		M.resize(meshes.size());
-		DS.resize(meshes.size());
+		DS_P.resize(meshes.size());
 		textures.resize(meshes.size());
 
 		for (int i = 0; i < meshes.size(); i++)
@@ -170,6 +189,10 @@ protected:
 			}
 		}
 
+		M_background.init(this, &VD, "assets/models/hdri.obj", OBJ);
+		auto textures_hdri_string = this->scene->getHDRI();
+		textures_hdri.initCubic(this, textures_hdri_string.data());
+
 		auto lights_current = root->getRecursiveLightsTransform();
 		lights.resize(lights_current.size());
 		trans_lights.resize(lights_current.size());
@@ -189,20 +212,27 @@ protected:
 	{
 		// This creates a new pipeline (with the current surface), using its shaders
 		P.create();
+		P_background.create();
 
 		// Models, textures and Descriptors (values assigned to the uniforms)
-		for (int i = 0; i < DS.size(); i++)
+		for (int i = 0; i < DS_P.size(); i++)
 		{
 			std::vector<DescriptorSetElement> E;
-			E.resize(2 + textures[i].size());
+			E.resize(3 + textures[i].size());
 			E[0] = {0, UNIFORM, sizeof(UniformBufferObject), nullptr};
 			E[1] = {1, UNIFORM, sizeof(GlobalUniformBufferObject), nullptr};
+			E[2] = {2, TEXTURE, 0, &textures_hdri};
 			for(int j = 0; j < textures[i].size(); j++)
 			{
-				E[j + 2] = {j + 2, TEXTURE, 0, &textures[i][j]};
+				E[j + 3] = {j + 3, TEXTURE, 0, &textures[i][j]};
 			}
-			DS[i].init(this, &DSL, E);
+			DS_P[i].init(this, &DSL_P, E);
 		}
+
+		DS_P_background.init(this, &DSL_P_background, {
+			{0, UNIFORM, sizeof(UniformBufferObject), nullptr},
+			{1, TEXTURE, 0, &textures_hdri}
+		});
 	}
 
 
@@ -212,17 +242,22 @@ protected:
 
 	void populateCommandBuffer(VkCommandBuffer commandBuffer, int currentImage)
 	{
-		// binds the pipeline
-		P.bind(commandBuffer);
 
+		P.bind(commandBuffer);
 		for (int i = 0; i < M.size(); i++)
 		{
 			M[i].bind(commandBuffer);
-			DS[i].bind(commandBuffer, P, 0, currentImage);
+			DS_P[i].bind(commandBuffer, P, 0, currentImage);
 
 			vkCmdDrawIndexed(commandBuffer,
 											 static_cast<uint32_t>(M[i].indices.size()), 1, 0, 0, 0);
 		}
+
+		// binds the pipeline
+		P_background.bind(commandBuffer);
+		M_background.bind(commandBuffer);
+		DS_P_background.bind(commandBuffer, P_background, 0, currentImage);
+		vkCmdDrawIndexed(commandBuffer, static_cast<uint32_t>(M_background.indices.size()), 1, 0, 0, 0);
 	}
 
 	// Here is where you update the uniforms.
@@ -289,7 +324,7 @@ protected:
 			glfwSetWindowShouldClose(window, GL_TRUE);
 		}
 
-		glm::mat4 M = glm::perspective(glm::radians(45.0f), Ar, 0.1f, 50.0f);
+		glm::mat4 M = glm::perspective(glm::radians(45.0f), Ar, 0.1f, 100000.0f);
 		M[1][1] *= -1;
 
 		glm::mat4 Mv = cam->getViewMatrix();
@@ -323,17 +358,25 @@ protected:
 		}
 		gubo.numLightsDir = numDir;
 		gubo.numLightsPoint = numPoint;
-		gubo.eyePos = cam->getPosition();;
+		gubo.eyePos = cam->getPosition();
+
+		// scale the background by 100
+		glm::mat4 trans_mat_background = glm::scale(glm::mat4(1.0f), glm::vec3(10000.0f));
+		ubo.mMat = baseTr * trans_mat_background;
+		ubo.mvpMat = ViewPrj * ubo.mMat;
+		ubo.nMat = glm::inverse(glm::transpose(ubo.mMat));
+		DS_P_background.map(currentImage, &ubo, sizeof(ubo), 0);
 
 		glm::mat4 AxTr = glm::scale(glm::mat4(1.0f), glm::vec3(0.0f));
-		for (int i = 0; i < DS.size(); i++)
+		for (int i = 0; i < DS_P.size(); i++)
 		{
 			ubo.mMat = baseTr * trans_mat[i];
 			ubo.mvpMat = ViewPrj * ubo.mMat;
 			ubo.nMat = glm::inverse(glm::transpose(ubo.mMat));
-			DS[i].map(currentImage, &ubo, sizeof(ubo), 0);
-			DS[i].map(currentImage, &gubo, sizeof(gubo), 1);
+			DS_P[i].map(currentImage, &ubo, sizeof(ubo), 0);
+			DS_P[i].map(currentImage, &gubo, sizeof(gubo), 1);
 		}
+
 		ubo.mMat = baseTr * AxTr * glm::rotate(glm::mat4(1.0f), glm::radians(-90.0f), glm::vec3(0.0f, 1.0f, 0.0f));
 		ubo.mvpMat = ViewPrj * ubo.mMat;
 		ubo.nMat = glm::inverse(glm::transpose(ubo.mMat));
@@ -346,11 +389,14 @@ protected:
 	{
 		// Cleanup pipelines
 		P.cleanup();
+		P_background.cleanup();
 
 		// Cleanup datasets
-		for (int i = 0; i < DS.size(); i++)
-			DS[i].cleanup();
-		DS.clear();
+		for (int i = 0; i < DS_P.size(); i++)
+			DS_P[i].cleanup();
+		DS_P.clear();
+
+		DS_P_background.cleanup();
 	}
 
 	// Here you destroy all the Models, TextureVulkan and Desc. Set Layouts you created!
@@ -369,16 +415,21 @@ protected:
 		}
 		textures.clear();
 
+		textures_hdri.cleanup();
+
 		// Cleanup models
 		for (int i = 0; i < M.size(); i++)
 			M[i].cleanup();
 		M.clear();
 
+		M_background.cleanup();
+
 		// Cleanup descriptor set layouts
-		DSL.cleanup();
+		DSL_P.cleanup();
 
 		// Destroies the pipelines
 		P.destroy();
+		P_background.destroy();
 	}
 };
 

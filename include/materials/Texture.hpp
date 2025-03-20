@@ -14,7 +14,8 @@ enum class TextureType {
     Specular,
     AmbientOcclusion,
     Emissive,
-    Height
+    Height,
+    HDRI
 };
 
 
