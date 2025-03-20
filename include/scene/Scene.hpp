@@ -1,6 +1,7 @@
 #ifndef SCENE_HPP
 #define SCENE_HPP
 
+#include <array>
 #include <vector>
 #include <memory>
 #include <optional>
