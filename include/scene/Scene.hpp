@@ -24,6 +24,7 @@ public:
 
     std::shared_ptr<Object> getRoot() const { return root; }    // Get the root object
     Shader getShader() const { return shader; }                 // Get the shader
+    std::shared_ptr<Camera> getCamera() const { return camera; }                // Get the camera
 private:
     std::shared_ptr<Object> root;                               // Root object of the scene
     std::shared_ptr<Camera> camera;                             // Camera of the scene

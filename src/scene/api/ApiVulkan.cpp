@@ -82,9 +82,6 @@ protected:
 	std::vector<std::vector<TextureVulkan>> textures;
 
 	// Other application parameters
-	glm::vec3 CamPos = glm::vec3(0.0, 1.5, 7.0);
-	float CamAlpha = 0.0f;
-	float CamBeta = 0.0f;
 	float Ar;
 
 	// Here you set the main application parameters
@@ -243,15 +240,24 @@ protected:
 		const float ROT_SPEED = glm::radians(120.0f);
 		const float MOVE_SPEED = 2.0f;
 
-		CamAlpha = CamAlpha - ROT_SPEED * deltaT * r.y;
-		CamBeta = CamBeta - ROT_SPEED * deltaT * r.x;
-		CamBeta = CamBeta < glm::radians(-90.0f) ? glm::radians(-90.0f) : (CamBeta > glm::radians(90.0f) ? glm::radians(90.0f) : CamBeta);
+		auto cam = scene->getCamera();
 
-		glm::vec3 ux = glm::rotate(glm::mat4(1.0f), CamAlpha, glm::vec3(0, 1, 0)) * glm::vec4(1, 0, 0, 1);
-		glm::vec3 uz = glm::rotate(glm::mat4(1.0f), CamAlpha, glm::vec3(0, 1, 0)) * glm::vec4(0, 0, -1, 1);
-		CamPos = CamPos + MOVE_SPEED * m.x * ux * deltaT;
-		CamPos = CamPos + MOVE_SPEED * m.y * glm::vec3(0, 1, 0) * deltaT;
-		CamPos = CamPos + MOVE_SPEED * m.z * uz * deltaT;
+		float newYaw = cam->getYaw() - ROT_SPEED * deltaT * r.y;
+		float newPitch = cam->getPitch() - ROT_SPEED * deltaT * r.x;
+
+		newPitch = (newPitch < glm::radians(-90.0f)) ? glm::radians(-90.0f)
+				   : (newPitch > glm::radians(90.0f) ? glm::radians(90.0f) : newPitch);
+
+		glm::vec3 currentPos = cam->getPosition();
+
+		glm::vec3 ux = glm::rotate(glm::mat4(1.0f), newYaw, glm::vec3(0, 1, 0)) * glm::vec4(1, 0, 0, 1);
+		glm::vec3 uz = glm::rotate(glm::mat4(1.0f), newYaw, glm::vec3(0, 1, 0)) * glm::vec4(0, 0, -1, 1);
+
+		glm::vec3 newPos = currentPos + MOVE_SPEED * deltaT * (m.x * ux + m.y * glm::vec3(0, 1, 0) + m.z * uz);
+
+		cam->setYaw(newYaw);
+		cam->setPitch(newPitch);
+		cam->setPosition(newPos);
 
 		if (glfwGetKey(window, GLFW_KEY_SPACE))
 		{
@@ -286,11 +292,9 @@ protected:
 		glm::mat4 M = glm::perspective(glm::radians(45.0f), Ar, 0.1f, 50.0f);
 		M[1][1] *= -1;
 
-		glm::mat4 Mv = glm::rotate(glm::mat4(1.0), -CamBeta, glm::vec3(1, 0, 0)) *
-									 glm::rotate(glm::mat4(1.0), -CamAlpha, glm::vec3(0, 1, 0)) *
-									 glm::translate(glm::mat4(1.0), -CamPos);
-
+		glm::mat4 Mv = cam->getViewMatrix();
 		glm::mat4 ViewPrj = M * Mv;
+
 		UniformBufferObject ubo{};
 		glm::mat4 baseTr = glm::mat4(1.0f);
 		// Here is where you actually update your uniforms
@@ -319,7 +323,7 @@ protected:
 		}
 		gubo.numLightsDir = numDir;
 		gubo.numLightsPoint = numPoint;
-		gubo.eyePos = CamPos;
+		gubo.eyePos = cam->getPosition();;
 
 		glm::mat4 AxTr = glm::scale(glm::mat4(1.0f), glm::vec3(0.0f));
 		for (int i = 0; i < DS.size(); i++)

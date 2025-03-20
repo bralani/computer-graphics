@@ -98,7 +98,8 @@ elseif(WIN32)
     list(APPEND INCLUDE_DIRS "${GLFW}/include" ${GLM} headers)
 
     # List of libraries to link to the executable
-    list(APPEND LINK_LIBS "${GLFW}/lib-mingw-w64/libglfw3.a")
+    # list(APPEND LINK_LIBS "${GLFW}/lib-mingw-w64/libglfw3.a")
+    list(APPEND LINK_LIBS "${GLFW}/lib-vc2022/glfw3.lib")
     file(GLOB_RECURSE SOURCES src/*.cpp)
     file(GLOB_RECURSE HEADERS include/*.h include/*.hpp)
     file(GLOB_RECURSE HEADERS third_party/*.h third_party/*.hpp)

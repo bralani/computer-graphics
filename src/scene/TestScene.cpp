@@ -7,13 +7,19 @@
 #include "lights/DirectionalLight.hpp"
 #include "lights/PointLight.hpp"
 #include "lights/SpotLight.hpp"
+#include "camera/FirstPersonCamera.hpp"
 #include <iostream>
 
 // constructor
 TestScene::TestScene()
 {
   // create the camera
-  auto camera = std::make_shared<Camera>();
+  auto camera = std::make_shared<FirstPersonCamera>(
+    glm::vec3(0.0f, 1.5f, 7.0f),  // Posizione iniziale
+    glm::radians(0.0f),           // Yaw iniziale (in radianti)
+    glm::radians(0.0f),           // Pitch iniziale (in radianti)
+    glm::radians(0.0f)            // Roll iniziale (in radianti)
+);
 
   PBRShader shader;
 
