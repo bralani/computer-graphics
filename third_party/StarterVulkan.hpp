@@ -45,6 +45,7 @@
 #define SINFL_IMPLEMENTATION
 #include <sinfl.h>
 
+#include "utilities/Input.hpp"
 
 
 const int MAX_FRAMES_IN_FLIGHT = 2;
@@ -413,6 +414,8 @@ protected:
         glfwSetFramebufferSizeCallback(window, framebufferResizeCallback);
 		
 		glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+
+		Input::setWindow(window);
     }
 
 	virtual void onWindowResize(int w, int h) = 0;
@@ -1798,77 +1801,6 @@ std::cout << "Starting createInstance()\n"  << std::flush;
 				fire = fire | (bool)state.buttons[GLFW_GAMEPAD_BUTTON_A] | (bool)state.buttons[GLFW_GAMEPAD_BUTTON_B];
 			}
 		}
-	}
-		
-	void getSixAxis(float &deltaT, glm::vec3 &m, glm::vec3 &r, bool &fire) {
-		static auto startTime = std::chrono::high_resolution_clock::now();
-		static float lastTime = 0.0f;
-		
-		auto currentTime = std::chrono::high_resolution_clock::now();
-		float time = std::chrono::duration<float, std::chrono::seconds::period>
-					(currentTime - startTime).count();
-		deltaT = time - lastTime;
-		lastTime = time;
-
-		int winWidth, winHeight;
-		glfwGetWindowSize(window, &winWidth, &winHeight);
-		double centerX = winWidth / 2.0;
-		double centerY = winHeight / 2.0;
-
-		double xpos, ypos;
-		glfwGetCursorPos(window, &xpos, &ypos);
-		double m_dx = xpos - centerX;
-		double m_dy = ypos - centerY;
-
-		glfwSetCursorPos(window, centerX, centerY);
-
-		const float MOUSE_RES = 7.0f;
-		r.y = m_dx / MOUSE_RES;
-    	r.x = m_dy / MOUSE_RES;				
-
-		if(glfwGetKey(window, GLFW_KEY_LEFT)) {
-			r.y = -1.0f;
-		}
-		if(glfwGetKey(window, GLFW_KEY_RIGHT)) {
-			r.y = 1.0f;
-		}
-		if(glfwGetKey(window, GLFW_KEY_UP)) {
-			r.x = -1.0f;
-		}
-		if(glfwGetKey(window, GLFW_KEY_DOWN)) {
-			r.x = 1.0f;
-		}
-		if(glfwGetKey(window, GLFW_KEY_Q)) {
-			r.z = 1.0f;
-		}
-		if(glfwGetKey(window, GLFW_KEY_E)) {
-			r.z = -1.0f;
-		}
-
-		if(glfwGetKey(window, GLFW_KEY_A)) {
-			m.x = -2.0f;
-		}
-		if(glfwGetKey(window, GLFW_KEY_D)) {
-			m.x = 2.0f;
-		}
-		if(glfwGetKey(window, GLFW_KEY_S)) {
-			m.z = -2.0f;
-		}
-		if(glfwGetKey(window, GLFW_KEY_W)) {
-			m.z = 2.0f;
-		}
-		if(glfwGetKey(window, GLFW_KEY_SPACE)) {
-			m.y = 1.0f;
-		}
-		if(glfwGetKey(window, GLFW_KEY_LEFT_SHIFT)) {
-			m.y = -1.0f;
-		}
-		
-		fire = (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_RIGHT) == GLFW_PRESS);
-		handleGamePad(GLFW_JOYSTICK_1,m,r,fire);
-		handleGamePad(GLFW_JOYSTICK_2,m,r,fire);
-		handleGamePad(GLFW_JOYSTICK_3,m,r,fire);
-		handleGamePad(GLFW_JOYSTICK_4,m,r,fire);
 	}
 	
 	// Public part of the base class

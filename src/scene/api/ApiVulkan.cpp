@@ -264,89 +264,9 @@ protected:
 	// Very likely this will be where you will be writing the logic of your application.
 	void updateUniformBuffer(uint32_t currentImage)
 	{
-		static bool isPaused = false;
-		static bool pDebounce = false;
-
-		if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS) {
-			if (!pDebounce) {
-				pDebounce = true;
-				isPaused = !isPaused;
-				if (isPaused) {
-					glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
-				} else {
-					glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
-					int winWidth, winHeight;
-					glfwGetWindowSize(window, &winWidth, &winHeight);
-					glfwSetCursorPos(window, winWidth / 2.0, winHeight / 2.0);
-				}
-			}
-		} else {
-			pDebounce = false;
-		}
-		
-		if (isPaused) {
-			return;
-		}
-
-		static bool debounce = false;
-		static int curDebounce = 0;
-
-		float deltaT;
-		glm::vec3 m = glm::vec3(0.0f), r = glm::vec3(0.0f);
-		bool fire = false;
-		getSixAxis(deltaT, m, r, fire);
-
-		const float ROT_SPEED = glm::radians(120.0f);
-		const float MOVE_SPEED = 2.0f;
+		scene->update();
 
 		auto cam = scene->getCamera();
-
-		float newYaw = cam->getYaw() - ROT_SPEED * deltaT * r.y;
-		float newPitch = cam->getPitch() - ROT_SPEED * deltaT * r.x;
-
-		newPitch = (newPitch < glm::radians(-90.0f)) ? glm::radians(-90.0f)
-				   : (newPitch > glm::radians(90.0f) ? glm::radians(90.0f) : newPitch);
-
-		glm::vec3 currentPos = cam->getPosition();
-
-		glm::vec3 ux = glm::rotate(glm::mat4(1.0f), newYaw, glm::vec3(0, 1, 0)) * glm::vec4(1, 0, 0, 1);
-		glm::vec3 uz = glm::rotate(glm::mat4(1.0f), newYaw, glm::vec3(0, 1, 0)) * glm::vec4(0, 0, -1, 1);
-
-		glm::vec3 newPos = currentPos + MOVE_SPEED * deltaT * (m.x * ux + m.y * glm::vec3(0, 1, 0) + m.z * uz);
-
-		cam->setYaw(newYaw);
-		cam->setPitch(newPitch);
-		cam->setPosition(newPos);
-
-		if (glfwGetKey(window, GLFW_KEY_F2))
-		{
-			if (!debounce)
-			{
-				debounce = true;
-				curDebounce = GLFW_KEY_F2;
-
-				if (!screenshotSaved)
-				{
-					saveScreenshot("VulkanApp.png", currentImage);
-				}
-
-				RebuildPipeline();
-			}
-		}
-		else
-		{
-			if ((curDebounce == GLFW_KEY_F2) && debounce)
-			{
-				debounce = false;
-				curDebounce = 0;
-			}
-		}
-
-		// Standard procedure to quit when the P key is pressed
-		if (glfwGetKey(window, GLFW_KEY_P))
-		{
-			glfwSetWindowShouldClose(window, GL_TRUE);
-		}
 
 		glm::mat4 M = glm::perspective(glm::radians(45.0f), Ar, 0.1f, 100000.0f);
 		M[1][1] *= -1;

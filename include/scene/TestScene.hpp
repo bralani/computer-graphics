@@ -9,6 +9,7 @@ public:
     ~TestScene() = default;
 private:
     std::shared_ptr<Object> createRoot();
+    void update() override;
 };
 
 #endif // TESTSCENE_HPP

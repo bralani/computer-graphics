@@ -1,4 +1,5 @@
 #include "scene/Scene.hpp"
+#include "utilities/Input.hpp"
 
 void Scene::setup(std::shared_ptr<Object> root, std::shared_ptr<Camera> camera, Shader &shader, const std::array<const char*, 6>& hdri_textures) {
     this->root = root;
