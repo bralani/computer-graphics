@@ -101,9 +101,13 @@ protected:
 		initialBackgroundColor = {0.0f, 0.005f, 0.01f, 1.0f};
 
 		// Descriptor pool sizes
-		uniformBlocksInPool = 15 * 2 + 2;
-		texturesInPool = 100;
-		setsInPool = 15 + 1 + 1;
+		// uniformBlocksInPool = 15 * 2 + 2;
+		// texturesInPool = 100;
+		// setsInPool = 15 + 1 + 1;
+
+		uniformBlocksInPool = 200;
+		texturesInPool = 200;
+		setsInPool = 200;
 
 		Ar = 4.0f / 3.0f;
 	}
@@ -112,6 +116,11 @@ protected:
 	void onWindowResize(int w, int h)
 	{
 		std::cout << "Window resized to: " << w << " x " << h << "\n";
+
+		if (w == 0 || h == 0) {
+			return;
+		}
+
 		Ar = (float)w / (float)h;
 	}
 
@@ -331,16 +340,38 @@ protected:
 	// All the object classes defined in Starter.hpp have a method .cleanup() for this purpose
 	void pipelinesAndDescriptorSetsCleanup()
 	{
-		// Cleanup pipelines
-		P.cleanup();
-		P_background.cleanup();
+		P.create();
+		P_background.create();
 
-		// Cleanup datasets
-		for (int i = 0; i < DS_P.size(); i++)
-			DS_P[i].cleanup();
-		DS_P.clear();
+		DS_P.resize(M.size());
 
-		DS_P_background.cleanup();
+		for (int i = 0; i < (int)M.size(); i++)
+		{
+			std::vector<DescriptorSetElement> E;
+			E.resize(3 + textures[i].size());
+
+			E[0] = {0, UNIFORM,  sizeof(UniformBufferObject),       nullptr};
+			E[1] = {1, UNIFORM,  sizeof(GlobalUniformBufferObject), nullptr};
+
+			E[2] = {2, TEXTURE,  0, &textures_hdri};
+
+			for (int j = 0; j < (int)textures[i].size(); j++)
+			{
+				E[j + 3] = {
+					static_cast<int32_t>(j + 3),
+					TEXTURE,
+					0,
+					&textures[i][j]
+				};
+			}
+
+			DS_P[i].init(this, &DSL_P, E);
+		}
+
+		DS_P_background.init(this, &DSL_P_background, {
+			{0, UNIFORM, sizeof(UniformBufferObject), nullptr},
+			{1, TEXTURE, 0, &textures_hdri}
+		});
 	}
 
 	// Here you destroy all the Models, TextureVulkan and Desc. Set Layouts you created!

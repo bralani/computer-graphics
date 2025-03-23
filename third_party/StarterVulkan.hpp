@@ -1673,6 +1673,7 @@ std::cout << "Starting createInstance()\n"  << std::flush;
 			framebufferResized) {
             framebufferResized = false;
             recreateSwapChain();
+			return;
         } else if (result != VK_SUCCESS) {
             throw std::runtime_error("failed to present swap chain image!");
         }
