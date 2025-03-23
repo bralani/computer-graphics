@@ -411,7 +411,8 @@ protected:
 
         glfwSetWindowUserPointer(window, this);
         glfwSetFramebufferSizeCallback(window, framebufferResizeCallback);
-
+		
+		glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
     }
 
 	virtual void onWindowResize(int w, int h) = 0;
@@ -1809,19 +1810,21 @@ std::cout << "Starting createInstance()\n"  << std::flush;
 		deltaT = time - lastTime;
 		lastTime = time;
 
-		static double old_xpos = 0, old_ypos = 0;
+		int winWidth, winHeight;
+		glfwGetWindowSize(window, &winWidth, &winHeight);
+		double centerX = winWidth / 2.0;
+		double centerY = winHeight / 2.0;
+
 		double xpos, ypos;
 		glfwGetCursorPos(window, &xpos, &ypos);
-		double m_dx = xpos - old_xpos;
-		double m_dy = ypos - old_ypos;
-		old_xpos = xpos; old_ypos = ypos;
+		double m_dx = xpos - centerX;
+		double m_dy = ypos - centerY;
 
-		const float MOUSE_RES = 10.0f;				
-		glfwSetInputMode(window, GLFW_STICKY_MOUSE_BUTTONS, GLFW_TRUE);
-		if(glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS) {
-			r.y = -m_dx / MOUSE_RES;
-			r.x = -m_dy / MOUSE_RES;
-		}
+		glfwSetCursorPos(window, centerX, centerY);
+
+		const float MOUSE_RES = 7.0f;
+		r.y = m_dx / MOUSE_RES;
+    	r.x = m_dy / MOUSE_RES;				
 
 		if(glfwGetKey(window, GLFW_KEY_LEFT)) {
 			r.y = -1.0f;
@@ -1843,25 +1846,25 @@ std::cout << "Starting createInstance()\n"  << std::flush;
 		}
 
 		if(glfwGetKey(window, GLFW_KEY_A)) {
-			m.x = -1.0f;
+			m.x = -2.0f;
 		}
 		if(glfwGetKey(window, GLFW_KEY_D)) {
-			m.x = 1.0f;
+			m.x = 2.0f;
 		}
 		if(glfwGetKey(window, GLFW_KEY_S)) {
-			m.z = -1.0f;
+			m.z = -2.0f;
 		}
 		if(glfwGetKey(window, GLFW_KEY_W)) {
-			m.z = 1.0f;
+			m.z = 2.0f;
 		}
-		if(glfwGetKey(window, GLFW_KEY_R)) {
+		if(glfwGetKey(window, GLFW_KEY_SPACE)) {
 			m.y = 1.0f;
 		}
-		if(glfwGetKey(window, GLFW_KEY_F)) {
+		if(glfwGetKey(window, GLFW_KEY_LEFT_SHIFT)) {
 			m.y = -1.0f;
 		}
 		
-		fire = glfwGetKey(window, GLFW_KEY_SPACE) | (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_RIGHT) == GLFW_PRESS);
+		fire = (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_RIGHT) == GLFW_PRESS);
 		handleGamePad(GLFW_JOYSTICK_1,m,r,fire);
 		handleGamePad(GLFW_JOYSTICK_2,m,r,fire);
 		handleGamePad(GLFW_JOYSTICK_3,m,r,fire);

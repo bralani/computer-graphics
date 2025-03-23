@@ -264,6 +264,30 @@ protected:
 	// Very likely this will be where you will be writing the logic of your application.
 	void updateUniformBuffer(uint32_t currentImage)
 	{
+		static bool isPaused = false;
+		static bool pDebounce = false;
+
+		if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS) {
+			if (!pDebounce) {
+				pDebounce = true;
+				isPaused = !isPaused;
+				if (isPaused) {
+					glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+				} else {
+					glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+					int winWidth, winHeight;
+					glfwGetWindowSize(window, &winWidth, &winHeight);
+					glfwSetCursorPos(window, winWidth / 2.0, winHeight / 2.0);
+				}
+			}
+		} else {
+			pDebounce = false;
+		}
+		
+		if (isPaused) {
+			return;
+		}
+
 		static bool debounce = false;
 		static int curDebounce = 0;
 
@@ -294,12 +318,12 @@ protected:
 		cam->setPitch(newPitch);
 		cam->setPosition(newPos);
 
-		if (glfwGetKey(window, GLFW_KEY_SPACE))
+		if (glfwGetKey(window, GLFW_KEY_F2))
 		{
 			if (!debounce)
 			{
 				debounce = true;
-				curDebounce = GLFW_KEY_SPACE;
+				curDebounce = GLFW_KEY_F2;
 
 				if (!screenshotSaved)
 				{
@@ -311,15 +335,15 @@ protected:
 		}
 		else
 		{
-			if ((curDebounce == GLFW_KEY_SPACE) && debounce)
+			if ((curDebounce == GLFW_KEY_F2) && debounce)
 			{
 				debounce = false;
 				curDebounce = 0;
 			}
 		}
 
-		// Standard procedure to quit when the ESC key is pressed
-		if (glfwGetKey(window, GLFW_KEY_ESCAPE))
+		// Standard procedure to quit when the P key is pressed
+		if (glfwGetKey(window, GLFW_KEY_P))
 		{
 			glfwSetWindowShouldClose(window, GL_TRUE);
 		}
