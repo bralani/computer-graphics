@@ -81,6 +81,18 @@ std::shared_ptr<Object> TestScene::createRoot()
 			meshes2.push_back(mesh);
 		}
 	}
+
+	auto mesh = std::make_shared<Mesh>("assets/models/rock.obj");
+	Texture texture1_rock("assets/textures/rock_low_Base_Color.png", TextureType::Diffuse);
+	Texture texture2_rock("assets/textures/rock_low_Metallic.png", TextureType::Metallic);
+	Texture texture3_rock("assets/textures/bog_roughness.png", TextureType::Roughness);
+	Texture texture4_rock("assets/textures/rock_low_Normal_DirectX.png", TextureType::Normal);
+	Texture texture5_rock("assets/textures/rock_low_Mixed_AO.png", TextureType::AmbientOcclusion);
+	PBRMaterial material2(texture1_rock, texture3_rock, texture2_rock, texture4_rock, texture5_rock);
+	mesh.get()->setMaterial(material2);
+	mesh.get()->transform.setScale(glm::vec3(0.1f));
+	meshes2.push_back(mesh);
+
 	auto child2 = std::make_shared<Object>();
 	child2.get()->setMeshes(meshes2);
 	child2.get()->transform.setPosition(glm::vec3(5.0f, 0.0f, -5.0f));

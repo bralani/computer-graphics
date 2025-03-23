@@ -1,9 +1,9 @@
 ﻿#include <iostream>
-#include "scene/TestScene.hpp"
+#include "scene/natureScene/NatureScene.hpp"
 
 int main() {
 
-    TestScene app;
+    NatureScene app;
     app.run();
 
     return 0;
