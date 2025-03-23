@@ -284,8 +284,6 @@ protected:
 		glm::mat4 ViewPrj = M * Mv;
 
 		UniformBufferObject ubo{};
-		glm::mat4 baseTr = glm::mat4(1.0f);
-		// Here is where you actually update your uniforms
 
 		// updates global uniforms
 		GlobalUniformBufferObject gubo{};
@@ -315,7 +313,7 @@ protected:
 
 		// scale the background by 100
 		glm::mat4 trans_mat_background = glm::scale(glm::mat4(1.0f), glm::vec3(10000.0f));
-		ubo.mMat = baseTr * trans_mat_background;
+		ubo.mMat = trans_mat_background;
 		ubo.mvpMat = ViewPrj * ubo.mMat;
 		ubo.nMat = glm::inverse(glm::transpose(ubo.mMat));
 		DS_P_background.map(currentImage, &ubo, sizeof(ubo), 0);
@@ -323,16 +321,12 @@ protected:
 		glm::mat4 AxTr = glm::scale(glm::mat4(1.0f), glm::vec3(0.0f));
 		for (int i = 0; i < DS_P.size(); i++)
 		{
-			ubo.mMat = baseTr * trans_mat[i];
+			ubo.mMat = trans_mat[i];
 			ubo.mvpMat = ViewPrj * ubo.mMat;
 			ubo.nMat = glm::inverse(glm::transpose(ubo.mMat));
 			DS_P[i].map(currentImage, &ubo, sizeof(ubo), 0);
 			DS_P[i].map(currentImage, &gubo, sizeof(gubo), 1);
 		}
-
-		ubo.mMat = baseTr * AxTr * glm::rotate(glm::mat4(1.0f), glm::radians(-90.0f), glm::vec3(0.0f, 1.0f, 0.0f));
-		ubo.mvpMat = ViewPrj * ubo.mMat;
-		ubo.nMat = glm::inverse(glm::transpose(ubo.mMat));
 	}
 
 
