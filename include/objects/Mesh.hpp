@@ -2,6 +2,7 @@
 #define MESH_HPP
 
 #include <string>
+#include <memory>
 #include "objects/Transform.hpp"
 #include "materials/Material.hpp"
 
