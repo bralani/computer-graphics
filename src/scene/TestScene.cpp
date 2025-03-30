@@ -58,7 +58,7 @@ std::shared_ptr<Object> TestScene::createRoot()
 		for (int i = 0; i < 5; i++)
 		{
 			auto mesh = std::make_shared<Mesh>("assets/models/P" + std::to_string(j) + std::to_string(i) + ".obj");
-			mesh.get()->setMaterial(material1);
+			mesh.get()->setMaterial(std::make_shared<PBRMaterial>(material1));
 
 			if (j == 0 && i == 0)
 			{
@@ -77,7 +77,7 @@ std::shared_ptr<Object> TestScene::createRoot()
 		for (int i = 0; i < 5; i++)
 		{
 			auto mesh = std::make_shared<Mesh>("assets/models/P" + std::to_string(j) + std::to_string(i) + ".obj");
-			mesh.get()->setMaterial(material1);
+			mesh.get()->setMaterial(std::make_shared<PBRMaterial>(material1));
 			meshes2.push_back(mesh);
 		}
 	}
@@ -89,7 +89,7 @@ std::shared_ptr<Object> TestScene::createRoot()
 	Texture texture4_rock("assets/textures/rock_low_Normal_DirectX.png", TextureType::Normal);
 	Texture texture5_rock("assets/textures/rock_low_Mixed_AO.png", TextureType::AmbientOcclusion);
 	PBRMaterial material2(texture1_rock, texture3_rock, texture2_rock, texture4_rock, texture5_rock);
-	mesh.get()->setMaterial(material2);
+	mesh.get()->setMaterial(std::make_shared<PBRMaterial>(material2));
 	mesh.get()->transform.setScale(glm::vec3(0.1f));
 	meshes2.push_back(mesh);
 

@@ -2,6 +2,7 @@
 #include "scene/Scene.hpp"
 #include "lights/Light.hpp"
 #include "StarterVulkan.hpp"
+#include <unordered_set>
 
 #define GLM_ENABLE_EXPERIMENTAL
 #include <glm/gtx/transform2.hpp>
@@ -84,8 +85,10 @@ protected:
 	DescriptorSet DS_P_background;
 
 	// Textures
-	std::vector<std::vector<TextureVulkan>> textures;
+	std::map<std::string, std::vector<TextureVulkan>> textures_map;
+	std::vector<std::string> materials_name;
 	TextureVulkan textures_hdri;
+	TextureVulkan texture_shadow;
 
 	// Other application parameters
 	float Ar;
@@ -128,8 +131,8 @@ protected:
 	// Here you also create your Descriptor set layouts and load the shaders for the pipelines
 	void localInit()
 	{
-		auto textures_types = this->scene->getShader().getTextureTypes();
-		int num_textures = textures_types.size();
+		auto texture_types = this->scene->getShader().getTextureTypes();
+		int num_textures = texture_types.size();
 
 		// Descriptor Layouts P
 		std::vector<DescriptorSetLayoutBinding> B;
@@ -176,7 +179,7 @@ protected:
 		// allocate the models
 		M.resize(meshes.size());
 		DS_P.resize(meshes.size());
-		textures.resize(meshes.size());
+		materials_name.resize(num_textures);
 
 		for (int i = 0; i < meshes.size(); i++)
 		{
@@ -189,13 +192,34 @@ protected:
 
 			// load material and textures
 			auto material = mesh->getMaterial();
-			textures[i].resize(num_textures);
-			for (int j = 0; j < num_textures; j++)
-			{
-				auto texture = material.getTexture(textures_types[j]);
-				std::cout << "Loading texture: " << texture->getPath() << "\n";
-				textures[i][j].init(this, texture->getPath().c_str());
+			std::string material_name = material->getClassName();
+			static const std::unordered_set<std::string> invalid_materials = {
+				"BasicMaterial", 
+				"PBRMaterial", 
+				"Material"
+		};
+		
+			if (invalid_materials.find(material_name) != invalid_materials.end()) {
+					std::cout << "Material \"" << material_name << "\" not accepted! Derive the material and ovveride the getClassName().\n";
+					throw std::runtime_error("Material not accepted");
 			}
+
+
+			materials_name[i] = material_name;
+			
+			auto it = textures_map.find(material_name);
+			if (it == textures_map.end())
+			{
+				textures_map[material_name] = std::vector<TextureVulkan>();
+				textures_map[material_name].resize(num_textures);
+				for (int j = 0; j < num_textures; j++)
+				{
+					auto texture = material->getTexture(texture_types[j]);
+					std::cout << "Loading texture: " << texture->getPath() << "\n";
+					textures_map[material_name][j].init(this, texture->getPath().c_str());
+				}
+			}
+			
 		}
 
 		M_background.init(this, &VD, "assets/models/hdri.obj", OBJ);
@@ -226,14 +250,18 @@ protected:
 		// Models, textures and Descriptors (values assigned to the uniforms)
 		for (int i = 0; i < DS_P.size(); i++)
 		{
+			std::string material = materials_name[i];
+			std::vector<TextureVulkan> textures = textures_map[material];
+
+
 			std::vector<DescriptorSetElement> E;
-			E.resize(3 + textures[i].size());
+			E.resize(3 + textures.size());
 			E[0] = {0, UNIFORM, sizeof(UniformBufferObject), nullptr};
 			E[1] = {1, UNIFORM, sizeof(GlobalUniformBufferObject), nullptr};
 			E[2] = {2, TEXTURE, 0, &textures_hdri};
-			for(int j = 0; j < textures[i].size(); j++)
+			for(int j = 0; j < textures.size(); j++)
 			{
-				E[j + 3] = {j + 3, TEXTURE, 0, &textures[i][j]};
+				E[j + 3] = {j + 3, TEXTURE, 0, &textures[j]};
 			}
 			DS_P[i].init(this, &DSL_P, E);
 		}
@@ -375,15 +403,14 @@ protected:
 	void localCleanup()
 	{
 		// Cleanup textures
-		for (int i = 0; i < textures.size(); i++)
+		for(auto it = textures_map.begin(); it != textures_map.end(); ++it)
 		{
-			for (int j = 0; j < textures[i].size(); j++)
+			for (int j = 0; j < it->second.size(); j++)
 			{
-				textures[i][j].cleanup();
+				it->second[j].cleanup();
 			}
+			textures_map[it->first].clear();
 		}
-		textures.clear();
-
 		textures_hdri.cleanup();
 
 		// Cleanup models

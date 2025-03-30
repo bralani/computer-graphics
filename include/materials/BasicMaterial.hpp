@@ -20,6 +20,11 @@ public:
         textures[TextureType::Diffuse] = diffuseTexture;
     }
 
+
+    std::string getClassName() const override {
+        return "BasicMaterial";
+    }
+
 };
 
 #endif // BASICMATERIAL_HPP

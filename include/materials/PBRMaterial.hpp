@@ -56,6 +56,10 @@ public:
     textures[TextureType::AmbientOcclusion] = ambientOcclusionTexture;
   }
 
+  std::string getClassName() const override {
+    return "PBRMaterial";
+  }
+
 };
 
 #endif // PBRMATERIAL_HPP

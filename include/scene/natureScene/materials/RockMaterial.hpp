@@ -21,6 +21,11 @@ class RockMaterial : public PBRMaterial
         )
     {
     }
+
+    std::string getClassName() const override
+    {
+        return "RockMaterial";
+    }
 };
     
 

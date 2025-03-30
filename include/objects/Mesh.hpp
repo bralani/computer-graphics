@@ -10,20 +10,20 @@ class Mesh {
 public:
     Transform transform;
 
-    Mesh(const std::string& filename) : filename(filename) {
-        material = Material();
-        transform = Transform();
+    Mesh(const std::string& filename) 
+        : filename(filename), transform(), material(std::make_shared<Material>()) {
     }
 
     ~Mesh() = default;
         
-    const Material& getMaterial() const { return material; }
-    void setMaterial(const Material& mat) { material = mat; }
+    const std::shared_ptr<Material>& getMaterial() const { return material; }
+    void setMaterial(const std::shared_ptr<Material>& mat) { material = mat; }
 
     const std::string& getFilename() const { return filename; }
     void setFilename(const std::string& name) { filename = name; }
+    
 private:
-    Material material;
+    std::shared_ptr<Material> material;
     std::string filename;
 };
 

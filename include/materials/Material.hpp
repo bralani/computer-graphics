@@ -22,6 +22,10 @@ public:
         return (it != textures.end()) ? &it->second : nullptr;
     }
 
+    virtual std::string getClassName() const {
+        return "Material";
+    }
+
 };
 
 #endif // MATERIAL_HPP
