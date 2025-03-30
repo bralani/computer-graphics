@@ -362,38 +362,17 @@ protected:
 	// All the object classes defined in Starter.hpp have a method .cleanup() for this purpose
 	void pipelinesAndDescriptorSetsCleanup()
 	{
-		P.create();
-		P_background.create();
+		// Cleanup pipelines
+		P.cleanup();
+		P_background.cleanup();
 
-		DS_P.resize(M.size());
+		// Cleanup datasets
+		for (int i = 0; i < DS_P.size(); i++)
+			DS_P[i].cleanup();
+		DS_P.clear();
 
-		for (int i = 0; i < (int)M.size(); i++)
-		{
-			std::vector<DescriptorSetElement> E;
-			E.resize(3 + textures[i].size());
 
-			E[0] = {0, UNIFORM,  sizeof(UniformBufferObject),       nullptr};
-			E[1] = {1, UNIFORM,  sizeof(GlobalUniformBufferObject), nullptr};
-
-			E[2] = {2, TEXTURE,  0, &textures_hdri};
-
-			for (int j = 0; j < (int)textures[i].size(); j++)
-			{
-				E[j + 3] = {
-					static_cast<int32_t>(j + 3),
-					TEXTURE,
-					0,
-					&textures[i][j]
-				};
-			}
-
-			DS_P[i].init(this, &DSL_P, E);
-		}
-
-		DS_P_background.init(this, &DSL_P_background, {
-			{0, UNIFORM, sizeof(UniformBufferObject), nullptr},
-			{1, TEXTURE, 0, &textures_hdri}
-		});
+		DS_P_background.cleanup();
 	}
 
 	// Here you destroy all the Models, TextureVulkan and Desc. Set Layouts you created!
