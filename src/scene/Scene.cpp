@@ -8,6 +8,6 @@ void Scene::setup(std::shared_ptr<Object> root, std::shared_ptr<Camera> camera, 
     this->hdri_textures = hdri_textures;
 }
 
-void Scene::run() {
-    ApiVulkan app (this);
+void Scene::run(bool compute_shadows) {
+    ApiVulkan app (this, compute_shadows);
 }

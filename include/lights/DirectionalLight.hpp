@@ -10,6 +10,7 @@ class DirectionalLight : public Light {
     DirectionalLight(glm::vec3 color, glm::vec3 direction, float intensity = 1.0f) : Light() {
         this->type = TypeLight::DIRECTIONAL;
         this->color = color;
+        this->transform.setPosition(glm::vec3(2.0f, 6.0f, 2.5f));
         this->transform.setRotation(direction);
         this->intensity = intensity;
     }

@@ -27,12 +27,13 @@ if(APPLE)
     find_package(Threads REQUIRED)
 
     # Define the project source and header files
-    file(GLOB_RECURSE SOURCES src/*.cpp)
+    file(GLOB_RECURSE SOURCES src/camera/*.cpp src/objects/*.cpp src/scene/*.cpp src/utilities/*.cpp)
     file(GLOB_RECURSE HEADERS include/*.h include/*.hpp)
     file(GLOB_RECURSE HEADERS third_party/*.h third_party/*.hpp)
 
     # Define the project executable
-    add_executable(exe ${SOURCES} ${HEADERS})
+    add_executable(exe src/main.cpp ${SOURCES} ${HEADERS})
+    add_executable(compute_shadows src/compute_shadows.cpp ${SOURCES} ${HEADERS})
 
     # Include directories
     target_include_directories(exe PRIVATE ${GLM_INCLUDE_DIRS})
@@ -40,8 +41,15 @@ if(APPLE)
     target_include_directories(exe PRIVATE ${CMAKE_SOURCE_DIR}/third_party)
     target_include_directories(exe PUBLIC ${Vulkan_INCLUDE_DIR})
 
+
+    target_include_directories(compute_shadows PRIVATE ${GLM_INCLUDE_DIRS})
+    target_include_directories(compute_shadows PRIVATE ${CMAKE_SOURCE_DIR}/include)
+    target_include_directories(compute_shadows PRIVATE ${CMAKE_SOURCE_DIR}/third_party)
+    target_include_directories(compute_shadows PUBLIC ${Vulkan_INCLUDE_DIR})
+
     # Link libraries
     target_link_libraries(exe PRIVATE Vulkan::Vulkan glfw Threads::Threads)
+    target_link_libraries(compute_shadows PRIVATE Vulkan::Vulkan glfw Threads::Threads)
     
     file(GLOB GLSL_SOURCE_FILES "${CMAKE_SOURCE_DIR}/assets/shaders/*.vert" "${CMAKE_SOURCE_DIR}/assets/shaders/*.frag")
 
@@ -82,6 +90,7 @@ if(APPLE)
 
     # Ensure that exe depends on the SPIR-V files
     add_dependencies(exe Shaders)
+    add_dependencies(compute_shadows Shaders)
 
     # Copy resources (textures, models, etc.) to the build directory
     file(COPY ${CMAKE_SOURCE_DIR}/assets/textures DESTINATION ${CMAKE_BINARY_DIR}/assets)
@@ -100,11 +109,12 @@ elseif(WIN32)
     # List of libraries to link to the executable
     # list(APPEND LINK_LIBS "${GLFW}/lib-mingw-w64/libglfw3.a")
     list(APPEND LINK_LIBS "${GLFW}/lib-vc2022/glfw3.lib")
-    file(GLOB_RECURSE SOURCES src/*.cpp)
+    file(GLOB_RECURSE SOURCES src/camera/*.cpp src/objects/*.cpp src/scene/*.cpp src/utilities/*.cpp)
     file(GLOB_RECURSE HEADERS include/*.h include/*.hpp)
     file(GLOB_RECURSE HEADERS third_party/*.h third_party/*.hpp)
 
-    add_executable(${PROJECT_NAME} ${SOURCES} ${HEADERS})
+    add_executable(exe src/main.cpp ${SOURCES} ${HEADERS})
+    add_executable(compute_shadows src/compute_shadows.cpp ${SOURCES} ${HEADERS})
 
     find_package(Vulkan REQUIRED)
 
@@ -159,14 +169,16 @@ elseif(WIN32)
 
     # Ensure that exe depends on the SPIR-V files
     add_dependencies(exe Shaders)
+    add_dependencies(compute_shadows Shaders)
 
     file(COPY ${CMAKE_SOURCE_DIR}/assets/textures DESTINATION ${CMAKE_BINARY_DIR}/assets)
     file(COPY ${CMAKE_SOURCE_DIR}/assets/models DESTINATION ${CMAKE_BINARY_DIR}/assets)
 elseif(UNIX AND NOT APPLE)
-    file(GLOB_RECURSE SOURCES src/*.cpp)
+    file(GLOB_RECURSE SOURCES src/camera/*.cpp src/objects/*.cpp src/scene/*.cpp src/utilities/*.cpp)
     file(GLOB_RECURSE HEADERS include/*.h include/*.hpp)
 
-    add_executable(${PROJECT_NAME} ${SOURCES} ${HEADERS})
+    add_executable(exe src/main.cpp ${SOURCES} ${HEADERS})
+    add_executable(compute_shadows src/compute_shadows.cpp ${SOURCES} ${HEADERS})
 
     find_package(Vulkan REQUIRED)
     find_package(glfw3 REQUIRED)
@@ -229,6 +241,7 @@ elseif(UNIX AND NOT APPLE)
 
     # Ensure that exe depends on the SPIR-V files
     add_dependencies(exe Shaders)
+    add_dependencies(compute_shadows Shaders)
 
     file(COPY ${CMAKE_SOURCE_DIR}/assets/textures DESTINATION ${CMAKE_BINARY_DIR}/assets)
     file(COPY ${CMAKE_SOURCE_DIR}/assets/models DESTINATION ${CMAKE_BINARY_DIR}/assets)

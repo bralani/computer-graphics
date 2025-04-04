@@ -1,5 +1,6 @@
 #include "scene/natureScene/NatureScene.hpp"
 #include "scene/natureScene/object/Rocks.hpp"
+#include "scene/natureScene/object/Terrain.hpp"
 #include "materials/Texture.hpp"
 #include "materials/BasicMaterial.hpp"
 #include "materials/PBRMaterial.hpp"
@@ -16,12 +17,20 @@
 // constructor
 NatureScene::NatureScene()
 {
+	glm::vec3 position = glm::vec3(5.0f, 1.0f, 7.0f);
+	glm::vec3 target = glm::vec3(0.0f, 0.0f, 0.0f);
+	glm::vec3 direction = glm::normalize(target - position);
+	float yaw = atan2(direction.z, direction.x);
+	float pitch = asin(direction.y);
+	float roll = 0.0f;
+
+
 	// create the camera
 	auto camera = std::make_shared<FirstPersonCamera>(
-		glm::vec3(0.0f, 1.5f, 7.0f), // Posizione iniziale
-		glm::radians(0.0f),			 // Yaw iniziale (in radianti)
-		glm::radians(0.0f),			 // Pitch iniziale (in radianti)
-		glm::radians(0.0f)			 // Roll iniziale (in radianti)
+		position, // Posizione iniziale
+		yaw,			 // Yaw iniziale (in radianti)
+		pitch,			 // Pitch iniziale (in radianti)
+		roll			 // Roll iniziale (in radianti)
 	);
 
 	PBRShader shader;
@@ -45,12 +54,13 @@ NatureScene::NatureScene()
 std::shared_ptr<Object> NatureScene::createRoot()
 {
   auto rocks = std::make_shared<Rocks>();
+	auto terrain = std::make_shared<Terrain>();
   auto root = std::make_shared<Object>();
-  root.get()->setChildrenObjects({rocks});
+  root.get()->setChildrenObjects({rocks, terrain});
 
 	DirectionalLight dirLight(
-		glm::vec3(1.0f, 1.0f, 1.0f),
-		glm::vec3(0.1f, .9f, 1.0f),
+		glm::vec3(0.2f, 0.2f, 0.2f),
+		glm::vec3(0.1f, -0.9f, .1f),
 		50.0f);
 
 	PointLight pointLight(
@@ -58,7 +68,7 @@ std::shared_ptr<Object> NatureScene::createRoot()
 		glm::vec3(1.0f, 1.0f, 1.0f),
 		3.0f);
 
-	root.get()->setLights({std::make_shared<DirectionalLight>(dirLight), std::make_shared<PointLight>(pointLight)});
+	root.get()->setLights({std::make_shared<DirectionalLight>(dirLight)});
 
 	return root;
 }

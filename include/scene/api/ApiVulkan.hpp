@@ -8,7 +8,7 @@ class Scene;  // Forward declaration
 
 class ApiVulkan {
 public:
-    ApiVulkan(Scene *scene);
+    ApiVulkan(Scene *scene, bool compute_shadows);
     ~ApiVulkan() = default;
 private:
     Scene *scene;

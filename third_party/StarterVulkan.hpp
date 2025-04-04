@@ -2381,73 +2381,145 @@ std::vector<VkVertexInputAttributeDescription> VertexDescriptor::getAttributeDes
 }
 
 
-
 template <class Vert>
 void Model<Vert>::loadModelOBJ(std::string file) {
-	tinyobj::attrib_t attrib;
-	std::vector<tinyobj::shape_t> shapes;
-	std::vector<tinyobj::material_t> materials;
-	std::string warn, err;
-	
-	std::cout << "Loading : " << file << "[OBJ]\n";	
-	if (!tinyobj::LoadObj(&attrib, &shapes, &materials, &warn, &err,
-						  file.c_str())) {
-		throw std::runtime_error(warn + err);
-	}
-	
-	std::cout << "Building\n";	
-//	std::cout << "Position " << VD->Position.hasIt << "," << VD->Position.offset << "\n";	
-//	std::cout << "UV " << VD->UV.hasIt << "," << VD->UV.offset << "\n";	
-//	std::cout << "Normal " << VD->Normal.hasIt << "," << VD->Normal.offset << "\n";	
-	for (const auto& shape : shapes) {
-		for (const auto& index : shape.mesh.indices) {
-			Vert vertex{};
-			glm::vec3 pos = {
-				attrib.vertices[3 * index.vertex_index + 0],
-				attrib.vertices[3 * index.vertex_index + 1],
-				attrib.vertices[3 * index.vertex_index + 2]
-			};
-			if(VD->Position.hasIt) {
-				glm::vec3 *o = (glm::vec3 *)((char*)(&vertex) + VD->Position.offset);
-				*o = pos;
-			}
-			
-			glm::vec3 color = {
-				attrib.colors[3 * index.vertex_index + 0],
-				attrib.colors[3 * index.vertex_index + 1],
-				attrib.colors[3 * index.vertex_index + 2]
-			};
-			if(VD->Color.hasIt) {
-				glm::vec3 *o = (glm::vec3 *)((char*)(&vertex) + VD->Color.offset);
-				*o = color;
-			}
-			
-			glm::vec2 texCoord = {
-				attrib.texcoords[2 * index.texcoord_index + 0],
-				1 - attrib.texcoords[2 * index.texcoord_index + 1] 
-			};
-			if(VD->UV.hasIt) {
-				glm::vec2 *o = (glm::vec2 *)((char*)(&vertex) + VD->UV.offset);
-				*o = texCoord;
-			}
+    tinyobj::attrib_t attrib;
+    std::vector<tinyobj::shape_t> shapes;
+    std::vector<tinyobj::material_t> materials;
+    std::string warn, err;
 
-			glm::vec3 norm = {
-				attrib.normals[3 * index.normal_index + 0],
-				attrib.normals[3 * index.normal_index + 1],
-				attrib.normals[3 * index.normal_index + 2]
-			};
-			if(VD->Normal.hasIt) {
-				glm::vec3 *o = (glm::vec3 *)((char*)(&vertex) + VD->Normal.offset);
-				*o = norm;
-			}
-			
-			vertices.push_back(vertex);
-			indices.push_back(vertices.size()-1);
-		}
-	}
-	std::cout << "[OBJ] Vertices: "<< vertices.size() << "\n";
-	std::cout << "Indices: "<< indices.size() << "\n";
-	
+    std::cout << "Loading : " << file << " [OBJ]\n";
+    if (!tinyobj::LoadObj(&attrib, &shapes, &materials, &warn, &err, file.c_str())) {
+        throw std::runtime_error(warn + err);
+    }
+
+    std::cout << "Building\n";
+    std::vector<bool> hasUV; // Track UV validity per vertex
+
+    for (const auto& shape : shapes) {
+        for (const auto& index : shape.mesh.indices) {
+            Vert vertex{};
+            bool vertexHasUV = false;
+
+            // Position
+            glm::vec3 pos = {
+                attrib.vertices[3 * index.vertex_index + 0],
+                attrib.vertices[3 * index.vertex_index + 1],
+                attrib.vertices[3 * index.vertex_index + 2]
+            };
+            if (VD->Position.hasIt) {
+                glm::vec3* o = (glm::vec3*)((char*)(&vertex) + VD->Position.offset);
+                *o = pos;
+            }
+
+            // Color
+            if (!attrib.colors.empty()) {
+                glm::vec3 color = {
+                    attrib.colors[3 * index.vertex_index + 0],
+                    attrib.colors[3 * index.vertex_index + 1],
+                    attrib.colors[3 * index.vertex_index + 2]
+                };
+                if (VD->Color.hasIt) {
+                    glm::vec3* o = (glm::vec3*)((char*)(&vertex) + VD->Color.offset);
+                    *o = color;
+                }
+            }
+
+            // UV
+            if (index.texcoord_index >= 0 && !attrib.texcoords.empty()) {
+                glm::vec2 texCoord = {
+                    attrib.texcoords[2 * index.texcoord_index + 0],
+                    1.0f - attrib.texcoords[2 * index.texcoord_index + 1]
+                };
+                if (VD->UV.hasIt) {
+                    glm::vec2* o = (glm::vec2*)((char*)(&vertex) + VD->UV.offset);
+                    *o = texCoord;
+                    vertexHasUV = true;
+                }
+            }
+
+            // Normal
+            if (index.normal_index >= 0 && !attrib.normals.empty()) {
+                glm::vec3 norm = {
+                    attrib.normals[3 * index.normal_index + 0],
+                    attrib.normals[3 * index.normal_index + 1],
+                    attrib.normals[3 * index.normal_index + 2]
+                };
+                if (VD->Normal.hasIt) {
+                    glm::vec3* o = (glm::vec3*)((char*)(&vertex) + VD->Normal.offset);
+                    *o = norm;
+                }
+            }
+
+            vertices.push_back(vertex);
+            hasUV.push_back(vertexHasUV);
+            indices.push_back(vertices.size() - 1);
+        }
+    }
+
+    if (VD->Tangent.hasIt) {
+        std::vector<glm::vec4> tanAccum(vertices.size(), glm::vec4(0.0f));
+
+        for (size_t i = 0; i + 2 < indices.size(); i += 3) {
+            int i0 = indices[i];
+            int i1 = indices[i + 1];
+            int i2 = indices[i + 2];
+
+            // Skip triangles with missing UVs
+            if (!hasUV[i0] || !hasUV[i1] || !hasUV[i2]) continue;
+
+            // Retrieve positions and UVs
+            glm::vec3 pos0 = *reinterpret_cast<glm::vec3*>((char*)(&vertices[i0]) + VD->Position.offset);
+            glm::vec3 pos1 = *reinterpret_cast<glm::vec3*>((char*)(&vertices[i1]) + VD->Position.offset);
+            glm::vec3 pos2 = *reinterpret_cast<glm::vec3*>((char*)(&vertices[i2]) + VD->Position.offset);
+
+            glm::vec2 uv0 = *reinterpret_cast<glm::vec2*>((char*)(&vertices[i0]) + VD->UV.offset);
+            glm::vec2 uv1 = *reinterpret_cast<glm::vec2*>((char*)(&vertices[i1]) + VD->UV.offset);
+            glm::vec2 uv2 = *reinterpret_cast<glm::vec2*>((char*)(&vertices[i2]) + VD->UV.offset);
+
+            glm::vec3 edge1 = pos1 - pos0;
+            glm::vec3 edge2 = pos2 - pos0;
+            glm::vec2 deltaUV1 = uv1 - uv0;
+            glm::vec2 deltaUV2 = uv2 - uv0;
+
+            float r = deltaUV1.x * deltaUV2.y - deltaUV2.x * deltaUV1.y;
+            if (r == 0.0f) continue; // Avoid division by zero
+
+            float f = 1.0f / r;
+            glm::vec3 tangent = f * (deltaUV2.y * edge1 - deltaUV1.y * edge2);
+            float sign = (r < 0.0f) ? -1.0f : 1.0f;
+
+            // Accumulate tangent and sign
+            tanAccum[i0] += glm::vec4(tangent, sign);
+            tanAccum[i1] += glm::vec4(tangent, sign);
+            tanAccum[i2] += glm::vec4(tangent, sign);
+        }
+
+        // Normalize and orthogonalize tangents
+        for (size_t i = 0; i < vertices.size(); i++) {
+            glm::vec4& t4 = tanAccum[i];
+            if (glm::length(t4) < 1e-5f) continue; // Skip if no tangents accumulated
+
+            glm::vec3 t = glm::vec3(t4);
+            glm::vec3 n = *reinterpret_cast<glm::vec3*>((char*)(&vertices[i]) + VD->Normal.offset);
+
+            // Orthogonalize tangent with respect to normal
+            t = glm::normalize(t - n * glm::dot(n, t));
+
+            // Ensure tangent is perpendicular to normal
+            t = glm::normalize(t);
+
+            // Recompute sign based on the handedness
+            glm::vec3 bitangent = glm::cross(n, t);
+            float sign = (glm::dot(bitangent, glm::cross(t, n))) < 0.0f ? -1.0f : 1.0f;
+
+            glm::vec4* tangentPtr = (glm::vec4*)((char*)(&vertices[i]) + VD->Tangent.offset);
+            *tangentPtr = glm::vec4(t, sign);
+        }
+    }
+
+    std::cout << "[OBJ] Vertices: " << vertices.size() << "\n";
+    std::cout << "Indices: " << indices.size() << "\n";
 }
 
 template <class Vert>

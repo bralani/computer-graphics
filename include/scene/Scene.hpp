@@ -22,7 +22,7 @@ public:
             Shader &shader,
             const std::array<const char*, 6>& hdri_textures
         );                                                                          // Setup the scene
-    void run();                                                                     // Run the scene
+    void run(bool compute_shadows);                                                 // Run the scene
 
     std::shared_ptr<Object> getRoot() const { return root; }                        // Get the root object
     Shader getShader() const { return shader; }                                     // Get the shader

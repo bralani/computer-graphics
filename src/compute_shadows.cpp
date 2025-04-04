@@ -4,7 +4,7 @@
 int main() {
 
     NatureScene app;
-    app.run(false);
+    app.run(true);
 
     return 0;
 }

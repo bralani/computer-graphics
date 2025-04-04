@@ -4,6 +4,8 @@
 layout(location = 0) in vec3 fragPos; 
 layout(location = 1) in vec3 fragNorm; 
 layout(location = 2) in vec2 fragTexCoord;
+layout(location = 3) in vec4 lightSpacePos;
+layout(location = 4) in vec3 fragTangent;
 
 layout(location = 0) out vec4 outColor;
 
@@ -27,11 +29,12 @@ layout(binding = 1) uniform GlobalUniformBufferObject {
 } gubo;
 
 layout(binding = 2) uniform samplerCube hdrEnvMap;
-layout(binding = 3) uniform sampler2D textAlbedo;
-layout(binding = 4) uniform sampler2D textRoughness;
-layout(binding = 5) uniform sampler2D textMetallic;
-layout(binding = 6) uniform sampler2D textNormal;
-layout(binding = 7) uniform sampler2D textAO;
+layout(binding = 3) uniform sampler2D shadowMap;
+layout(binding = 4) uniform sampler2D textAlbedo;
+layout(binding = 5) uniform sampler2D textRoughness;
+layout(binding = 6) uniform sampler2D textMetallic;
+layout(binding = 7) uniform sampler2D textNormal;
+layout(binding = 8) uniform sampler2D textAO;
 
 const float PI = 3.14159265359;
 
@@ -87,14 +90,14 @@ void main() {
     float roughness = texture(textRoughness, fragTexCoord).r;
     float metallic = texture(textMetallic, fragTexCoord).r;
     vec3 normalMap = texture(textNormal, fragTexCoord).rgb * 2.0 - 1.0;
+    normalMap.y = -normalMap.y;
     float ao = texture(textAO, fragTexCoord).r;
 
-    // TBN matrix per il normal mapping
-    vec3 T = normalize(vec3(ubo.mMat * vec4(1.0, 0.0, 0.0, 0.0)));
-    vec3 B = normalize(vec3(ubo.mMat * vec4(0.0, 1.0, 0.0, 0.0)));
+    vec3 T = normalize(fragTangent);
     vec3 N = normalize(fragNorm);
+    vec3 B = cross(N, T) * (gl_FrontFacing ? 1.0 : -1.0); // Correzione winding order
     mat3 TBN = mat3(T, B, N);
-    N = normalize(TBN * normalMap);
+    N = normalize(TBN * normalMap); // Applicazione della normal map
 
     vec3 V = normalize(gubo.eyePos - fragPos);
     vec3 finalColor = vec3(0.0);
@@ -122,5 +125,33 @@ void main() {
 
     finalColor *= ao; // Applica ambient occlusion
 
+    // Sample multiple neighboring shadow map texels for PCF (Percentage Closer Filtering)
+    int sampleCount = 16; // The number of samples you want to take for PCF
+    float shadow = 0.0;
+    vec2 texelSize = 1.0 / textureSize(shadowMap, 0); 
+    vec2 shadowMapCoord = (lightSpacePos.xy / lightSpacePos.w )* 0.5 + 0.5;
+
+
+    // Loop through multiple samples
+    for (int i = -sampleCount / 2; i <= sampleCount / 2; ++i) {
+        for (int j = -sampleCount / 2; j <= sampleCount / 2; ++j) {
+            vec2 offset = vec2(i, j) * texelSize;
+            vec2 shadowCoord = shadowMapCoord + offset;
+            float depthInShadowMap = texture(shadowMap, shadowCoord).r + 0.3;
+
+            // Perform the depth comparison
+            float currentDepth = lightSpacePos.z / lightSpacePos.w;
+            if (currentDepth > depthInShadowMap + 0.05) {
+                shadow += 1.0; // Add contribution from this sample
+            } else {
+                shadow += 0.0; // No shadow
+            }
+        }
+    }
+
+    // Average the samples and apply the result to the final color
+    shadow /= float(sampleCount * sampleCount);
+    finalColor *= mix(0.2, 1.0, 1.0 - shadow);
+    
     outColor = vec4(finalColor, 1.0);
 }

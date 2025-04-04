@@ -10,6 +10,7 @@ layout(binding = 0) uniform UniformBufferObject {
     mat4 mvpMat; // Model-View-Projection matrix
     mat4 mMat;   // Model matrix (non necessario per questo caso)
     mat4 nMat;   // Normal matrix (non necessario per questo caso)
+    mat4 lightSpaceMatrix; // Light space matrix (non necessario per questo caso)
 } ubo;
 
 void main() {
