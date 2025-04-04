@@ -119,15 +119,19 @@ elseif(WIN32)
     find_package(Vulkan REQUIRED)
 
     foreach(dir IN LISTS Vulkan_INCLUDE_DIR INCLUDE_DIRS)
-        target_include_directories(${PROJECT_NAME} PUBLIC ${dir})
+        target_include_directories(exe PUBLIC ${dir})
+        target_include_directories(compute_shadows PUBLIC ${dir})
     endforeach()
 
     foreach(lib IN LISTS Vulkan_LIBRARIES LINK_LIBS)
-        target_link_libraries(${PROJECT_NAME} ${lib})
+        target_link_libraries(exe ${lib})
+        target_link_libraries(compute_shadows ${lib})
     endforeach()
 
-    target_include_directories(${PROJECT_NAME} PRIVATE ${CMAKE_SOURCE_DIR}/include)
-    target_include_directories(${PROJECT_NAME} PRIVATE ${CMAKE_SOURCE_DIR}/third_party)
+    target_include_directories(exe PRIVATE ${CMAKE_SOURCE_DIR}/include)
+    target_include_directories(exe PRIVATE ${CMAKE_SOURCE_DIR}/third_party)
+    target_include_directories(compute_shadows PRIVATE ${CMAKE_SOURCE_DIR}/include)
+    target_include_directories(compute_shadows PRIVATE ${CMAKE_SOURCE_DIR}/third_party)
 
 
     file(GLOB GLSL_SOURCE_FILES "${CMAKE_SOURCE_DIR}/assets/shaders/*.vert" "${CMAKE_SOURCE_DIR}/assets/shaders/*.frag")
@@ -185,22 +189,29 @@ elseif(UNIX AND NOT APPLE)
 
 
     find_package(glm REQUIRED)
-    target_include_directories(${PROJECT_NAME} PRIVATE ${GLM_INCLUDE_DIRS})
+    target_include_directories(exe PRIVATE ${GLM_INCLUDE_DIRS})
+    target_include_directories(compute_shadows PRIVATE ${GLM_INCLUDE_DIRS})
 
-    target_include_directories(${PROJECT_NAME} PRIVATE ${CMAKE_SOURCE_DIR}/include)
-    target_include_directories(${PROJECT_NAME} PRIVATE ${CMAKE_SOURCE_DIR}/third_party)
+    target_include_directories(exe PRIVATE ${CMAKE_SOURCE_DIR}/include)
+    target_include_directories(exe PRIVATE ${CMAKE_SOURCE_DIR}/third_party)
+    target_include_directories(compute_shadows PRIVATE ${CMAKE_SOURCE_DIR}/include)
+    target_include_directories(compute_shadows PRIVATE ${CMAKE_SOURCE_DIR}/third_party)
 
-    target_link_libraries(${PROJECT_NAME} Vulkan::Vulkan glfw)
+    target_link_libraries(exe Vulkan::Vulkan glfw)
+    target_link_libraries(compute_shadows Vulkan::Vulkan glfw)
 
     foreach(dir IN LISTS Vulkan_INCLUDE_DIR INCLUDE_DIRS)
-        target_include_directories(${PROJECT_NAME} PUBLIC ${dir})
+        target_include_directories(exe PUBLIC ${dir})
+        target_include_directories(compute_shadows PUBLIC ${dir})
     endforeach()
 
     foreach(lib IN LISTS Vulkan_LIBRARIES LINK_LIBS)
-        target_link_libraries(${PROJECT_NAME} ${lib})
+        target_link_libraries(exe ${lib})
+        target_link_libraries(compute_shadows ${lib})
     endforeach()
 
-    target_include_directories(${PROJECT_NAME} PRIVATE ${CMAKE_SOURCE_DIR}/include)
+    target_include_directories(exe PRIVATE ${CMAKE_SOURCE_DIR}/include)
+    target_include_directories(compute_shadows PRIVATE ${CMAKE_SOURCE_DIR}/include)
 
     file(GLOB GLSL_SOURCE_FILES "${CMAKE_SOURCE_DIR}/assets/shaders/*.vert" "${CMAKE_SOURCE_DIR}/assets/shaders/*.frag")
 
