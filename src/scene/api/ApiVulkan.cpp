@@ -194,7 +194,7 @@ protected:
 		M.resize(meshes.size());
 		DS_P.resize(meshes.size());
 		DS_P_shadows.resize(meshes.size());
-		materials_name.resize(num_textures);
+		materials_name.resize(meshes.size());
 
 		for (int i = 0; i < meshes.size(); i++)
 		{
@@ -250,7 +250,10 @@ protected:
 		textures_hdri.initCubic(this, textures_hdri_string.data());
 
 		// load shadow texture
-		texture_shadow.init(this, "light_0.png");
+		if (!compute_shadows)
+		{
+			texture_shadow.init(this, "light_0.png");
+		}
 
 		auto lights_current = root->getRecursiveLightsTransform();
 		lights.resize(lights_current.size());
@@ -441,6 +444,7 @@ protected:
 			{
 				exit(0);
 			}
+			
 		}
 		
 	}
