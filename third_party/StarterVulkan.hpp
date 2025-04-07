@@ -660,7 +660,7 @@ std::cout << "Starting createInstance()\n"  << std::flush;
     	uint32_t deviceCount = 0;
     	vkEnumeratePhysicalDevices(instance, &deviceCount, nullptr);
 		deviceReport devRep;
-    	 
+
     	if (deviceCount == 0) {
 			throw std::runtime_error("failed to find GPUs with Vulkan support!");
 		}
@@ -669,27 +669,32 @@ std::cout << "Starting createInstance()\n"  << std::flush;
 		vkEnumeratePhysicalDevices(instance, &deviceCount, devices.data());
 		
 		std::cout << "Physical devices found: " << deviceCount << "\n";
-		
+
+		VkPhysicalDevice selectedDevice = VK_NULL_HANDLE;
 		for (const auto& device : devices) {
-			if(checkIfItHasDeviceExtension(device, "VK_KHR_portability_subset")) {
-				deviceExtensions.push_back("VK_KHR_portability_subset");
-			}
-						
-			bool suitable = isDeviceSuitable(device, devRep);
-			if (suitable) {
-				physicalDevice = device;
-				msaaSamples = getMaxUsableSampleCount();
-				std::cout << "\n\nMaximum samples for anti-aliasing: " << msaaSamples << "\n\n\n";
+			VkPhysicalDeviceProperties deviceProperties;
+			vkGetPhysicalDeviceProperties(device, &deviceProperties);
+			std::cout << "Found: " << deviceProperties.deviceName << " - Type: " << deviceProperties.deviceType << "\n";
+
+			if (deviceProperties.deviceType == VK_PHYSICAL_DEVICE_TYPE_DISCRETE_GPU && isDeviceSuitable(device, devRep)) {
+				selectedDevice = device;
 				break;
-			} else {
-				std::cout << "Device " << device << " is not suitable\n";
-				devRep.print();
 			}
 		}
 		
-		if (physicalDevice == VK_NULL_HANDLE) {
+		if (selectedDevice == VK_NULL_HANDLE) {
+			for (const auto& device : devices) {
+				if (isDeviceSuitable(device, devRep)) {
+					selectedDevice = device;
+					break;
+				}
+			}
+		}
+		if (selectedDevice == VK_NULL_HANDLE) {
 			throw std::runtime_error("failed to find a suitable GPU!");
 		}
+		physicalDevice = selectedDevice;
+		msaaSamples = getMaxUsableSampleCount();
     }
 	
     bool isDeviceSuitable(VkPhysicalDevice device, deviceReport &devRep) {
@@ -801,6 +806,8 @@ std::cout << "Starting createInstance()\n"  << std::flush;
 	VkSampleCountFlagBits getMaxUsableSampleCount() {
 		VkPhysicalDeviceProperties physicalDeviceProperties;
 		vkGetPhysicalDeviceProperties(physicalDevice, &physicalDeviceProperties);
+		std::cout << "Using device: " << physicalDeviceProperties.deviceName << " - ";
+		std::cout << "Type: " << physicalDeviceProperties.deviceType << "\n";
 		
 		VkSampleCountFlags counts =
 				physicalDeviceProperties.limits.framebufferColorSampleCounts &
