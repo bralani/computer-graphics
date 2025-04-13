@@ -1,4 +1,5 @@
 #include "scene/natureScene/NatureScene.hpp"
+#include "scene/natureScene/object/Grounds.hpp"
 #include "scene/natureScene/object/Rocks.hpp"
 #include "scene/natureScene/object/Terrain.hpp"
 #include "materials/Texture.hpp"
@@ -13,6 +14,7 @@
 #include "utilities/Input.hpp"
 #include <iostream>
 #include <GLFW/glfw3.h>
+#include "scene/natureScene/mesh/Ground.hpp"
 
 // constructor
 NatureScene::NatureScene()
@@ -53,10 +55,12 @@ NatureScene::NatureScene()
 
 std::shared_ptr<Object> NatureScene::createRoot()
 {
-  auto rocks = std::make_shared<Rocks>();
+	auto rocks = std::make_shared<Rocks>();
 	auto terrain = std::make_shared<Terrain>();
-  auto root = std::make_shared<Object>();
-  root.get()->setChildrenObjects({rocks, terrain});
+	auto ground = std::make_shared<Grounds>();
+
+	auto root = std::make_shared<Object>();
+	root->setChildrenObjects({rocks, terrain, ground});
 
 	DirectionalLight dirLight(
 		glm::vec3(0.2f, 0.2f, 0.2f),
