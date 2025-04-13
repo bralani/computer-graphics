@@ -126,7 +126,7 @@ void main() {
     finalColor *= ao; // Applica ambient occlusion
 
     // Sample multiple neighboring shadow map texels for PCF (Percentage Closer Filtering)
-    int sampleCount = 16; // The number of samples you want to take for PCF
+    int sampleCount = 6; // The number of samples you want to take for PCF
     float shadow = 0.0;
     vec2 texelSize = 1.0 / textureSize(shadowMap, 0); 
     vec2 shadowMapCoord = (lightSpacePos.xy / lightSpacePos.w )* 0.5 + 0.5;
@@ -150,7 +150,7 @@ void main() {
     }
 
     // Average the samples and apply the result to the final color
-    shadow /= float(sampleCount * sampleCount);
+    shadow /= pow(float(sampleCount + 1), 2.0);
     finalColor *= mix(0.2, 1.0, 1.0 - shadow);
     
     outColor = vec4(finalColor, 1.0);
