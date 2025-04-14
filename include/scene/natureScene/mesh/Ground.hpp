@@ -11,7 +11,8 @@ public:
       
       GroundMaterial material;
       this->setMaterial(std::make_shared<GroundMaterial>(material));
-      this->transform.setScale(glm::vec3(0.1f));
+      this->transform.setScale(glm::vec3(10.0f));
+      this->transform.setPosition(glm::vec3(0.0f, -200.0f, 0.0f));
     }
 private:
 };

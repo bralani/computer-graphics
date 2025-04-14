@@ -11,8 +11,6 @@ public:
   Grounds() : Object()
   {
     auto groundMesh = std::make_shared<GroundMesh>();
-    
-	groundMesh->transform.setPosition(glm::vec3(10.0f, -1.0f, 0.0f));
 
     auto meshes = std::vector<std::shared_ptr<Mesh>>();
     meshes.push_back(groundMesh);
