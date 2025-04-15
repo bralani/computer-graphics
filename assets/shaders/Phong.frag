@@ -13,6 +13,7 @@ layout(binding = 0) uniform UniformBufferObject {
     mat4 mMat;
     mat4 nMat;
     mat4 lightSpaceMatrix;
+    int tilingFactor;
 } ubo;
 
 #define MAX_LIGHTS 20

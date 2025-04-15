@@ -13,6 +13,8 @@ layout(binding = 0) uniform UniformBufferObject {
     mat4 mvpMat;
     mat4 mMat;
     mat4 nMat;
+    mat4 lightSpaceMatrix;
+    int tilingFactor;
 } ubo;
 
 #define MAX_LIGHTS 20
@@ -85,13 +87,17 @@ vec3 reflectColor(vec3 viewDir, vec3 normal) {
 }
 
 void main() {
-    // Albedo, roughness, metallic, normal e AO
-    vec3 albedo = texture(textAlbedo, fragTexCoord).rgb;
-    float roughness = texture(textRoughness, fragTexCoord).r;
-    float metallic = texture(textMetallic, fragTexCoord).r;
-    vec3 normalMap = texture(textNormal, fragTexCoord).rgb * 2.0 - 1.0;
+
+    // Adjust texture coordinates for tiling
+    vec2 tiledTexCoord = fragTexCoord * ubo.tilingFactor;
+
+    // Sample textures with tiled coordinates
+    vec3 albedo = texture(textAlbedo, tiledTexCoord).rgb;
+    float roughness = texture(textRoughness, tiledTexCoord).r;
+    float metallic = texture(textMetallic, tiledTexCoord).r;
+    vec3 normalMap = texture(textNormal, tiledTexCoord).rgb * 2.0 - 1.0;
     normalMap.y = -normalMap.y;
-    float ao = texture(textAO, fragTexCoord).r;
+    float ao = texture(textAO, tiledTexCoord).r;
 
     vec3 T = normalize(fragTangent);
     vec3 N = normalize(fragNorm);
