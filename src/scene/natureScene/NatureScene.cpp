@@ -56,11 +56,10 @@ NatureScene::NatureScene()
 std::shared_ptr<Object> NatureScene::createRoot()
 {
 	auto rocks = std::make_shared<Rocks>();
-	auto terrain = std::make_shared<Terrain>();
 	auto ground = std::make_shared<Grounds>();
 
 	auto root = std::make_shared<Object>();
-	root->setChildrenObjects({rocks, terrain, ground});
+	root->setChildrenObjects({ground, rocks});
 
 	DirectionalLight dirLight(
 		glm::vec3(0.2f, 0.2f, 0.2f),
