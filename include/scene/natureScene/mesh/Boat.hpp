@@ -11,7 +11,6 @@ public:
       
       BoatMaterial material;
       this->setMaterial(std::make_shared<BoatMaterial>(material));
-      this->transform.setPosition(glm::vec3(0.0f, 2.0f, 0.0f));
     }
 private:
 };

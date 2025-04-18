@@ -12,6 +12,7 @@ public:
            float roll = 0.0f);
     virtual ~Camera();
 
+    virtual void update();
     void setPosition(const glm::vec3& pos);
     void setYaw(float newYaw);
     void setPitch(float newPitch);

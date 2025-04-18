@@ -78,7 +78,7 @@ protected:
 	// Please note that Model objects depends on the corresponding vertex structure
 	// Models
 	std::vector<Model<Vertex>> M;
-	std::vector<glm::mat4> trans_mat;
+	std::vector<std::shared_ptr<Mesh>> meshesVulkan;
 	Model<Vertex> M_background;
 
 	// Lights
@@ -190,19 +190,19 @@ protected:
 
 		// Models, textures and Descriptors (values assigned to the uniforms)
 		auto root = this->scene->getRoot();
-		auto meshes = root->getRecursiveMeshesTransform();
+		meshesVulkan = root->getRecursiveMeshesTransform();
 
 		// allocate the models
-		M.resize(meshes.size());
-		DS_P.resize(meshes.size());
-		DS_P_shadows.resize(meshes.size());
-		materials_name.resize(meshes.size());
-		materials_tiling.resize(meshes.size());
+		M.resize(meshesVulkan.size());
+		DS_P.resize(meshesVulkan.size());
+		DS_P_shadows.resize(meshesVulkan.size());
+		materials_name.resize(meshesVulkan.size());
+		materials_tiling.resize(meshesVulkan.size());
 
-		for (int i = 0; i < meshes.size(); i++)
+		for (int i = 0; i < meshesVulkan.size(); i++)
 		{
 			// load mesh
-			std::shared_ptr<Mesh> mesh = meshes[i].first;
+			std::shared_ptr<Mesh> mesh = meshesVulkan[i];
 
 			auto filename = mesh->getFilename();
 			auto extension = filename.substr(filename.find_last_of(".") + 1);
@@ -214,9 +214,6 @@ protected:
 			{
 				M[i].init(this, &VD, mesh->getFilename(), GLTF);
 			}
-
-			// apply transform
-			trans_mat.push_back(meshes[i].second.getTransform());
 
 			// load material and textures
 			auto material = mesh->getMaterial();
@@ -256,7 +253,7 @@ protected:
 		// load shadow texture
 		if (!compute_shadows)
 		{
-			texture_shadow.init(this, "light_0.png");
+			texture_shadow.init(this, "D:/computer-graphics/build/Release/assets/textures/bog_metallic.png");
 		}
 
 		auto lights_current = root->getRecursiveLightsTransform();
@@ -422,7 +419,7 @@ protected:
 		glm::mat4 AxTr = glm::scale(glm::mat4(1.0f), glm::vec3(0.0f));
 		for (int i = 0; i < DS_P.size(); i++)
 		{
-			ubo.mMat = trans_mat[i];
+			ubo.mMat = meshesVulkan[i]->getGlobalTransform().getTransform();
 			ubo.mvpMat = ViewPrj * ubo.mMat;
 			ubo.nMat = glm::inverse(glm::transpose(ubo.mMat));
 			ubo.lightSpaceMatrix = lightSpaceMatrix * ubo.mMat;

@@ -29,13 +29,14 @@ public:
   void setMeshes(const std::vector<std::shared_ptr<Mesh>> &meshes) { this->meshes = meshes; }
   void setLights(const std::vector<std::shared_ptr<Light>> &lights) { this->lights = lights; }
 
-  std::vector<std::pair<std::shared_ptr<Mesh>, Transform>> getRecursiveMeshesTransform() {
-    std::vector<std::pair<std::shared_ptr<Mesh>, Transform>> allMeshesTransform;
+  std::vector<std::shared_ptr<Mesh>> getRecursiveMeshesTransform() {
+    std::vector<std::shared_ptr<Mesh>> allMeshesTransform;
 
     // Collect all meshes from the current node
     for (const auto& mesh : meshes) {
         auto transformedMesh = transform * mesh->transform;
-        allMeshesTransform.emplace_back(mesh, transformedMesh);
+        mesh->setGlobalTransform(transformedMesh);
+        allMeshesTransform.push_back(mesh);
     }
 
     // Recursively collect meshes from children

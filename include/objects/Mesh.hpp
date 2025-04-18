@@ -12,7 +12,7 @@ public:
     Transform transform;
 
     Mesh(const std::string& filename) 
-        : filename(filename), transform(), material(std::make_shared<Material>()) {
+        : filename(filename), transform(), globalTransform(), material(std::make_shared<Material>()) {
     }
 
     ~Mesh() = default;
@@ -22,8 +22,11 @@ public:
 
     const std::string& getFilename() const { return filename; }
     void setFilename(const std::string& name) { filename = name; }
+    void setGlobalTransform(const Transform& transform) { globalTransform = transform; }
+    Transform& getGlobalTransform() { return globalTransform; }
     
 private:
+    Transform globalTransform;
     std::shared_ptr<Material> material;
     std::string filename;
 };
