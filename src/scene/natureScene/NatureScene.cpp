@@ -36,6 +36,7 @@ NatureScene::NatureScene()
 		pitch,			 // Pitch iniziale (in radianti)
 		roll			 // Roll iniziale (in radianti)
 	);
+	firstPersonCamera = camera;
 
 	PBRShader shader;
 
@@ -52,7 +53,7 @@ NatureScene::NatureScene()
 	};
 
 	// setup the scene
-	setup(root, boatCamera, shader, hdri_textures);
+	setup(root, camera, shader, hdri_textures);
 }
 
 std::shared_ptr<Object> NatureScene::createRoot()
@@ -111,6 +112,20 @@ void NatureScene::update()
 	}
 	if (isPaused)
 		return;
+
+	static bool fPressedPrev = false;
+	bool fpressedCurrent = Input::getKey(GLFW_KEY_F);
+	if (!fpressedCurrent && fPressedPrev) {
+		if (cameraType == 0) {
+			cameraType = 1;
+			setCamera(boatCamera);
+		}
+		else {
+			cameraType = 0;
+			setCamera(firstPersonCamera);
+		}
+	}
+	fPressedPrev = fpressedCurrent;
 
 	// update the camera every frame
 	camera->update();

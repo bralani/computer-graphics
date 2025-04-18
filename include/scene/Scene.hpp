@@ -27,6 +27,7 @@ public:
     std::shared_ptr<Object> getRoot() const { return root; }                        // Get the root object
     Shader getShader() const { return shader; }                                     // Get the shader
     std::shared_ptr<Camera> getCamera() const { return camera; }                    // Get the camera
+    void setCamera(std::shared_ptr<Camera> camera) { this->camera = camera; }       // Set the camera
     const std::array<const char*, 6>& getHDRI() const { return hdri_textures; }     // Get the HDRI textures
     virtual void update() = 0;                                                      // Update the scene
 protected:
