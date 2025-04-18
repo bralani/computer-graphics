@@ -253,7 +253,7 @@ protected:
 		// load shadow texture
 		if (!compute_shadows)
 		{
-			texture_shadow.init(this, "D:/computer-graphics/build/Release/assets/textures/bog_metallic.png");
+			texture_shadow.init(this, "light_0.png");
 		}
 
 		auto lights_current = root->getRecursiveLightsTransform();
