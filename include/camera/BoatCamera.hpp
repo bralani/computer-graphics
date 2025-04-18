@@ -7,7 +7,7 @@
 class BoatCamera : public Camera {
 public:
 
-    BoatCamera::BoatCamera(const std::shared_ptr<Boat>& boatObject);
+    BoatCamera(const std::shared_ptr<Boat>& boatObject);
     
     virtual ~BoatCamera();
 
