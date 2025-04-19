@@ -15,6 +15,7 @@ layout(binding = 0) uniform UniformBufferObject {
     mat4 nMat;
     mat4 lightSpaceMatrix;
     int tilingFactor;
+    float opacity;
 } ubo;
 
 #define MAX_LIGHTS 20
@@ -159,5 +160,5 @@ void main() {
     shadow /= pow(float(sampleCount + 1), 2.0);
     finalColor *= mix(0.2, 1.0, 1.0 - shadow);
     
-    outColor = vec4(finalColor, 1.0);
+    outColor = vec4(finalColor, ubo.opacity);
 }

@@ -21,6 +21,7 @@ class WaterMaterial : public PBRMaterial
         )
     {
         this->setTilingFactor(100);
+        this->setOpacity(0.8f);
     }
 
     std::string getClassName() const override

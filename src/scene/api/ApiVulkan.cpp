@@ -15,6 +15,7 @@ struct UniformBufferObject
 	alignas(16) glm::mat4 nMat;
 	alignas(16) glm::mat4 lightSpaceMatrix;
 	alignas(4) int tilingFactor;
+	alignas(4) float opacity;
 };
 
 struct GlobalUniformBufferObject
@@ -95,6 +96,7 @@ protected:
 	std::map<std::string, std::vector<TextureVulkan>> textures_map;
 	std::vector<std::string> materials_name;
 	std::vector<int> materials_tiling;
+	std::vector<float> materials_opacity;
 	TextureVulkan textures_hdri;
 	TextureVulkan texture_shadow;
 
@@ -179,7 +181,7 @@ protected:
 		// Pipelines [Shader couples]
 		P.init(this, &VD, this->scene->getShader().getVertexPath(), this->scene->getShader().getFragmentPath(), {&DSL_P});
 		P.setAdvancedFeatures(VK_COMPARE_OP_LESS_OR_EQUAL, VK_POLYGON_MODE_FILL,
-													VK_CULL_MODE_NONE, false);
+													VK_CULL_MODE_NONE, true);
 
 		P_background.init(this, &VD, "shaders/hdriVert.spv", "shaders/hdriFrag.spv", {&DSL_P_background});
 		P_background.setAdvancedFeatures(VK_COMPARE_OP_LESS_OR_EQUAL, VK_POLYGON_MODE_FILL,
@@ -198,6 +200,7 @@ protected:
 		DS_P_shadows.resize(meshesVulkan.size());
 		materials_name.resize(meshesVulkan.size());
 		materials_tiling.resize(meshesVulkan.size());
+		materials_opacity.resize(meshesVulkan.size());
 
 		for (int i = 0; i < meshesVulkan.size(); i++)
 		{
@@ -231,6 +234,7 @@ protected:
 
 			materials_name[i] = material_name;
 			materials_tiling[i] = material->getTilingFactor();
+			materials_opacity[i] = material->getOpacity();
 
 			auto it = textures_map.find(material_name);
 			if (it == textures_map.end())
@@ -414,6 +418,7 @@ protected:
 		ubo.nMat = glm::inverse(glm::transpose(ubo.mMat));
 		ubo.lightSpaceMatrix = lightSpaceMatrix;
 		ubo.tilingFactor = 1;
+		ubo.opacity = 1.0f;
 		DS_P_background.map(currentImage, &ubo, sizeof(ubo), 0);
 
 		glm::mat4 AxTr = glm::scale(glm::mat4(1.0f), glm::vec3(0.0f));
@@ -424,6 +429,7 @@ protected:
 			ubo.nMat = glm::inverse(glm::transpose(ubo.mMat));
 			ubo.lightSpaceMatrix = lightSpaceMatrix * ubo.mMat;
 			ubo.tilingFactor = materials_tiling[i];
+			ubo.opacity = materials_opacity[i];
 			DS_P[i].map(currentImage, &ubo, sizeof(ubo), 0);
 			DS_P[i].map(currentImage, &gubo, sizeof(gubo), 1);
 

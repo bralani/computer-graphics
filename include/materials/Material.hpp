@@ -10,6 +10,7 @@ class Material {
 protected:
     std::map<TextureType, Texture> textures;
     int tilingFactor = 1;
+    float opacity = 1.0f;
 
 public:
     Material(const std::map<TextureType, Texture>& textures)
@@ -29,6 +30,14 @@ public:
 
     void setTilingFactor(int factor) {
         tilingFactor = factor;
+    }
+
+    float getOpacity() const {
+        return opacity;
+    }
+
+    void setOpacity(float newOpacity) {
+        opacity = newOpacity;
     }
 
     virtual std::string getClassName() const {
