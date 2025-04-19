@@ -20,8 +20,8 @@ class WaterMaterial : public PBRMaterial
           Texture ("assets/textures/water/ao.png", TextureType::AmbientOcclusion)
         )
     {
-        this->setTilingFactor(100);
-        this->setOpacity(0.8f);
+        this->setTilingFactor(150);
+        this->setOpacity(0.7f);
     }
 
     std::string getClassName() const override

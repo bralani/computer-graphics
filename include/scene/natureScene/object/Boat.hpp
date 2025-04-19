@@ -18,7 +18,8 @@ public:
     auto meshes = std::vector<std::shared_ptr<Mesh>>();
     meshes.push_back(boatMesh);
 
-    this->transform.setPosition(glm::vec3(0.0f, 2.0f, 0.0f));
+    this->transform.setPosition(glm::vec3(139.935, -18.55, 31.9537));
+    this->transform.setRotation(glm::vec3(0, -77.4445, 0));
 
     this->setMeshes(meshes);
   }

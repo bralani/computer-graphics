@@ -14,8 +14,8 @@ public:
     auto groundMesh = std::make_shared<GroundMesh>();
     auto waterMesh = std::make_shared<WaterMesh>();
 
-    this->transform.setScale(glm::vec3(2.0f));
-    this->transform.setPosition(glm::vec3(0.0f, -25.0f, 0.0f));
+    this->transform.setScale(glm::vec3(3.0f));
+    this->transform.setPosition(glm::vec3(0.0f, -60.0f, 0.0f));
 
     auto meshes = std::vector<std::shared_ptr<Mesh>>();
     meshes.push_back(groundMesh);
