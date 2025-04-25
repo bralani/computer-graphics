@@ -471,11 +471,9 @@ protected:
 		// Cleanup datasets
 		for (int i = 0; i < DS_P.size(); i++)
 			DS_P[i].cleanup();
-		DS_P.clear();
 
 		for (int i = 0; i < DS_P_shadows.size(); i++)
 			DS_P_shadows[i].cleanup();
-		DS_P_shadows.clear();
 
 		DS_P_background.cleanup();
 	}
