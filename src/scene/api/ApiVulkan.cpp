@@ -331,6 +331,11 @@ protected:
 			}
 		} else {
 
+			P_background.bind(commandBuffer);
+			M_background.bind(commandBuffer);
+			DS_P_background.bind(commandBuffer, P_background, 0, currentImage);
+			vkCmdDrawIndexed(commandBuffer, static_cast<uint32_t>(M_background.indices.size()), 1, 0, 0, 0);
+
 			P.bind(commandBuffer);
 			for (int i = 0; i < M.size(); i++)
 			{
@@ -340,11 +345,6 @@ protected:
 				vkCmdDrawIndexed(commandBuffer,
 												 static_cast<uint32_t>(M[i].indices.size()), 1, 0, 0, 0);
 			}
-
-			P_background.bind(commandBuffer);
-			M_background.bind(commandBuffer);
-			DS_P_background.bind(commandBuffer, P_background, 0, currentImage);
-			vkCmdDrawIndexed(commandBuffer, static_cast<uint32_t>(M_background.indices.size()), 1, 0, 0, 0);
 		
 		}
 

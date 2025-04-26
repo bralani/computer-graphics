@@ -160,5 +160,8 @@ void main() {
     shadow /= pow(float(sampleCount + 1), 2.0);
     finalColor *= mix(0.2, 1.0, 1.0 - shadow);
     
-    outColor = vec4(finalColor, ubo.opacity);
+    float opacity_albedo = texture(textAlbedo, tiledTexCoord).a;
+    float finalOpacity = ubo.opacity * opacity_albedo;
+
+    outColor = vec4(finalColor, finalOpacity);
 }

@@ -11,7 +11,7 @@ public:
   Rocks() : Object()
   {
     auto rock1 = std::make_shared<RockMesh>();
-    rock1->transform.setPosition(glm::vec3(0.0, 0.4, 0.0));
+    rock1->transform.setPosition(glm::vec3(0.0, 0.0, 1.0));
 
 
     auto meshes = std::vector<std::shared_ptr<Mesh>>();
