@@ -234,7 +234,7 @@ elseif(UNIX AND NOT APPLE)
     endforeach()
 
     foreach(lib IN LISTS Vulkan_LIBRARIES LINK_LIBS)
-        target_link_libraries(exe ${lib})
+        target_link_libraries(exe PRIVATE ${lib})
         target_link_libraries(compute_shadows ${lib})
     endforeach()
 
