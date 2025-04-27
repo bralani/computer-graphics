@@ -30,10 +30,18 @@ if(APPLE)
     file(GLOB_RECURSE SOURCES src/camera/*.cpp src/objects/*.cpp src/scene/*.cpp src/utilities/*.cpp)
     file(GLOB_RECURSE HEADERS include/*.h include/*.hpp)
     file(GLOB_RECURSE HEADERS third_party/*.h third_party/*.hpp)
+    
+    add_subdirectory(third_party/bullet3)
 
     # Define the project executable
     add_executable(exe src/main.cpp ${SOURCES} ${HEADERS})
     add_executable(compute_shadows src/compute_shadows.cpp ${SOURCES} ${HEADERS})
+
+    target_include_directories(exe PRIVATE 
+        ${CMAKE_SOURCE_DIR}/third_party/bullet3/src
+    )
+    add_dependencies(exe Bullet3Common BulletDynamics BulletCollision LinearMath)
+    target_link_libraries(exe PRIVATE Bullet3Common BulletDynamics BulletCollision LinearMath)
 
     # Include directories
     target_include_directories(exe PRIVATE ${GLM_INCLUDE_DIRS})
@@ -97,6 +105,10 @@ if(APPLE)
     file(COPY ${CMAKE_SOURCE_DIR}/assets/models DESTINATION ${CMAKE_BINARY_DIR}/assets)
 
 elseif(WIN32)
+
+    set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreadedDLL")
+    add_compile_options(/MD)
+
     # Windows specific configurations
 
     # Set paths to libraries (modify these based on your SDK and library installation)
@@ -113,8 +125,16 @@ elseif(WIN32)
     file(GLOB_RECURSE HEADERS include/*.h include/*.hpp)
     file(GLOB_RECURSE HEADERS third_party/*.h third_party/*.hpp)
 
+    add_subdirectory(third_party/bullet3)
+
     add_executable(exe src/main.cpp ${SOURCES} ${HEADERS})
     add_executable(compute_shadows src/compute_shadows.cpp ${SOURCES} ${HEADERS})
+
+    target_include_directories(exe PRIVATE 
+        ${CMAKE_SOURCE_DIR}/third_party/bullet3/src
+    )
+    add_dependencies(exe Bullet3Common BulletDynamics BulletCollision LinearMath)
+    target_link_libraries(exe PRIVATE Bullet3Common BulletDynamics BulletCollision LinearMath)
 
     find_package(Vulkan REQUIRED)
 
@@ -124,7 +144,7 @@ elseif(WIN32)
     endforeach()
 
     foreach(lib IN LISTS Vulkan_LIBRARIES LINK_LIBS)
-        target_link_libraries(exe ${lib})
+        target_link_libraries(exe PRIVATE ${lib})
         target_link_libraries(compute_shadows ${lib})
     endforeach()
 
@@ -180,9 +200,17 @@ elseif(WIN32)
 elseif(UNIX AND NOT APPLE)
     file(GLOB_RECURSE SOURCES src/camera/*.cpp src/objects/*.cpp src/scene/*.cpp src/utilities/*.cpp)
     file(GLOB_RECURSE HEADERS include/*.h include/*.hpp)
+    
+    add_subdirectory(third_party/bullet3)
 
     add_executable(exe src/main.cpp ${SOURCES} ${HEADERS})
     add_executable(compute_shadows src/compute_shadows.cpp ${SOURCES} ${HEADERS})
+
+    target_include_directories(exe PRIVATE 
+        ${CMAKE_SOURCE_DIR}/third_party/bullet3/src
+    )
+    add_dependencies(exe Bullet3Common BulletDynamics BulletCollision LinearMath)
+    target_link_libraries(exe PRIVATE Bullet3Common BulletDynamics BulletCollision LinearMath)
 
     find_package(Vulkan REQUIRED)
     find_package(glfw3 REQUIRED)
@@ -197,7 +225,7 @@ elseif(UNIX AND NOT APPLE)
     target_include_directories(compute_shadows PRIVATE ${CMAKE_SOURCE_DIR}/include)
     target_include_directories(compute_shadows PRIVATE ${CMAKE_SOURCE_DIR}/third_party)
 
-    target_link_libraries(exe Vulkan::Vulkan glfw)
+    target_link_libraries(exe PRIVATE Vulkan::Vulkan glfw)
     target_link_libraries(compute_shadows Vulkan::Vulkan glfw)
 
     foreach(dir IN LISTS Vulkan_INCLUDE_DIR INCLUDE_DIRS)
