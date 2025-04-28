@@ -29,8 +29,8 @@ FirstPersonCamera::FirstPersonCamera(const glm::vec3& pos, float yaw, float pitc
       m_motionState(nullptr),
       m_physicsWorld(physicsWorld),
       m_isGrounded(false),
-      m_jumpForce(2.0f),
-      m_moveForce(0.1f),
+      m_jumpForce(1.0f),
+      m_moveForce(0.03f),
       m_maxSpeed(1.0f) {
     
     // Inizializzazione fisica
@@ -100,6 +100,13 @@ void FirstPersonCamera::update() {
     if (Input::getKey(GLFW_KEY_D)) moveDir.x = 1.0f;
     if (Input::getKey(GLFW_KEY_S)) moveDir.z = 1.0f;
     if (Input::getKey(GLFW_KEY_W)) moveDir.z = -1.0f;
+
+    bool shift = Input::getKey(GLFW_KEY_LEFT_SHIFT);
+    float moveForce = m_moveForce;
+    if (shift) {
+        moveForce *= 2.0f;
+    }
+    
     
     // Salto
     if (Input::getKey(GLFW_KEY_SPACE) && m_isGrounded) {
@@ -113,7 +120,7 @@ void FirstPersonCamera::update() {
     // Applica forze fisiche
     if(m_rigidBody) {
 
-        glm::vec3 desiredMove = (forward * moveDir.z + right * moveDir.x) * m_moveForce;
+        glm::vec3 desiredMove = (forward * moveDir.z + right * moveDir.x) * moveForce;
         
         // Limita velocità orizzontale
         btVector3 currentVel = m_rigidBody->getLinearVelocity();

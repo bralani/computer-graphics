@@ -119,7 +119,7 @@ void Collision::createRigidBody() {
     );
     
     rigidBody = new btRigidBody(rbInfo);
-    rigidBody->setFriction(1.0f);
+    rigidBody->setFriction(0.5f);
     rigidBody->setRestitution(0.1f);
 }
 

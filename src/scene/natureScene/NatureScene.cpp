@@ -67,7 +67,7 @@ void NatureScene::initializePhysicsWorld()
 	auto broadphase = new btDbvtBroadphase();
 	btSequentialImpulseConstraintSolver* sol = new btSequentialImpulseConstraintSolver;
 	physicsWorld = new btDiscreteDynamicsWorld(dispatcher, broadphase, sol, collisionConfiguration);
-	physicsWorld->setGravity(btVector3(0, -0.1, 0));
+	physicsWorld->setGravity(btVector3(0, -0.05, 0));
 }
 
 void NatureScene::addCollisions()
