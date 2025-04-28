@@ -4,6 +4,7 @@
 #include <string>
 #include <memory>
 #include "objects/Transform.hpp"
+#include "objects/Collision.hpp"
 #include "materials/Material.hpp"
 
 
@@ -22,13 +23,24 @@ public:
 
     const std::string& getFilename() const { return filename; }
     void setFilename(const std::string& name) { filename = name; }
-    void setGlobalTransform(const Transform& transform) { globalTransform = transform; }
-    Transform& getGlobalTransform() { return globalTransform; }
     
-private:
+    void setGlobalTransform(Transform& transform) { 
+        globalTransform = transform;
+    }
+    
+    void setCollisionTransform() {
+        if (!collision) return;
+        
+        collision->setGlobalTransform(globalTransform);
+    }
+
+    Transform& getGlobalTransform() { return globalTransform; }
+    const std::shared_ptr<Collision>& getCollision() const { return collision; }
+protected:
     Transform globalTransform;
     std::shared_ptr<Material> material;
     std::string filename;
+    std::shared_ptr<Collision> collision = nullptr;
 };
 
 #endif // MESH_HPP

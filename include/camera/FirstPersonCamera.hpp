@@ -2,19 +2,38 @@
 #define FIRST_PERSON_CAMERA_HPP
 
 #include "camera/Camera.hpp"
+#include <btBulletDynamicsCommon.h>
 
 class FirstPersonCamera : public Camera {
 public:
     FirstPersonCamera(const glm::vec3& pos = glm::vec3(0.0f),
-                      float yaw = 0.0f,
-                      float pitch = 0.0f,
-                      float roll = 0.0f);
-
+                     float yaw = 0.0f,
+                     float pitch = 0.0f,
+                     float roll = 0.0f,
+                     btDynamicsWorld* physicsWorld = nullptr);
     
     virtual ~FirstPersonCamera();
 
-
+    virtual void update() override;
     virtual glm::mat4 getViewMatrix() const override;
+
+    // Metodi per la fisica
+    void setPhysicsWorld(btDynamicsWorld* world);
+    btRigidBody* getRigidBody() const { return m_rigidBody; }
+    void jump();
+    bool isGrounded() const { return m_isGrounded; }
+
+private:
+    // Variabili per la fisica
+    btRigidBody* m_rigidBody;
+    btCollisionShape* m_collisionShape;
+    btMotionState* m_motionState;
+    btDynamicsWorld* m_physicsWorld;
+    
+    bool m_isGrounded;
+    float m_jumpForce;
+    float m_moveForce;
+    float m_maxSpeed;
 };
 
 #endif

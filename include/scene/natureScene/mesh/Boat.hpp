@@ -12,7 +12,6 @@ public:
       BoatMaterial material;
       this->setMaterial(std::make_shared<BoatMaterial>(material));
     }
-private:
 };
 
 #endif // BOATMESH_HPP

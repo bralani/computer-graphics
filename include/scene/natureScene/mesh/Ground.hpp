@@ -11,8 +11,9 @@ public:
       
       GroundMaterial material;
       this->setMaterial(std::make_shared<GroundMaterial>(material));
+      this->collision = std::make_shared<Collision>(filename, globalTransform);
+      this->collision->setActive(true);
     }
-private:
 };
 
 #endif // GROUNDMESH_HPP

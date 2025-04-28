@@ -29,13 +29,15 @@ NatureScene::NatureScene()
 	float pitch = asin(direction.y);
 	float roll = 0.0f;
 
+	initializePhysicsWorld();
 
 	// create the camera
 	auto camera = std::make_shared<FirstPersonCamera>(
 		position, // Posizione iniziale
 		yaw,			 // Yaw iniziale (in radianti)
 		pitch,			 // Pitch iniziale (in radianti)
-		roll			 // Roll iniziale (in radianti)
+		roll,			 // Roll iniziale (in radianti)
+		physicsWorld 	 // Passa il mondo fisico alla camera
 	);
 	firstPersonCamera = camera;
 
@@ -55,6 +57,36 @@ NatureScene::NatureScene()
 
 	// setup the scene
 	setup(root, camera, shader, hdri_textures);
+	addCollisions();
+}
+
+void NatureScene::initializePhysicsWorld()
+{
+	auto collisionConfiguration = new btDefaultCollisionConfiguration();
+	auto dispatcher = new btCollisionDispatcher(collisionConfiguration);
+	auto broadphase = new btDbvtBroadphase();
+	btSequentialImpulseConstraintSolver* sol = new btSequentialImpulseConstraintSolver;
+	physicsWorld = new btDiscreteDynamicsWorld(dispatcher, broadphase, sol, collisionConfiguration);
+	physicsWorld->setGravity(btVector3(0, -0.1, 0));
+}
+
+void NatureScene::addCollisions()
+{
+	// Iterate over root's children and add collisions to each mesh
+	for (const auto& child : root->getRecursiveMeshesTransform())
+	{
+		auto collision = child->getCollision();
+		if (collision && collision->isActiveCollision())
+		{
+			physicsWorld->addRigidBody(collision->getRigidBody());
+		}
+	}
+	
+	// Iterate over root's children and add collisions to each mesh
+	for (const auto& child : root->getRecursiveMeshesTransform())
+	{
+		child->setCollisionTransform();
+	}
 }
 
 std::shared_ptr<Object> NatureScene::createRoot()
@@ -86,6 +118,9 @@ std::shared_ptr<Object> NatureScene::createRoot()
 void NatureScene::update()
 {
 	auto window = Input::getWindow();
+    static double lastTime = glfwGetTime();
+    double currentTime = glfwGetTime();
+    float deltaT = static_cast<float>(currentTime - lastTime);
 
 	static bool isPaused = false;
 	static bool pDebounce = false;
@@ -129,6 +164,7 @@ void NatureScene::update()
 	}
 	fPressedPrev = fpressedCurrent;
 
-	// update the camera every frame
+	// update the camera and physics world
 	camera->update();
+    physicsWorld->stepSimulation(deltaT, 10);
 }
