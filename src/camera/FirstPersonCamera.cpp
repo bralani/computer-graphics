@@ -34,7 +34,7 @@ FirstPersonCamera::FirstPersonCamera(const glm::vec3& pos, float yaw, float pitc
       m_maxSpeed(1.0f) {
     
     // Inizializzazione fisica
-    m_collisionShape = new btCapsuleShape(0.5f, 1.0f);
+    m_collisionShape = new btCapsuleShape(0.5f, 1.5f);
     
     btScalar mass(1.0f);
     btVector3 localInertia(0, 0, 0);
@@ -46,7 +46,7 @@ FirstPersonCamera::FirstPersonCamera(const glm::vec3& pos, float yaw, float pitc
     m_rigidBody = new btRigidBody(rbInfo);
     // Configurazione rigid body
     m_rigidBody->setAngularFactor(0.0f);
-    m_rigidBody->setFriction(1.0f);
+    m_rigidBody->setFriction(0.7f);
     m_rigidBody->setDamping(0.2f, 0.1f);
     m_rigidBody->setActivationState(DISABLE_DEACTIVATION);
     
