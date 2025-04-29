@@ -21,7 +21,6 @@ public:
     void setPhysicsWorld(btDynamicsWorld* world);
     btRigidBody* getRigidBody() const { return m_rigidBody; }
     void jump();
-    bool isGrounded() const { return m_isGrounded; }
 
 private:
     // Variabili per la fisica
@@ -30,7 +29,6 @@ private:
     btMotionState* m_motionState;
     btDynamicsWorld* m_physicsWorld;
     
-    bool m_isGrounded;
     float m_jumpForce;
     float m_moveForce;
     float m_maxSpeed;

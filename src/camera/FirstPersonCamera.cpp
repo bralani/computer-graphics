@@ -28,7 +28,6 @@ FirstPersonCamera::FirstPersonCamera(const glm::vec3& pos, float yaw, float pitc
       m_collisionShape(nullptr),
       m_motionState(nullptr),
       m_physicsWorld(physicsWorld),
-      m_isGrounded(false),
       m_jumpForce(1.0f),
       m_moveForce(0.03f),
       m_maxSpeed(1.0f) {
@@ -109,7 +108,7 @@ void FirstPersonCamera::update() {
     
     
     // Salto
-    if (Input::getKey(GLFW_KEY_SPACE) && m_isGrounded) {
+    if (Input::getKey(GLFW_KEY_SPACE)) {
         jump();
     }
 
@@ -128,18 +127,6 @@ void FirstPersonCamera::update() {
         
         if(glm::length(flatVel) < m_maxSpeed) {
             m_rigidBody->applyCentralForce(btVector3(desiredMove.x, 0, desiredMove.z));
-        }
-        
-        // Controllo a terra con raycast
-        btTransform transform;
-        m_motionState->getWorldTransform(transform);
-        btVector3 from = transform.getOrigin();
-        btVector3 to = from - btVector3(0, 1.1f, 0);
-        
-        btCollisionWorld::ClosestRayResultCallback rayCallback(from, to);
-        if(m_physicsWorld) {
-            m_physicsWorld->rayTest(from, to, rayCallback);
-            m_isGrounded = rayCallback.hasHit();
         }
     }
 }
@@ -163,8 +150,7 @@ void FirstPersonCamera::setPhysicsWorld(btDynamicsWorld* world) {
 }
 
 void FirstPersonCamera::jump() {
-    if(m_rigidBody && m_isGrounded) {
+    if(m_rigidBody) {
         m_rigidBody->applyCentralImpulse(btVector3(0, m_jumpForce, 0));
-        m_isGrounded = false;
     }
 }
