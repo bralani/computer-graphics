@@ -101,6 +101,7 @@ std::shared_ptr<Object> NatureScene::createRoot()
 	auto tree = std::make_shared<Tree>();
 	auto treasure = std::make_shared<Treasure>();
 	boatCamera = std::make_shared<BoatCamera>(boat);
+	meshCamera = std::make_shared<MeshCamera>(rocks);
 
 	auto root = std::make_shared<Object>();
 	root->setChildrenObjects({ground, rocks, boat, tree, treasure});
@@ -202,7 +203,10 @@ void NatureScene::checkChangeCamera() {
 			}
 
 		}
-		else {
+		else if (cameraType == 1) {
+			cameraType = 2;
+			setCamera(meshCamera);
+		} else {
 			glm::vec3 cameraPos = boatCamera->getBoatPosition();
 			auto dist = glm::distance(cameraPos, spawn1);
 
@@ -218,7 +222,6 @@ void NatureScene::checkChangeCamera() {
 				firstPersonCamera->setPositionRigidBody(spawn2);
 				setCamera(firstPersonCamera);
 			}
-
 		}
 	}
 	vPressedPrev = vpressedCurrent;

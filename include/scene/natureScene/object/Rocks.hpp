@@ -3,8 +3,11 @@
 
 #include <vector>
 #include <memory>
+#include <fstream>
 #include <random>
 #include "scene/natureScene/mesh/Rock.hpp"
+#include "objects/Object.hpp"
+#include "utilities/Input.hpp"
 
 class Rocks : public Object
 {
@@ -176,6 +179,84 @@ public:
     this->setMeshes(meshes);
   }
 
+  void update() {
+    // Movement parameters
+    const float moveSpeed = 5.0f;  // units per second
+    const float turnSpeed = 90.0f; // degrees per second
+
+    static double lastTime = glfwGetTime();
+    double currentTime = glfwGetTime();
+    float deltaTime = static_cast<float>(currentTime - lastTime);
+    lastTime = currentTime;
+
+    const int rockToMove = 0;
+
+    // Get current transform values
+    glm::vec3 position = m_meshes[rockToMove]->transform.getPosition();
+    glm::vec3 rotation = m_meshes[rockToMove]->transform.getRotation(); // Assuming rotation is stored in degrees
+
+    // Handle keyboard input
+    // Rotation (A/D)
+    if (Input::getKey(GLFW_KEY_A)) {
+      rotation.y += turnSpeed * deltaTime;
+    }
+    if (Input::getKey(GLFW_KEY_D)) {
+      rotation.y -= turnSpeed * deltaTime;
+    }
+
+    // Convert rotation to radians for calculations
+    float yawRad = glm::radians(rotation.y);
+
+    // Calculate forward direction vector
+    glm::vec3 moveDirection(
+        sin(yawRad),
+        0.0f,
+        cos(yawRad)
+    );
+
+    // Movement (W/S)
+	  if (Input::getKey(GLFW_KEY_W)) {
+      position += moveDirection * moveSpeed * deltaTime;
+    }
+    if (Input::getKey(GLFW_KEY_S)) {
+      position -= moveDirection * moveSpeed * deltaTime;
+    }
+    if (Input::getKey(GLFW_KEY_SPACE)) {
+      position.y += moveSpeed * deltaTime;
+    }
+    if (Input::getKey(GLFW_KEY_LEFT_SHIFT)) {
+      position.y -= moveSpeed * deltaTime;
+    }
+
+    static bool wasEnterDown = false;
+    bool enterDown = Input::getKey(GLFW_KEY_ENTER) 
+                  || Input::getKey(GLFW_KEY_KP_ENTER); // anche il pad numerico
+
+    if (enterDown && !wasEnterDown) {
+        // borda di salita: appena premuto
+        std::ofstream out("positions.txt", std::ios::app);
+        if (out) {
+            out << position.x << ", "
+                << position.y << ", "
+                << position.z << "\n";
+        } else {
+            std::cerr << "Errore: impossibile aprire positions.txt\n";
+        }
+    }
+    wasEnterDown = enterDown;
+
+    std::cout << "Position: " << position.x << ", " << position.y << ", " << position.z << std::endl;
+
+    // Update transform
+    m_meshes[rockToMove]->transform.setPosition(position);
+    m_meshes[rockToMove]->transform.setRotation(rotation);
+
+    // Update the global transform of the tree mesh
+    this->getRecursiveMeshesTransform();
+  }
+
+  private:
+    std::vector<std::shared_ptr<Mesh>> m_meshes;
 };
 
 #endif // ROCKS_HPP
