@@ -416,6 +416,7 @@ protected:
 		glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
 		Input::setWindow(window);
+		Input::initScrollCallback();
     }
 
 	virtual void onWindowResize(int w, int h) = 0;
