@@ -15,6 +15,8 @@ public:
 
     virtual void update() override;
 
+    virtual void processMouseScroll(float yoffset);
+
 private:
     glm::vec3 calculateCameraPos();
     float distanceFromBoat;

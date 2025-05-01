@@ -66,12 +66,22 @@ void BoatCamera::update() {
 		scroll -= 2.0f * deltaT;
 	}
 	
-	float zoomSpeed = 1.0f;
-    distanceFromBoat = scroll * zoomSpeed;
-    distanceFromBoat = glm::clamp(distanceFromBoat, 4.0f, 15.0f);
+	double yoff = Input::getScrollOffset();
+    if (yoff != 0.0) {
+        processMouseScroll(static_cast<float>(yoff));
+    }
 
     // Update camera position
     position = calculateCameraPos();
 
     boatObject->update();
+}
+
+
+void BoatCamera::processMouseScroll(float yoffset) {
+    const float zoomSpeed = 1.0f;
+
+    distanceFromBoat -= yoffset * zoomSpeed;
+
+    distanceFromBoat = glm::clamp(distanceFromBoat, 4.0f, 50.0f);
 }
