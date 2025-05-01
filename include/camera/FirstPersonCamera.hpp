@@ -19,6 +19,7 @@ public:
 
     // Metodi per la fisica
     void setPhysicsWorld(btDynamicsWorld* world);
+    void setPositionRigidBody(const glm::vec3& pos);
     btRigidBody* getRigidBody() const { return m_rigidBody; }
     void jump();
 

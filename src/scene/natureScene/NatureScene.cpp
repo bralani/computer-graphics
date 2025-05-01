@@ -167,35 +167,58 @@ void NatureScene::update()
 void NatureScene::checkChangeCamera() {
 	bool vpressedCurrent = Input::getKey(GLFW_KEY_V);
 	if (vpressedCurrent && !vPressedPrev) {
+		glm::vec3 spawn1 = glm::vec3(137.79, -5.71614, 24.1367); 
+		glm::vec3 spawn2 = glm::vec3(-199.512, -8.77594, -93.2629); 
+
 		if (cameraType == 0) {
 
-			// check if the distance to the boat is small enough to switch to boat camera
 			glm::vec3 cameraPos = camera->getPosition();
-			glm::vec3 boatPos = boatCamera->getBoatPosition();
-			auto dist = glm::distance(cameraPos, boatPos);
-			if (dist > 10.0f) return;
 
-
-			// check if all items are found
-			bool allFound = true;
-			for (const auto& found : itemsFound) {
-				if (!found) {
-					allFound = false;
-					break;
+			// check if the distance to the boat is small enough to switch to boat camera
+			auto dist = glm::distance(cameraPos, spawn1);
+			if (dist < 20.0f) {
+				// check if all items are found
+				bool allFound = true;
+				for (const auto& found : itemsFound) {
+					if (!found) {
+						allFound = false;
+						break;
+					}
 				}
+
+				if(!allFound) {
+					menu->pushMenuItem(MenuItem::BoatBroken, 7.0f);
+					return;
+				}
+
+				cameraType = 1;
+				setCamera(boatCamera);
 			}
 
-			if(!allFound) {
-				menu->pushMenuItem(MenuItem::BoatBroken, 7.0f);
-				return;
+			dist = glm::distance(cameraPos, spawn2);
+			if (dist < 20.0f) {
+				cameraType = 1;
+				setCamera(boatCamera);
 			}
 
-			cameraType = 1;
-			setCamera(boatCamera);
 		}
 		else {
-			cameraType = 0;
-			setCamera(firstPersonCamera);
+			glm::vec3 cameraPos = boatCamera->getBoatPosition();
+			auto dist = glm::distance(cameraPos, spawn1);
+
+			if (dist < 40.0f) {
+				cameraType = 0;
+				firstPersonCamera->setPositionRigidBody(spawn1);
+				setCamera(firstPersonCamera);
+			}
+
+			dist = glm::distance(cameraPos, spawn2);
+			if (dist < 40.0f) {
+				cameraType = 0;
+				firstPersonCamera->setPositionRigidBody(spawn2);
+				setCamera(firstPersonCamera);
+			}
+
 		}
 	}
 	vPressedPrev = vpressedCurrent;
@@ -210,7 +233,7 @@ void NatureScene::checkPickItem() {
 		glm::vec3(2.0f, 0.0f, 0.0f),
 		glm::vec3(3.0f, 0.0f, 0.0f)
 	};
-	static float pickDistance = 2.0f; // Distance to pick items
+	static float pickDistance = 5.0f; // Distance to pick items
 	bool fpressedCurrent = Input::getKey(GLFW_KEY_F);
 	if (fpressedCurrent && !fPressedPrev) {
 		glm::vec3 cameraPos = camera->getPosition();
@@ -222,6 +245,33 @@ void NatureScene::checkPickItem() {
 
 			if (dist < pickDistance) {
 				itemsFound[i] = true;
+
+				int countItems = 0;
+				for (const auto& found : itemsFound) {
+					if (found) {
+						countItems++;
+					}
+				}
+
+				switch (countItems)
+				{
+					case 1:
+						menu->setMenuItem(MenuItem::OneItem, 0);
+						break;
+					case 2:
+						menu->setMenuItem(MenuItem::TwoItems, 0);
+						break;
+					case 3:
+						menu->setMenuItem(MenuItem::ThreeItems, 0);
+						break;
+					case 4:
+						menu->setMenuItem(MenuItem::FourItems, 0);
+						break;
+					
+					default:
+						menu->setMenuItem(MenuItem::ZeroItems, 0);
+						break;
+				}
 			}
 		}
 	}

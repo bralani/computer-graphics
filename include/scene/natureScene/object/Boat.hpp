@@ -31,7 +31,7 @@ public:
       return;
 
     // Movement parameters
-    const float moveSpeed = 5.0f;  // units per second
+    const float moveSpeed = 20.0f;  // units per second
     const float turnSpeed = 90.0f; // degrees per second
 
     static double lastTime = glfwGetTime();

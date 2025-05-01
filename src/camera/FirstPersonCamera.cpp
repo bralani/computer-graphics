@@ -137,6 +137,15 @@ glm::mat4 FirstPersonCamera::getViewMatrix() const {
            glm::translate(glm::mat4(1.0), -getPosition());
 }
 
+void FirstPersonCamera::setPositionRigidBody(const glm::vec3& pos) {
+    btTransform newTransform;
+    newTransform.setOrigin(btVector3(pos.x, pos.y, pos.z));
+    newTransform.setRotation(btQuaternion(getYaw(), 0, 0));
+    m_rigidBody->setWorldTransform(newTransform);
+    m_rigidBody->getMotionState()->setWorldTransform(newTransform);
+    m_rigidBody->activate();
+}
+
 void FirstPersonCamera::setPhysicsWorld(btDynamicsWorld* world) {
     if(m_physicsWorld && m_rigidBody) {
         m_physicsWorld->removeRigidBody(m_rigidBody);
