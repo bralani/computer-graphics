@@ -4,6 +4,7 @@
 #include "scene/natureScene/object/Boat.hpp"
 #include "scene/natureScene/object/Rocks.hpp"
 #include "scene/natureScene/object/Terrain.hpp"
+#include "scene/natureScene/object/Treasure.hpp"
 #include "materials/Texture.hpp"
 #include "materials/BasicMaterial.hpp"
 #include "materials/PBRMaterial.hpp"
@@ -98,10 +99,11 @@ std::shared_ptr<Object> NatureScene::createRoot()
 	auto ground = std::make_shared<Grounds>();
 	auto boat = std::make_shared<Boat>();
 	auto tree = std::make_shared<Tree>();
+	auto treasure = std::make_shared<Treasure>();
 	boatCamera = std::make_shared<BoatCamera>(boat);
 
 	auto root = std::make_shared<Object>();
-	root->setChildrenObjects({ground, rocks, boat, tree});
+	root->setChildrenObjects({ground, rocks, boat, tree, treasure});
 
 	DirectionalLight dirLight(
 		glm::vec3(0.2f, 0.2f, 0.2f),

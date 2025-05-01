@@ -9,6 +9,7 @@
 #include <glm/gtx/transform2.hpp>
 #define MAX_LIGHTS 20
 
+
 struct UniformBufferObject
 {
 	alignas(16) glm::mat4 mvpMat;
@@ -76,8 +77,10 @@ protected:
 	DescriptorSetLayout DSL_P_background;
 	DescriptorSetLayout DSL_P_shadows;
 
+	// text
 	std::vector<SingleText> outText;
 	TextMaker txt;
+
 	// Models, textures and Descriptors (values assigned to the uniforms)
 	// Please note that Model objects depends on the corresponding vertex structure
 	// Models
