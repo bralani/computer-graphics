@@ -17,6 +17,10 @@ public:
 
     static GLFWwindow* getWindow();
 
+    static void initScrollCallback(); 
+                
+    static double getScrollOffset();  
+
 private:
     static GLFWwindow* window;
 };

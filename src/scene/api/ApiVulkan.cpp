@@ -118,9 +118,9 @@ protected:
 		// texturesInPool = 100;
 		// setsInPool = 15 + 1 + 1;
 
-		uniformBlocksInPool = 500;
-		texturesInPool = 500;
-		setsInPool = 500;
+		uniformBlocksInPool = 2000;
+		texturesInPool = 2000;
+		setsInPool = 2000;
 
 		Ar = 4.0f / 3.0f;
 	}
@@ -180,8 +180,7 @@ protected:
 
 		// Pipelines [Shader couples]
 		P.init(this, &VD, this->scene->getShader().getVertexPath(), this->scene->getShader().getFragmentPath(), {&DSL_P});
-		P.setAdvancedFeatures(VK_COMPARE_OP_LESS_OR_EQUAL, VK_POLYGON_MODE_FILL,
-													VK_CULL_MODE_NONE, true);
+		P.setAdvancedFeatures(VK_COMPARE_OP_LESS_OR_EQUAL, VK_POLYGON_MODE_FILL, VK_CULL_MODE_NONE, true);
 
 		P_background.init(this, &VD, "shaders/hdriVert.spv", "shaders/hdriFrag.spv", {&DSL_P_background});
 		P_background.setAdvancedFeatures(VK_COMPARE_OP_LESS_OR_EQUAL, VK_POLYGON_MODE_FILL,
