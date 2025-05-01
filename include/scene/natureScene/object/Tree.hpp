@@ -2,6 +2,7 @@
 #define TREE_HPP
 
 #include <vector>
+#include <random>
 #include <memory>
 #include "scene/natureScene/mesh/Tree.hpp"
 #include "objects/Object.hpp"
@@ -140,6 +141,9 @@ public:
     
     auto meshes = std::vector<std::shared_ptr<Mesh>>();
     meshes.reserve(treePositions.size() * 2);
+    std::random_device rd;
+    std::mt19937 gen(rd());
+    std::uniform_real_distribution<float> angle_dist(0.0f, 360.0f);
     
     for (const auto& pos : treePositions) {
         auto wood   = std::make_shared<TreeWoodMesh>();
@@ -147,6 +151,12 @@ public:
     
         wood  ->transform.setPosition(pos);
         leaves->transform.setPosition(pos);
+
+        float angleY = angle_dist(gen);
+        glm::vec3 rotation(0.0f, angleY, 0.0f);
+
+        wood  ->transform.setRotation(rotation);
+        leaves->transform.setRotation(rotation);
     
         meshes.push_back(wood);
         meshes.push_back(leaves);
