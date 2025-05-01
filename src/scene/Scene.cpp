@@ -6,6 +6,7 @@ void Scene::setup(std::shared_ptr<Object> root, std::shared_ptr<Camera> camera, 
     this->camera = camera;
     this->shader = shader;
     this->hdri_textures = hdri_textures;
+    this->menu = std::make_shared<Menu>();
 }
 
 void Scene::run(bool compute_shadows) {

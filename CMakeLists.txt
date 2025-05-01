@@ -104,6 +104,14 @@ if(APPLE)
     file(COPY ${CMAKE_SOURCE_DIR}/assets/textures DESTINATION ${CMAKE_BINARY_DIR}/assets)
     file(COPY ${CMAKE_SOURCE_DIR}/assets/models DESTINATION ${CMAKE_BINARY_DIR}/assets)
 
+    # Use GLOB to find files and only copy if any exist
+    file(GLOB SHADER_FILES "${CMAKE_SOURCE_DIR}/assets/shaders/*.spv")
+    if(SHADER_FILES)
+        file(COPY ${SHADER_FILES} DESTINATION ${CMAKE_BINARY_DIR}/shaders)
+    else()
+        message(WARNING "No SPIR-V shader files found in ${CMAKE_SOURCE_DIR}/assets/shaders/")
+    endif()
+
 elseif(WIN32)
 
     set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreadedDLL")
@@ -197,6 +205,13 @@ elseif(WIN32)
 
     file(COPY ${CMAKE_SOURCE_DIR}/assets/textures DESTINATION ${CMAKE_BINARY_DIR}/assets)
     file(COPY ${CMAKE_SOURCE_DIR}/assets/models DESTINATION ${CMAKE_BINARY_DIR}/assets)
+    # Use GLOB to find files and only copy if any exist
+    file(GLOB SHADER_FILES "${CMAKE_SOURCE_DIR}/assets/shaders/*.spv")
+    if(SHADER_FILES)
+        file(COPY ${SHADER_FILES} DESTINATION ${CMAKE_BINARY_DIR}/shaders)
+    else()
+        message(WARNING "No SPIR-V shader files found in ${CMAKE_SOURCE_DIR}/assets/shaders/")
+    endif()
 elseif(UNIX AND NOT APPLE)
     file(GLOB_RECURSE SOURCES src/camera/*.cpp src/objects/*.cpp src/scene/*.cpp src/utilities/*.cpp)
     file(GLOB_RECURSE HEADERS include/*.h include/*.hpp)
@@ -284,6 +299,14 @@ elseif(UNIX AND NOT APPLE)
 
     file(COPY ${CMAKE_SOURCE_DIR}/assets/textures DESTINATION ${CMAKE_BINARY_DIR}/assets)
     file(COPY ${CMAKE_SOURCE_DIR}/assets/models DESTINATION ${CMAKE_BINARY_DIR}/assets)
+
+    # Use GLOB to find files and only copy if any exist
+    file(GLOB SHADER_FILES "${CMAKE_SOURCE_DIR}/assets/shaders/*.spv")
+    if(SHADER_FILES)
+        file(COPY ${SHADER_FILES} DESTINATION ${CMAKE_BINARY_DIR}/shaders)
+    else()
+        message(WARNING "No SPIR-V shader files found in ${CMAKE_SOURCE_DIR}/assets/shaders/")
+    endif()
 else()
     message(FATAL_ERROR "Unsupported platform: ${CMAKE_SYSTEM_NAME}")
 endif()

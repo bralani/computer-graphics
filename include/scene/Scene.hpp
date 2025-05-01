@@ -10,6 +10,7 @@
 #include "objects/Object.hpp"
 #include "shaders/Shader.hpp"
 #include "scene/api/ApiVulkan.hpp"
+#include "scene/Menu.hpp"
 
 class Scene {
 public:
@@ -29,12 +30,14 @@ public:
     std::shared_ptr<Camera> getCamera() const { return camera; }                    // Get the camera
     void setCamera(std::shared_ptr<Camera> camera) { this->camera = camera; }       // Set the camera
     const std::array<const char*, 6>& getHDRI() const { return hdri_textures; }     // Get the HDRI textures
+    const std::shared_ptr<Menu> getMenu() const { return menu; }                   // Get the menu
     virtual void update() = 0;                                                      // Update the scene
 protected:
     std::shared_ptr<Object> root;                               // Root object of the scene
     std::shared_ptr<Camera> camera;                             // Camera of the scene
     Shader shader;                                              // Shader of the scene
     std::array<const char*, 6> hdri_textures;                   // HDRI textures
+    std::shared_ptr<Menu> menu;
 
     std::optional<ApiVulkan> app;                               // ApiVulkan
 };

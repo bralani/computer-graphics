@@ -2,6 +2,7 @@
 #include "scene/Scene.hpp"
 #include "lights/Light.hpp"
 #include "StarterVulkan.hpp"
+#include "TextMaker.hpp"
 #include <unordered_set>
 
 #define GLM_ENABLE_EXPERIMENTAL
@@ -75,6 +76,8 @@ protected:
 	DescriptorSetLayout DSL_P_background;
 	DescriptorSetLayout DSL_P_shadows;
 
+	std::vector<SingleText> outText;
+	TextMaker txt;
 	// Models, textures and Descriptors (values assigned to the uniforms)
 	// Please note that Model objects depends on the corresponding vertex structure
 	// Models
@@ -188,6 +191,40 @@ protected:
 
 		P_shadows.init(this, &VD, "shaders/shadowsVert.spv", "shaders/shadowsFrag.spv", {&DSL_P_shadows});
 		P_shadows.setAdvancedFeatures(VK_COMPARE_OP_LESS_OR_EQUAL, VK_POLYGON_MODE_FILL, VK_CULL_MODE_BACK_BIT, false);
+
+		// updates the text
+		auto menu = this->scene->getMenu();
+		std::cout << "Updating text...\n";
+		int num_items = menu->getMenuItemCount();
+		outText.clear();
+
+		for (int combo = 0; combo < num_items * num_items * num_items * num_items; combo++)
+		{
+			int i = (combo / (num_items * num_items * num_items)) % num_items;
+			int j = (combo / (num_items * num_items)) % num_items;
+			int k = (combo / num_items) % num_items;
+			int l = combo % num_items;
+
+			// Crea copie permanenti delle stringhe
+			std::string text1 = menu->getMenuItemString(static_cast<MenuItem>(i));
+			std::string text2 = menu->getMenuItemString(static_cast<MenuItem>(j));
+			std::string text3 = menu->getMenuItemString(static_cast<MenuItem>(k));
+			std::string text4 = menu->getMenuItemString(static_cast<MenuItem>(l));
+
+			outText.push_back({
+				4, 
+				{
+					text1, 
+					text2, 
+					text3, 
+					text4
+				}, 
+				0, 
+				0
+			});
+		}
+
+		txt.init(this, &outText);
 
 		// Models, textures and Descriptors (values assigned to the uniforms)
 		auto root = this->scene->getRoot();
@@ -309,6 +346,8 @@ protected:
 			E[0] = {0, UNIFORM, sizeof(UniformBufferObject), nullptr};
 			DS_P_shadows[i].init(this, &DSL_P_shadows, E);
 		}
+
+		txt.pipelinesAndDescriptorSetsInit();
 	}
 
 	// Here it is the creation of the command buffer:
@@ -344,7 +383,10 @@ protected:
 				vkCmdDrawIndexed(commandBuffer,
 												 static_cast<uint32_t>(M[i].indices.size()), 1, 0, 0, 0);
 			}
+
+			int menuindex = this->scene->getMenu()->getMenuIndex();
 		
+			txt.populateCommandBuffer(commandBuffer, currentImage, menuindex);
 		}
 
 	}
@@ -358,6 +400,11 @@ protected:
 			frame++;
 
 		scene->update();
+
+		if(scene->getMenu()->getUpdatePipeline()) {
+			RebuildPipeline();
+			scene->getMenu()->setUpdatePipeline(false);
+		}
 
 		auto cam = scene->getCamera();
 
@@ -475,6 +522,7 @@ protected:
 			DS_P_shadows[i].cleanup();
 
 		DS_P_background.cleanup();
+		txt.pipelinesAndDescriptorSetsCleanup();
 	}
 
 	// Here you destroy all the Models, TextureVulkan and Desc. Set Layouts you created!
@@ -511,6 +559,7 @@ protected:
 		P.destroy();
 		P_shadows.destroy();
 		P_background.destroy();
+		txt.localCleanup();
 	}
 };
 

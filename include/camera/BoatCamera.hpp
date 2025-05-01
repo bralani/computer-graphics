@@ -17,6 +17,10 @@ public:
 
     virtual void processMouseScroll(float yoffset);
 
+    glm::vec3 getBoatPosition() const {
+        return boatObject->getBoatMesh()->getGlobalTransform().getPosition();
+    }
+
 private:
     glm::vec3 calculateCameraPos();
     float distanceFromBoat;

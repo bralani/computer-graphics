@@ -46,6 +46,9 @@ NatureScene::NatureScene()
 	// create the models
 	auto root = createRoot();
 
+	// set items found to false
+	itemsFound.resize(4, false);
+
 	const std::array<const char *, 6> &hdri_textures = {
 		"assets/textures/hdri/bluecloud_ft.jpg",
 		"assets/textures/hdri/bluecloud_bk.jpg",
@@ -150,10 +153,41 @@ void NatureScene::update()
 	if (isPaused)
 		return;
 
-	static bool fPressedPrev = false;
-	bool fpressedCurrent = Input::getKey(GLFW_KEY_F);
-	if (!fpressedCurrent && fPressedPrev) {
+	checkChangeCamera();
+	checkPickItem();
+
+	// update the camera and physics world
+	camera->update();
+    physicsWorld->stepSimulation(deltaT, 10);
+	menu->update();
+}
+
+void NatureScene::checkChangeCamera() {
+	bool vpressedCurrent = Input::getKey(GLFW_KEY_V);
+	if (vpressedCurrent && !vPressedPrev) {
 		if (cameraType == 0) {
+
+			// check if the distance to the boat is small enough to switch to boat camera
+			glm::vec3 cameraPos = camera->getPosition();
+			glm::vec3 boatPos = boatCamera->getBoatPosition();
+			auto dist = glm::distance(cameraPos, boatPos);
+			if (dist > 10.0f) return;
+
+
+			// check if all items are found
+			bool allFound = true;
+			for (const auto& found : itemsFound) {
+				if (!found) {
+					allFound = false;
+					break;
+				}
+			}
+
+			if(!allFound) {
+				menu->pushMenuItem(MenuItem::BoatBroken, 7.0f);
+				return;
+			}
+
 			cameraType = 1;
 			setCamera(boatCamera);
 		}
@@ -162,9 +196,32 @@ void NatureScene::update()
 			setCamera(firstPersonCamera);
 		}
 	}
-	fPressedPrev = fpressedCurrent;
+	vPressedPrev = vpressedCurrent;
+}
 
-	// update the camera and physics world
-	camera->update();
-    physicsWorld->stepSimulation(deltaT, 10);
+void NatureScene::checkPickItem() {
+	if (cameraType != 0) return; // Only allow picking items in first person mode
+
+	static std::vector<Transform> posItems = {
+		glm::vec3(0.0f, 0.0f, 0.0f),
+		glm::vec3(1.0f, 0.0f, 0.0f),
+		glm::vec3(2.0f, 0.0f, 0.0f),
+		glm::vec3(3.0f, 0.0f, 0.0f)
+	};
+	static float pickDistance = 2.0f; // Distance to pick items
+	bool fpressedCurrent = Input::getKey(GLFW_KEY_F);
+	if (fpressedCurrent && !fPressedPrev) {
+		glm::vec3 cameraPos = camera->getPosition();
+
+		for (size_t i = 0; i < posItems.size(); ++i) {
+			if (itemsFound[i]) continue; // Skip if already found
+
+			auto dist = glm::distance(cameraPos, posItems[i].getPosition());
+
+			if (dist < pickDistance) {
+				itemsFound[i] = true;
+			}
+		}
+	}
+	fPressedPrev = fpressedCurrent;
 }
