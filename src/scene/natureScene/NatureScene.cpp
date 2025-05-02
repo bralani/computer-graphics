@@ -108,7 +108,7 @@ std::shared_ptr<Object> NatureScene::createRoot()
 
 	DirectionalLight dirLight(
 		glm::vec3(0.2f, 0.2f, 0.2f),
-		glm::vec3(0.1f, -0.9f, .1f),
+		glm::vec3(0.0f, -1.0f, .0f),
 		50.0f);
 
 	PointLight pointLight(

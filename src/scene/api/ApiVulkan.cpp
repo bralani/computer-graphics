@@ -316,41 +316,41 @@ protected:
 	void pipelinesAndDescriptorSetsInit()
 	{
 		// This creates a new pipeline (with the current surface), using its shaders
-		P.create();
-		P_shadows.create();
-		P_background.create();
-
-		// Models, textures and Descriptors (values assigned to the uniforms)
-		for (int i = 0; i < DS_P.size(); i++)
-		{
-			std::string material = materials_name[i];
-			std::vector<TextureVulkan> textures = textures_map[material];
-
-			std::vector<DescriptorSetElement> E;
-			E.resize(4 + textures.size());
-			E[0] = {0, UNIFORM, sizeof(UniformBufferObject), nullptr};
-			E[1] = {1, UNIFORM, sizeof(GlobalUniformBufferObject), nullptr};
-			E[2] = {2, TEXTURE, 0, &textures_hdri};
-			E[3] = {3, TEXTURE, 0, &texture_shadow};
-			for (int j = 0; j < textures.size(); j++)
+		if(!compute_shadows) {
+			P.create();
+			P_background.create();
+			// Models, textures and Descriptors (values assigned to the uniforms)
+			for (int i = 0; i < DS_P.size(); i++)
 			{
-				E[j + 4] = {j + 4, TEXTURE, 0, &textures[j]};
+				std::string material = materials_name[i];
+				std::vector<TextureVulkan> textures = textures_map[material];
+	
+				std::vector<DescriptorSetElement> E;
+				E.resize(4 + textures.size());
+				E[0] = {0, UNIFORM, sizeof(UniformBufferObject), nullptr};
+				E[1] = {1, UNIFORM, sizeof(GlobalUniformBufferObject), nullptr};
+				E[2] = {2, TEXTURE, 0, &textures_hdri};
+				E[3] = {3, TEXTURE, 0, &texture_shadow};
+				for (int j = 0; j < textures.size(); j++)
+				{
+					E[j + 4] = {j + 4, TEXTURE, 0, &textures[j]};
+				}
+				DS_P[i].init(this, &DSL_P, E);
 			}
-			DS_P[i].init(this, &DSL_P, E);
+			txt.pipelinesAndDescriptorSetsInit();
+			DS_P_background.init(this, &DSL_P_background, {{0, UNIFORM, sizeof(UniformBufferObject), nullptr}, {1, TEXTURE, 0, &textures_hdri}});
+		} else {
+			P_shadows.create();
+			// Models, textures and Descriptors (values assigned to the uniforms)
+			for (int i = 0; i < DS_P_shadows.size(); i++)
+			{
+				std::vector<DescriptorSetElement> E;
+				E.resize(1);
+				E[0] = {0, UNIFORM, sizeof(UniformBufferObject), nullptr};
+				DS_P_shadows[i].init(this, &DSL_P_shadows, E);
+			}
 		}
 
-		DS_P_background.init(this, &DSL_P_background, {{0, UNIFORM, sizeof(UniformBufferObject), nullptr}, {1, TEXTURE, 0, &textures_hdri}});
-
-		// Models, textures and Descriptors (values assigned to the uniforms)
-		for (int i = 0; i < DS_P_shadows.size(); i++)
-		{
-			std::vector<DescriptorSetElement> E;
-			E.resize(1);
-			E[0] = {0, UNIFORM, sizeof(UniformBufferObject), nullptr};
-			DS_P_shadows[i].init(this, &DSL_P_shadows, E);
-		}
-
-		txt.pipelinesAndDescriptorSetsInit();
 	}
 
 	// Here it is the creation of the command buffer:
@@ -449,14 +449,23 @@ protected:
 		// Create view matrix
 		glm::vec3 lightPos = lights[curr_light]->getPosition();
 		glm::vec3 lightDir = lights[curr_light]->getDirection();
-		float yaw = atan2(lightDir.z, lightDir.x);
-		float pitch = asin(lightDir.y);
-		float roll = 0.0f;
 
-		glm::mat4 lightView = glm::rotate(glm::mat4(1.0), -pitch, glm::vec3(1, 0, 0)) * glm::rotate(glm::mat4(1.0), -yaw, glm::vec3(0, 1, 0)) * glm::translate(glm::mat4(1.0), -lightPos);
+		glm::mat4 lightView = glm::lookAt(
+			lightPos,
+			lightPos + lightDir,
+			glm::vec3(0.0f, 0.0f, 1.0f)
+		);
 
-		// Final light-space matrix
-		glm::mat4 M_light = glm::perspective(glm::radians(45.0f), Ar, 4.1f, 8.0f);
+		float orthoHalfSize = 300.0f;
+		float nearPlane = 650.1f;
+		float farPlane = 713.1f;
+
+		glm::mat4 M_light = glm::ortho(
+			-orthoHalfSize, orthoHalfSize,
+			-orthoHalfSize, orthoHalfSize,
+			nearPlane, farPlane
+		);
+
 		M_light[1][1] *= -1;
 		glm::mat4 lightSpaceMatrix = M_light * lightView;
 
@@ -468,7 +477,9 @@ protected:
 		ubo.lightSpaceMatrix = lightSpaceMatrix;
 		ubo.tilingFactor = 1;
 		ubo.opacity = 1.0f;
-		DS_P_background.map(currentImage, &ubo, sizeof(ubo), 0);
+		if(!compute_shadows) {
+			DS_P_background.map(currentImage, &ubo, sizeof(ubo), 0);
+		}
 
 		glm::mat4 AxTr = glm::scale(glm::mat4(1.0f), glm::vec3(0.0f));
 		for (int i = 0; i < DS_P.size(); i++)
@@ -479,9 +490,11 @@ protected:
 			ubo.lightSpaceMatrix = lightSpaceMatrix * ubo.mMat;
 			ubo.tilingFactor = materials_tiling[i];
 			ubo.opacity = materials_opacity[i];
-			DS_P[i].map(currentImage, &ubo, sizeof(ubo), 0);
-			DS_P[i].map(currentImage, &gubo, sizeof(gubo), 1);
 
+			if(!compute_shadows) {
+				DS_P[i].map(currentImage, &ubo, sizeof(ubo), 0);
+				DS_P[i].map(currentImage, &gubo, sizeof(gubo), 1);
+			}
 
 			if (compute_shadows)
 			{
@@ -495,6 +508,7 @@ protected:
 
 		if (compute_shadows && frame > 5)
 		{
+			std::cout << "Saving shadow map...\n";
 			saveScreenshot(("light_" + std::to_string(curr_light) + ".png").c_str(), currentImage);
 			curr_light++;
 			frame = 0;
@@ -513,19 +527,22 @@ protected:
 	void pipelinesAndDescriptorSetsCleanup()
 	{
 		// Cleanup pipelines
-		P.cleanup();
-		P_background.cleanup();
-		P_shadows.cleanup();
+		if(!compute_shadows) {
+			P.cleanup();
+			P_background.cleanup();
+	
+			DS_P_background.cleanup();
+			txt.pipelinesAndDescriptorSetsCleanup();
+	
+			// Cleanup datasets
+			for (int i = 0; i < DS_P.size(); i++)
+				DS_P[i].cleanup();
+		} else {
+			P_shadows.cleanup();
+			for (int i = 0; i < DS_P_shadows.size(); i++)
+				DS_P_shadows[i].cleanup();
+		}
 
-		// Cleanup datasets
-		for (int i = 0; i < DS_P.size(); i++)
-			DS_P[i].cleanup();
-
-		for (int i = 0; i < DS_P_shadows.size(); i++)
-			DS_P_shadows[i].cleanup();
-
-		DS_P_background.cleanup();
-		txt.pipelinesAndDescriptorSetsCleanup();
 	}
 
 	// Here you destroy all the Models, TextureVulkan and Desc. Set Layouts you created!

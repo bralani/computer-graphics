@@ -132,23 +132,21 @@ void main() {
 
     finalColor *= ao; // Applica ambient occlusion
 
-    // Sample multiple neighboring shadow map texels for PCF (Percentage Closer Filtering)
-    int sampleCount = 6; // The number of samples you want to take for PCF
+    int sampleCount = 3; // The number of samples you want to take for PCF
     float shadow = 0.0;
     vec2 texelSize = 1.0 / textureSize(shadowMap, 0); 
-    vec2 shadowMapCoord = (lightSpacePos.xy / lightSpacePos.w )* 0.5 + 0.5;
-
+    vec2 shadowMapCoord = (lightSpacePos.xy / lightSpacePos.w) * 0.5 + 0.5;
 
     // Loop through multiple samples
     for (int i = -sampleCount / 2; i <= sampleCount / 2; ++i) {
         for (int j = -sampleCount / 2; j <= sampleCount / 2; ++j) {
             vec2 offset = vec2(i, j) * texelSize;
             vec2 shadowCoord = shadowMapCoord + offset;
-            float depthInShadowMap = texture(shadowMap, shadowCoord).r + 0.3;
+            float depthInShadowMap = texture(shadowMap, shadowCoord).r + 0.32;
 
             // Perform the depth comparison
-            float currentDepth = lightSpacePos.z / lightSpacePos.w;
-            if (currentDepth > depthInShadowMap + 0.05) {
+            float currentDepth = (lightSpacePos.z / lightSpacePos.w);
+            if (currentDepth > depthInShadowMap) {
                 shadow += 1.0; // Add contribution from this sample
             } else {
                 shadow += 0.0; // No shadow
@@ -157,8 +155,10 @@ void main() {
     }
 
     // Average the samples and apply the result to the final color
-    shadow /= pow(float(sampleCount + 1), 2.0);
-    finalColor *= mix(0.2, 1.0, 1.0 - shadow);
+    if (ubo.opacity > 0.9) { // no shadow for transparent objects
+        shadow /= pow(float(sampleCount + 1), 2.0);
+        finalColor *= mix(0.2, 1.0, 1.0 - shadow);
+    }
     
     float opacity_albedo = texture(textAlbedo, tiledTexCoord).a;
     float finalOpacity = ubo.opacity * opacity_albedo;
