@@ -28,8 +28,8 @@ FirstPersonCamera::FirstPersonCamera(const glm::vec3& pos, float yaw, float pitc
       m_collisionShape(nullptr),
       m_motionState(nullptr),
       m_physicsWorld(physicsWorld),
-      m_jumpForce(5.0f),
-      m_moveForce(40.0f),
+      m_jumpForce(7.0f),
+      m_moveForce(20.0f),
       m_maxSpeed(4.0f) {
     
     // Inizializzazione fisica
@@ -102,8 +102,10 @@ void FirstPersonCamera::update() {
 
     bool shift = Input::getKey(GLFW_KEY_LEFT_SHIFT);
     float moveForce = m_moveForce;
+    float maxSpeed = m_maxSpeed;
     if (shift) {
         moveForce *= 2.0f;
+        maxSpeed *= 2.0f;
     }
     
     // Salto
@@ -124,7 +126,7 @@ void FirstPersonCamera::update() {
         btVector3 currentVel = m_rigidBody->getLinearVelocity();
         glm::vec3 flatVel(currentVel.x(), 0, currentVel.z());
         
-        if(glm::length(flatVel) < m_maxSpeed) {
+        if(glm::length(flatVel) < maxSpeed) {
             m_rigidBody->applyCentralForce(btVector3(desiredMove.x, 0, desiredMove.z));
         }
     }
@@ -164,6 +166,6 @@ void FirstPersonCamera::jump() {
 
     if(m_rigidBody && canJump) {
         m_rigidBody->applyCentralImpulse(btVector3(0, m_jumpForce, 0));
-        timeJump = duration + 1500;
+        timeJump = duration + 1000;             // 1 secondo di cooldown
     }
 }

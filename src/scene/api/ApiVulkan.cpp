@@ -4,6 +4,7 @@
 #include "StarterVulkan.hpp"
 #include "TextMaker.hpp"
 #include <unordered_set>
+#include <map>
 
 #define GLM_ENABLE_EXPERIMENTAL
 #include <glm/gtx/transform2.hpp>
@@ -84,7 +85,8 @@ protected:
 	// Models, textures and Descriptors (values assigned to the uniforms)
 	// Please note that Model objects depends on the corresponding vertex structure
 	// Models
-	std::vector<Model<Vertex>> M;
+	std::vector<std::string> M_string;
+	std::map<std::string, Model<Vertex>> M_map;
 	std::vector<std::shared_ptr<Mesh>> meshesVulkan;
 	Model<Vertex> M_background;
 
@@ -234,7 +236,8 @@ protected:
 		meshesVulkan = root->getRecursiveMeshesTransform();
 
 		// allocate the models
-		M.resize(meshesVulkan.size());
+
+		M_string.resize(meshesVulkan.size());
 		DS_P.resize(meshesVulkan.size());
 		DS_P_shadows.resize(meshesVulkan.size());
 		materials_name.resize(meshesVulkan.size());
@@ -248,13 +251,24 @@ protected:
 
 			auto filename = mesh->getFilename();
 			auto extension = filename.substr(filename.find_last_of(".") + 1);
+			M_string[i] = filename;
 			if (extension == "obj")
 			{
-				M[i].init(this, &VD, mesh->getFilename(), OBJ);
+				auto it = M_map.find(filename);
+				if (it == M_map.end())
+				{
+					M_map[filename] = Model<Vertex>();
+					M_map[filename].init(this, &VD, mesh->getFilename(), OBJ);
+				}
 			}
 			else
 			{
-				M[i].init(this, &VD, mesh->getFilename(), GLTF);
+				auto it = M_map.find(filename);
+				if (it == M_map.end())
+				{
+					M_map[filename] = Model<Vertex>();
+					M_map[filename].init(this, &VD, mesh->getFilename(), GLTF);
+				}
 			}
 
 			// load material and textures
@@ -362,13 +376,16 @@ protected:
 
 		if (compute_shadows) {
 			P_shadows.bind(commandBuffer);
-			for (int i = 0; i < M.size(); i++)
-			{
-				M[i].bind(commandBuffer);
-				DS_P_shadows[i].bind(commandBuffer, P_shadows, 0, currentImage);
-
+			
+			int i = 0;
+			for (const auto& filename : M_string) {
+				auto mesh = M_map.at(filename); 
+				mesh.bind(commandBuffer);
+				DS_P_shadows[i].bind(commandBuffer, P, 0, currentImage);
 				vkCmdDrawIndexed(commandBuffer,
-												static_cast<uint32_t>(M[i].indices.size()), 1, 0, 0, 0);
+								static_cast<uint32_t>(mesh.indices.size()), 
+								1, 0, 0, 0);
+				i++;
 			}
 		} else {
 
@@ -378,17 +395,19 @@ protected:
 			vkCmdDrawIndexed(commandBuffer, static_cast<uint32_t>(M_background.indices.size()), 1, 0, 0, 0);
 
 			P.bind(commandBuffer);
-			for (int i = 0; i < M.size(); i++)
-			{
-				M[i].bind(commandBuffer);
-				DS_P[i].bind(commandBuffer, P, 0, currentImage);
 
+			int i = 0;
+			for (const auto& filename : M_string) {
+				auto mesh = M_map.at(filename); 
+				mesh.bind(commandBuffer);
+				DS_P[i].bind(commandBuffer, P, 0, currentImage);
 				vkCmdDrawIndexed(commandBuffer,
-												 static_cast<uint32_t>(M[i].indices.size()), 1, 0, 0, 0);
+								static_cast<uint32_t>(mesh.indices.size()), 
+								1, 0, 0, 0);
+				i++;
 			}
 
 			int menuindex = this->scene->getMenu()->getMenuIndex();
-		
 			txt.populateCommandBuffer(commandBuffer, currentImage, menuindex);
 		}
 
@@ -564,9 +583,11 @@ protected:
 		textures_hdri.cleanup();
 
 		// Cleanup models
-		for (int i = 0; i < M.size(); i++)
-			M[i].cleanup();
-		M.clear();
+		for (int i = 0; i < M_string.size(); i++) {
+			std::string filename = M_string[i];
+			M_map[filename].cleanup();
+		}
+		M_map.clear();
 
 		M_background.cleanup();
 

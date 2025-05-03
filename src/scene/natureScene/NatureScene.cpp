@@ -101,7 +101,7 @@ std::shared_ptr<Object> NatureScene::createRoot()
 	auto tree = std::make_shared<Tree>();
 	auto treasure = std::make_shared<Treasure>();
 	boatCamera = std::make_shared<BoatCamera>(boat);
-	meshCamera = std::make_shared<MeshCamera>(rocks);
+	meshCamera = std::make_shared<MeshCamera>(treasure);
 
 	auto root = std::make_shared<Object>();
 	root->setChildrenObjects({ground, rocks, boat, tree, treasure});
@@ -161,7 +161,7 @@ void NatureScene::update()
 
 	// update the camera and physics world
 	camera->update();
-    physicsWorld->stepSimulation(deltaT, 2, 1.0f / 30.0f);
+    physicsWorld->stepSimulation(deltaT, 2, 1.0f / 120.0f);
 	menu->update();
 }
 
