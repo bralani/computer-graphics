@@ -101,7 +101,7 @@ std::shared_ptr<Object> NatureScene::createRoot()
 	auto tree = std::make_shared<Tree>();
 	auto treasure = std::make_shared<Treasure>();
 	boatCamera = std::make_shared<BoatCamera>(boat);
-	meshCamera = std::make_shared<MeshCamera>(treasure);
+	meshCamera = std::make_shared<MeshCamera>(rocks);
 
 	auto root = std::make_shared<Object>();
 	root->setChildrenObjects({ground, rocks, boat, tree, treasure});
