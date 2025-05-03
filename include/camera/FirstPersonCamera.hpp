@@ -33,6 +33,8 @@ private:
     float m_jumpForce;
     float m_moveForce;
     float m_maxSpeed;
+
+    float timeJump = 0.0f;
 };
 
 #endif

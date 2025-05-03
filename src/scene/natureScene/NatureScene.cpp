@@ -71,7 +71,7 @@ void NatureScene::initializePhysicsWorld()
 	auto broadphase = new btDbvtBroadphase();
 	btSequentialImpulseConstraintSolver* sol = new btSequentialImpulseConstraintSolver;
 	physicsWorld = new btDiscreteDynamicsWorld(dispatcher, broadphase, sol, collisionConfiguration);
-	physicsWorld->setGravity(btVector3(0, -0.05, 0));
+	physicsWorld->setGravity(btVector3(0, -9.8, 0));
 }
 
 void NatureScene::addCollisions()
@@ -161,7 +161,7 @@ void NatureScene::update()
 
 	// update the camera and physics world
 	camera->update();
-    physicsWorld->stepSimulation(deltaT, 10);
+    physicsWorld->stepSimulation(deltaT, 2, 1.0f / 30.0f);
 	menu->update();
 }
 

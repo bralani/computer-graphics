@@ -28,8 +28,8 @@ FirstPersonCamera::FirstPersonCamera(const glm::vec3& pos, float yaw, float pitc
       m_collisionShape(nullptr),
       m_motionState(nullptr),
       m_physicsWorld(physicsWorld),
-      m_jumpForce(0.2f),
-      m_moveForce(2.0f),
+      m_jumpForce(5.0f),
+      m_moveForce(40.0f),
       m_maxSpeed(4.0f) {
     
     // Inizializzazione fisica
@@ -45,8 +45,8 @@ FirstPersonCamera::FirstPersonCamera(const glm::vec3& pos, float yaw, float pitc
     m_rigidBody = new btRigidBody(rbInfo);
     // Configurazione rigid body
     m_rigidBody->setAngularFactor(0.0f);
-    m_rigidBody->setFriction(0.7f);
-    m_rigidBody->setDamping(0.2f, 0.1f);
+    m_rigidBody->setFriction(1.0f);
+    m_rigidBody->setDamping(0.0f, 0.0f);
     m_rigidBody->setActivationState(DISABLE_DEACTIVATION);
     
     if(m_physicsWorld) {
@@ -106,7 +106,6 @@ void FirstPersonCamera::update() {
         moveForce *= 2.0f;
     }
     
-    
     // Salto
     if (Input::getKey(GLFW_KEY_SPACE)) {
         jump();
@@ -159,7 +158,12 @@ void FirstPersonCamera::setPhysicsWorld(btDynamicsWorld* world) {
 }
 
 void FirstPersonCamera::jump() {
-    if(m_rigidBody) {
+    auto now = std::chrono::high_resolution_clock::now();
+    auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(now.time_since_epoch()).count();
+    bool canJump = duration > timeJump;
+
+    if(m_rigidBody && canJump) {
         m_rigidBody->applyCentralImpulse(btVector3(0, m_jumpForce, 0));
+        timeJump = duration + 1500;
     }
 }
