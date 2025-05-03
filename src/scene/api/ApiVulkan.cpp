@@ -381,7 +381,7 @@ protected:
 			for (const auto& filename : M_string) {
 				auto mesh = M_map.at(filename); 
 				mesh.bind(commandBuffer);
-				DS_P_shadows[i].bind(commandBuffer, P, 0, currentImage);
+				DS_P_shadows[i].bind(commandBuffer, P_shadows, 0, currentImage);
 				vkCmdDrawIndexed(commandBuffer,
 								static_cast<uint32_t>(mesh.indices.size()), 
 								1, 0, 0, 0);
