@@ -260,7 +260,7 @@ elseif(UNIX AND NOT APPLE)
     target_include_directories(compute_shadows PRIVATE ${CMAKE_SOURCE_DIR}/third_party)
 
     target_link_libraries(exe PRIVATE Vulkan::Vulkan glfw)
-    target_link_libraries(compute_shadows Vulkan::Vulkan glfw)
+    target_link_libraries(compute_shadows PRIVATE Vulkan::Vulkan glfw)
 
     foreach(dir IN LISTS Vulkan_INCLUDE_DIR INCLUDE_DIRS)
         target_include_directories(exe PUBLIC ${dir})
