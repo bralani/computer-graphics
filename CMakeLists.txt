@@ -43,6 +43,14 @@ if(APPLE)
     add_dependencies(exe Bullet3Common BulletDynamics BulletCollision LinearMath)
     target_link_libraries(exe PRIVATE Bullet3Common BulletDynamics BulletCollision LinearMath)
 
+
+    target_include_directories(compute_shadows PRIVATE 
+        ${CMAKE_SOURCE_DIR}/third_party/bullet3/src
+    )
+    add_dependencies(compute_shadows Bullet3Common BulletDynamics BulletCollision LinearMath)
+    target_link_libraries(compute_shadows PRIVATE Bullet3Common BulletDynamics BulletCollision LinearMath)
+
+
     # Include directories
     target_include_directories(exe PRIVATE ${GLM_INCLUDE_DIRS})
     target_include_directories(exe PRIVATE ${CMAKE_SOURCE_DIR}/include)
@@ -231,6 +239,12 @@ elseif(UNIX AND NOT APPLE)
     )
     add_dependencies(exe Bullet3Common BulletDynamics BulletCollision LinearMath)
     target_link_libraries(exe PRIVATE Bullet3Common BulletDynamics BulletCollision LinearMath)
+
+    target_include_directories(compute_shadows PRIVATE 
+        ${CMAKE_SOURCE_DIR}/third_party/bullet3/src
+    )
+    add_dependencies(compute_shadows Bullet3Common BulletDynamics BulletCollision LinearMath)
+    target_link_libraries(compute_shadows PRIVATE Bullet3Common BulletDynamics BulletCollision LinearMath)
 
     find_package(Vulkan REQUIRED)
     find_package(glfw3 REQUIRED)
