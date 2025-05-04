@@ -231,12 +231,12 @@ void NatureScene::checkPickItem() {
 	if (cameraType != 0) return; // Only allow picking items in first person mode
 
 	static std::vector<Transform> posItems = {
-		glm::vec3(0.0f, 0.0f, 0.0f),
+		glm::vec3(74.9698, -4.21949, -38.6691), // Cavern
 		glm::vec3(1.0f, 0.0f, 0.0f),
 		glm::vec3(2.0f, 0.0f, 0.0f),
 		glm::vec3(3.0f, 0.0f, 0.0f)
 	};
-	static float pickDistance = 5.0f; // Distance to pick items
+	static float pickDistance = 7.0f; // Distance to pick items
 	bool fpressedCurrent = Input::getKey(GLFW_KEY_F);
 	if (fpressedCurrent && !fPressedPrev) {
 		glm::vec3 cameraPos = camera->getPosition();

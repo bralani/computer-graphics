@@ -19,6 +19,7 @@ layout(binding = 0) uniform UniformBufferObject {
 } ubo;
 
 #define MAX_LIGHTS 20
+#define SAMPLE_COUNT 3
 layout(binding = 1) uniform GlobalUniformBufferObject {
     vec3 lightDir[MAX_LIGHTS];
     vec4 lightColor[MAX_LIGHTS];
@@ -69,7 +70,7 @@ float GeometrySmith(vec3 N, vec3 V, vec3 L, float roughness) {
     return ggx1 * ggx2;
 }
 
-vec3 CookTorranceBRDF(vec3 albedo, vec3 N, vec3 V, vec3 L, float roughness, float metallic) {
+vec3 CookTorranceBRDF(vec3 albedo, vec3 N, vec3 V, vec3 L, float roughness, float metallic, float shadow) {
     vec3 H = normalize(V + L);
     vec3 F0 = mix(vec3(0.04), albedo, metallic);
     vec3 F = fresnelSchlick(max(dot(H, V), 0.0), F0);
@@ -78,8 +79,15 @@ vec3 CookTorranceBRDF(vec3 albedo, vec3 N, vec3 V, vec3 L, float roughness, floa
     vec3 specular = (NDF * G * F) / max(4.0 * max(dot(N, V), 0.0) * max(dot(N, L), 0.0), 0.0001);
     vec3 kd = mix(vec3(1.0) - F, vec3(0.0), metallic);
     vec3 diffuse = kd * albedo / PI;
-    float NdotL = max(dot(N, L), 0.0);
-    return (diffuse + specular) * NdotL;
+    float NdotL = max(dot(N, L), 0.05);
+    vec3 finalColor = (diffuse + specular) * NdotL;
+
+    if(shadow > 0.0 && ubo.opacity > 0.9) {
+
+        shadow /= pow(float(SAMPLE_COUNT + 1), 2.0);
+        finalColor *= (1.0 - shadow);
+    }
+    return finalColor;
 }
 
 vec3 reflectColor(vec3 viewDir, vec3 normal) {
@@ -99,6 +107,7 @@ void main() {
     vec3 normalMap = texture(textNormal, tiledTexCoord).rgb * 2.0 - 1.0;
     normalMap.y = -normalMap.y;
     float ao = texture(textAO, tiledTexCoord).r;
+    albedo *= ao; // Modifica dell'albedo in base all'ambient occlusion
 
     vec3 T = normalize(fragTangent);
     vec3 N = normalize(fragNorm);
@@ -115,31 +124,13 @@ void main() {
     float reflectionStrength = pow(1.0 - roughness, 4.0) * 0.15;
     albedo = mix(albedo, reflected, reflectionStrength);
 
-    for (int i = 0; i < gubo.numLightsDir; i++) {
-        vec3 L = normalize(gubo.lightDir[i]);
-        vec3 LC = gubo.lightColor[i].rgb * gubo.lightColor[i].a;
-        finalColor += CookTorranceBRDF(albedo, N, V, L, roughness, metallic) * LC;
-    }
-
-    for (int i = 0; i < gubo.numLightsPoint; i++) {
-        vec3 lightPos = gubo.lightPosPoint[i];
-        vec3 L = normalize(lightPos - fragPos);
-        vec3 LC = gubo.lightColorPoint[i].rgb * gubo.lightColorPoint[i].a;
-        float distance = length(lightPos - fragPos);
-        float attenuation = 1.0 / (distance * distance);
-        finalColor += CookTorranceBRDF(albedo, N, V, L, roughness, metallic) * LC * attenuation;
-    }
-
-    finalColor *= ao; // Applica ambient occlusion
-
-    int sampleCount = 3; // The number of samples you want to take for PCF
     float shadow = 0.0;
     vec2 texelSize = 1.0 / textureSize(shadowMap, 0); 
     vec2 shadowMapCoord = (lightSpacePos.xy / lightSpacePos.w) * 0.5 + 0.5;
 
     // Loop through multiple samples
-    for (int i = -sampleCount / 2; i <= sampleCount / 2; ++i) {
-        for (int j = -sampleCount / 2; j <= sampleCount / 2; ++j) {
+    for (int i = -SAMPLE_COUNT / 2; i <= SAMPLE_COUNT / 2; ++i) {
+        for (int j = -SAMPLE_COUNT / 2; j <= SAMPLE_COUNT / 2; ++j) {
             vec2 offset = vec2(i, j) * texelSize;
             vec2 shadowCoord = shadowMapCoord + offset;
             float depthInShadowMap = texture(shadowMap, shadowCoord).r + 0.32;
@@ -154,10 +145,19 @@ void main() {
         }
     }
 
-    // Average the samples and apply the result to the final color
-    if (ubo.opacity > 0.9) { // no shadow for transparent objects
-        shadow /= pow(float(sampleCount + 1), 2.0);
-        finalColor *= mix(0.2, 1.0, 1.0 - shadow);
+    for (int i = 0; i < gubo.numLightsDir; i++) {
+        vec3 L = normalize(gubo.lightDir[i]);
+        vec3 LC = gubo.lightColor[i].rgb * gubo.lightColor[i].a;
+        finalColor += CookTorranceBRDF(albedo, N, V, L, roughness, metallic, shadow) * LC;
+    }
+
+    for (int i = 0; i < gubo.numLightsPoint; i++) {
+        vec3 lightPos = gubo.lightPosPoint[i];
+        vec3 L = normalize(lightPos - fragPos);
+        vec3 LC = gubo.lightColorPoint[i].rgb * gubo.lightColorPoint[i].a;
+        float distance = length(lightPos - fragPos);
+        float attenuation = 1.0 / (distance * distance);
+        finalColor += CookTorranceBRDF(albedo, N, V, L, roughness, metallic, shadow) * LC * attenuation;
     }
     
     float opacity_albedo = texture(textAlbedo, tiledTexCoord).a;
