@@ -7,6 +7,7 @@
 #include "scene/natureScene/mesh/Water.hpp"
 #include "scene/natureScene/mesh/Island.hpp"
 #include "scene/natureScene/mesh/Cavern.hpp"
+#include "scene/natureScene/mesh/Bridge.hpp"
 
 class Grounds : public Object
 {
@@ -17,6 +18,7 @@ public:
     auto waterMesh = std::make_shared<WaterMesh>();
     auto islandMesh = std::make_shared<IslandMesh>();
     auto cavernMesh = std::make_shared<CavernMesh>();
+    auto bridgeMesh = std::make_shared<BridgeMesh>();
 
     this->transform.setScale(glm::vec3(3.0f));
     this->transform.setPosition(glm::vec3(0.0f, -55.0f, 0.0f));
@@ -26,6 +28,7 @@ public:
     meshes.push_back(waterMesh);
     meshes.push_back(islandMesh);
     meshes.push_back(cavernMesh);
+    meshes.push_back(bridgeMesh);
 
     this->setMeshes(meshes);
   }
