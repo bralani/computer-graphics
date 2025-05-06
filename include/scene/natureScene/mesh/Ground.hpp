@@ -16,4 +16,15 @@ public:
     }
 };
 
+class GroundCollisionMesh : public Mesh {
+  public:
+      GroundCollisionMesh() : Mesh("assets/models/collisions.obj") {
+        
+        GroundCollisionMaterial material;
+        this->setMaterial(std::make_shared<GroundCollisionMaterial>(material));
+        this->collision = std::make_shared<Collision>(filename, globalTransform);
+        this->collision->setActive(true);
+      }
+  };
+  
 #endif // GROUNDMESH_HPP

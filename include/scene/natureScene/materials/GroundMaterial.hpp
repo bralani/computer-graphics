@@ -27,6 +27,27 @@ class GroundMaterial : public PBRMaterial
         return "GroundMaterial";
     }
 };
-    
+
+class GroundCollisionMaterial : public PBRMaterial
+{
+
+  public:
+    GroundCollisionMaterial()
+        : PBRMaterial(
+          Texture ("assets/textures/cavern/ao.png", TextureType::Diffuse), 
+          Texture ("assets/textures/cavern/ao.png", TextureType::Roughness),
+          Texture ("assets/textures/cavern/ao.png", TextureType::Metallic),
+          Texture ("assets/textures/cavern/ao.png", TextureType::Normal),
+          Texture ("assets/textures/cavern/ao.png", TextureType::AmbientOcclusion)
+        )
+    {
+      this->setOpacity(0.0f);
+    }
+
+    std::string getClassName() const override
+    {
+        return "GroundCollisionMaterial";
+    }
+}; 
 
 #endif // GROUNDMATERIAL_HPP

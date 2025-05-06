@@ -45,7 +45,7 @@ FirstPersonCamera::FirstPersonCamera(const glm::vec3& pos, float yaw, float pitc
     m_rigidBody = new btRigidBody(rbInfo);
     // Configurazione rigid body
     m_rigidBody->setAngularFactor(0.0f);
-    m_rigidBody->setFriction(1.0f);
+    m_rigidBody->setFriction(0.8f);
     m_rigidBody->setDamping(0.0f, 0.0f);
     m_rigidBody->setActivationState(DISABLE_DEACTIVATION);
     

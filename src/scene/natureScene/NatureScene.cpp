@@ -1,5 +1,6 @@
 #include "scene/natureScene/NatureScene.hpp"
 #include "scene/natureScene/object/Grounds.hpp"
+#include "scene/natureScene/object/CollisionWater.hpp"
 #include "scene/natureScene/object/Tree.hpp"
 #include "scene/natureScene/object/Boat.hpp"
 #include "scene/natureScene/object/Rocks.hpp"
@@ -97,6 +98,7 @@ std::shared_ptr<Object> NatureScene::createRoot()
 {
 	auto rocks = std::make_shared<Rocks>();
 	auto ground = std::make_shared<Grounds>();
+	auto collisionWater = std::make_shared<CollisionWater>();
 	auto boat = std::make_shared<Boat>();
 	auto tree = std::make_shared<Tree>();
 	auto treasure = std::make_shared<Treasure>();
@@ -104,7 +106,7 @@ std::shared_ptr<Object> NatureScene::createRoot()
 	meshCamera = std::make_shared<MeshCamera>(rocks);
 
 	auto root = std::make_shared<Object>();
-	root->setChildrenObjects({ground, rocks, boat, tree, treasure});
+	root->setChildrenObjects({ground, rocks, boat, tree, treasure, collisionWater});
 
 	DirectionalLight dirLight(
 		glm::vec3(0.2f, 0.2f, 0.2f),
