@@ -36,11 +36,15 @@ public:
 
     Transform& getGlobalTransform() { return globalTransform; }
     const std::shared_ptr<Collision>& getCollision() const { return collision; }
+
+    void setComputeShadows(bool compute) { computeShadows = compute; }
+    bool getComputeShadows() const { return computeShadows; }
 protected:
     Transform globalTransform;
     std::shared_ptr<Material> material;
     std::string filename;
     std::shared_ptr<Collision> collision = nullptr;
+    bool computeShadows = true;
 };
 
 #endif // MESH_HPP

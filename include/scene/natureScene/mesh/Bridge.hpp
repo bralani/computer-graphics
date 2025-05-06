@@ -13,6 +13,7 @@ public:
       this->setMaterial(std::make_shared<BridgeMaterial>(material));
       this->collision = std::make_shared<Collision>(filename, globalTransform);
       this->collision->setActive(true);
+      this->setComputeShadows(false);
     }
 };
 

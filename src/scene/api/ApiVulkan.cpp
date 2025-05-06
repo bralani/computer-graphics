@@ -86,6 +86,7 @@ protected:
 	// Please note that Model objects depends on the corresponding vertex structure
 	// Models
 	std::vector<std::string> M_string;
+	std::vector<bool> compute_shadows_bool;
 	std::map<std::string, Model<Vertex>> M_map;
 	std::vector<std::shared_ptr<Mesh>> meshesVulkan;
 	Model<Vertex> M_background;
@@ -239,6 +240,7 @@ protected:
 
 		M_string.resize(meshesVulkan.size());
 		DS_P.resize(meshesVulkan.size());
+		compute_shadows_bool.resize(meshesVulkan.size());
 		DS_P_shadows.resize(meshesVulkan.size());
 		materials_name.resize(meshesVulkan.size());
 		materials_tiling.resize(meshesVulkan.size());
@@ -248,6 +250,8 @@ protected:
 		{
 			// load mesh
 			std::shared_ptr<Mesh> mesh = meshesVulkan[i];
+
+			compute_shadows_bool[i] = mesh->getComputeShadows();
 
 			auto filename = mesh->getFilename();
 			auto extension = filename.substr(filename.find_last_of(".") + 1);
@@ -379,6 +383,11 @@ protected:
 			
 			int i = 0;
 			for (const auto& filename : M_string) {
+				bool compute_shadows = compute_shadows_bool[i];
+				if (!compute_shadows) {
+					i++;
+					continue;
+				}
 				auto mesh = M_map.at(filename); 
 				mesh.bind(commandBuffer);
 				DS_P_shadows[i].bind(commandBuffer, P_shadows, 0, currentImage);

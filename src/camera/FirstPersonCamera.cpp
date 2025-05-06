@@ -33,7 +33,7 @@ FirstPersonCamera::FirstPersonCamera(const glm::vec3& pos, float yaw, float pitc
       m_maxSpeed(4.0f) {
     
     // Inizializzazione fisica
-    m_collisionShape = new btCapsuleShape(0.5f, 1.5f);
+    m_collisionShape = new btCapsuleShape(0.5f, 2.0f);
     
     btScalar mass(1.0f);
     btVector3 localInertia(0, 0, 0);
