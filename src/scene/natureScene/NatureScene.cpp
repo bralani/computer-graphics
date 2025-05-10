@@ -205,10 +205,10 @@ void NatureScene::checkChangeCamera() {
 			}
 
 		}
-		else if (cameraType == 1) {
+		/*else if (cameraType == 1) {
 			cameraType = 2;
 			setCamera(meshCamera);
-		} else {
+		}*/ else {
 			glm::vec3 cameraPos = boatCamera->getBoatPosition();
 			auto dist = glm::distance(cameraPos, spawn1);
 
