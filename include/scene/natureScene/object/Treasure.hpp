@@ -14,7 +14,7 @@ public:
     auto chestGoldMesh = std::make_shared<ChestGoldMesh>();
 
 
-    this->transform.setPosition(glm::vec3(5.0f, 3.0f, 0.0f));
+    this->transform.setPosition(glm::vec3(-209.348f, -6.03917f, -109.388f));
 
     auto meshes = std::vector<std::shared_ptr<Mesh>>();
     meshes.push_back(chestMesh);
