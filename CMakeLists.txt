@@ -1,5 +1,13 @@
-cmake_minimum_required(VERSION 3.10)
+cmake_minimum_required(VERSION 3.15)
 project(exe C CXX)
+
+if (MSVC)
+  # In Debug usiamo la DLL di debug (/MDd), altrimenti la release (/MD)
+  set(CMAKE_MSVC_RUNTIME_LIBRARY
+    "MultiThreaded$<$<CONFIG:Debug>:Debug>DLL"
+    CACHE STRING "" FORCE
+  )
+endif()
 
 # Enable C and C++ languages
 enable_language(C)
@@ -121,9 +129,6 @@ if(APPLE)
     endif()
 
 elseif(WIN32)
-
-    set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreadedDLL")
-    add_compile_options(/MD)
 
     # Windows specific configurations
 
