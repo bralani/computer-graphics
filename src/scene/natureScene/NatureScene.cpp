@@ -6,12 +6,12 @@
 #include "scene/natureScene/object/Rocks.hpp"
 #include "scene/natureScene/object/Terrain.hpp"
 #include "scene/natureScene/object/Treasure.hpp"
+#include "scene/natureScene/object/Homes.hpp"
 #include "materials/Texture.hpp"
 #include "materials/BasicMaterial.hpp"
 #include "materials/PBRMaterial.hpp"
 #include "shaders/PhongShader.hpp"
 #include "shaders/PBRShader.hpp"
-#include "lights/DirectionalLight.hpp"
 #include "lights/PointLight.hpp"
 #include "lights/SpotLight.hpp"
 #include "camera/FirstPersonCamera.hpp"
@@ -47,9 +47,6 @@ NatureScene::NatureScene()
 
 	// create the models
 	auto root = createRoot();
-
-	// set items found to false
-	itemsFound.resize(4, false);
 
 	const std::array<const char *, 6> &hdri_textures = {
 		"assets/textures/hdri/bluecloud_ft.jpg",
@@ -102,21 +99,16 @@ std::shared_ptr<Object> NatureScene::createRoot()
 	auto boat = std::make_shared<Boat>();
 	auto tree = std::make_shared<Tree>();
 	auto treasure = std::make_shared<Treasure>();
+	auto homes = std::make_shared<Homes>();
 	boatCamera = std::make_shared<BoatCamera>(boat);
-	meshCamera = std::make_shared<MeshCamera>(rocks);
 
 	auto root = std::make_shared<Object>();
-	root->setChildrenObjects({ground, rocks, boat, tree, treasure, collisionWater});
+	root->setChildrenObjects({ground, rocks, boat, homes, tree, treasure, collisionWater});
 
 	DirectionalLight dirLight(
 		glm::vec3(0.2f, 0.2f, 0.2f),
 		glm::vec3(0.0f, -1.0f, .0f),
-		50.0f);
-
-	PointLight pointLight(
-		glm::vec3(1.0f, 1.0f, 1.0f),
-		glm::vec3(1.0f, 1.0f, 1.0f),
-		3.0f);
+		40.0f);
 
 	root.get()->setLights({std::make_shared<DirectionalLight>(dirLight)});
 
@@ -129,6 +121,7 @@ void NatureScene::update()
     static double lastTime = glfwGetTime();
     double currentTime = glfwGetTime();
     float deltaT = static_cast<float>(currentTime - lastTime);
+	lastTime = currentTime;
 
 	static bool isPaused = false;
 	static bool pDebounce = false;
@@ -159,7 +152,6 @@ void NatureScene::update()
 		return;
 
 	checkChangeCamera();
-	checkPickItem();
 
 	// update the camera and physics world
 	camera->update();
@@ -180,20 +172,6 @@ void NatureScene::checkChangeCamera() {
 			// check if the distance to the boat is small enough to switch to boat camera
 			auto dist = glm::distance(cameraPos, spawn1);
 			if (dist < 20.0f) {
-				// check if all items are found
-				bool allFound = true;
-				for (const auto& found : itemsFound) {
-					if (!found) {
-						allFound = false;
-						break;
-					}
-				}
-
-				if(!allFound) {
-					menu->pushMenuItem(MenuItem::BoatBroken, 7.0f);
-					return;
-				}
-
 				cameraType = 1;
 				setCamera(boatCamera);
 			}
@@ -204,11 +182,7 @@ void NatureScene::checkChangeCamera() {
 				setCamera(boatCamera);
 			}
 
-		}
-		/*else if (cameraType == 1) {
-			cameraType = 2;
-			setCamera(meshCamera);
-		}*/ else {
+		} else {
 			glm::vec3 cameraPos = boatCamera->getBoatPosition();
 			auto dist = glm::distance(cameraPos, spawn1);
 
@@ -227,58 +201,4 @@ void NatureScene::checkChangeCamera() {
 		}
 	}
 	vPressedPrev = vpressedCurrent;
-}
-
-void NatureScene::checkPickItem() {
-	if (cameraType != 0) return; // Only allow picking items in first person mode
-
-	static std::vector<Transform> posItems = {
-		glm::vec3(74.9698, -4.21949, -38.6691), // Cavern
-		glm::vec3(1.0f, 0.0f, 0.0f),
-		glm::vec3(2.0f, 0.0f, 0.0f),
-		glm::vec3(3.0f, 0.0f, 0.0f)
-	};
-	static float pickDistance = 7.0f; // Distance to pick items
-	bool fpressedCurrent = Input::getKey(GLFW_KEY_F);
-	if (fpressedCurrent && !fPressedPrev) {
-		glm::vec3 cameraPos = camera->getPosition();
-
-		for (size_t i = 0; i < posItems.size(); ++i) {
-			if (itemsFound[i]) continue; // Skip if already found
-
-			auto dist = glm::distance(cameraPos, posItems[i].getPosition());
-
-			if (dist < pickDistance) {
-				itemsFound[i] = true;
-
-				int countItems = 0;
-				for (const auto& found : itemsFound) {
-					if (found) {
-						countItems++;
-					}
-				}
-
-				switch (countItems)
-				{
-					case 1:
-						menu->setMenuItem(MenuItem::OneItem, 0);
-						break;
-					case 2:
-						menu->setMenuItem(MenuItem::TwoItems, 0);
-						break;
-					case 3:
-						menu->setMenuItem(MenuItem::ThreeItems, 0);
-						break;
-					case 4:
-						menu->setMenuItem(MenuItem::FourItems, 0);
-						break;
-					
-					default:
-						menu->setMenuItem(MenuItem::ZeroItems, 0);
-						break;
-				}
-			}
-		}
-	}
-	fPressedPrev = fpressedCurrent;
 }

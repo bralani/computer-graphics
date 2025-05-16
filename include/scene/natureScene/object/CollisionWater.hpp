@@ -15,9 +15,6 @@ public:
   {
     auto groundCollisionMesh = std::make_shared<GroundCollisionMesh>();
 
-    this->transform.setScale(glm::vec3(3.0f));
-    this->transform.setPosition(glm::vec3(0.0f, -55.0f, 0.0f));
-
     auto meshes = std::vector<std::shared_ptr<Mesh>>();
     meshes.push_back(groundCollisionMesh);
 

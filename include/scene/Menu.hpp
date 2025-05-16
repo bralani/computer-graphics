@@ -9,12 +9,6 @@
 enum class MenuItem
 {
     Empty,
-    ZeroItems,
-    OneItem,
-    TwoItems,
-    ThreeItems,
-    FourItems,
-    BoatBroken,
     PressF,
     PressV,
 };
@@ -150,17 +144,11 @@ public:
 private:
     std::unordered_map<MenuItem, std::string> mapTexts = {
         {MenuItem::Empty, ""},
-        {MenuItem::ZeroItems, "0/4 items found"},
-        {MenuItem::OneItem, "1/4 items found"},
-        {MenuItem::TwoItems, "2/4 items found"},
-        {MenuItem::ThreeItems, "3/4 items found"},
-        {MenuItem::FourItems, "You found all items! Now you can go back to the boat!"},
-        {MenuItem::BoatBroken, "The boat is broken! Please find a way to fix it!"},
         {MenuItem::PressF, "Press F to pick up the item"},
         {MenuItem::PressV, "Press V to change camera"},
     };
 
-    MenuItem firstRow = MenuItem::ZeroItems;
+    MenuItem firstRow = MenuItem::Empty;
     MenuItem secondRow = MenuItem::Empty;
     MenuItem thirdRow = MenuItem::Empty;
     MenuItem fourthRow = MenuItem::Empty;

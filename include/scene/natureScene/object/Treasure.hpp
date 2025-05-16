@@ -3,6 +3,7 @@
 
 #include <vector>
 #include <memory>
+#include "objects/Object.hpp"
 #include "scene/natureScene/mesh/Chest.hpp"
 
 class Treasure : public Object
