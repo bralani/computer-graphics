@@ -7,6 +7,7 @@
 #include "scene/natureScene/object/Terrain.hpp"
 #include "scene/natureScene/object/Treasure.hpp"
 #include "scene/natureScene/object/Homes.hpp"
+#include "scene/natureScene/object/Heat.hpp"
 #include "scene/natureScene/object/Carretto.hpp"
 #include "materials/Texture.hpp"
 #include "materials/BasicMaterial.hpp"
@@ -102,6 +103,7 @@ std::shared_ptr<Object> NatureScene::createRoot()
 	auto treasure = std::make_shared<Treasure>();
 	auto homes = std::make_shared<Homes>();
 	auto heat = std::make_shared<Heat>();
+	auto carretto = std::make_shared<Carretto>();
 	boatCamera = std::make_shared<BoatCamera>(boat);
 
 	auto root = std::make_shared<Object>();
