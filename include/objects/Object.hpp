@@ -67,7 +67,7 @@ public:
   }
 
 
-private:
+protected:
   std::vector<std::shared_ptr<Object>> childrenObjects;
   std::vector<std::shared_ptr<Mesh>> meshes;
   std::vector<std::shared_ptr<Light>> lights;

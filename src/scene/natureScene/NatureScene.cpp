@@ -7,6 +7,7 @@
 #include "scene/natureScene/object/Terrain.hpp"
 #include "scene/natureScene/object/Treasure.hpp"
 #include "scene/natureScene/object/Homes.hpp"
+#include "scene/natureScene/object/Carretto.hpp"
 #include "materials/Texture.hpp"
 #include "materials/BasicMaterial.hpp"
 #include "materials/PBRMaterial.hpp"
@@ -100,10 +101,11 @@ std::shared_ptr<Object> NatureScene::createRoot()
 	auto tree = std::make_shared<Tree>();
 	auto treasure = std::make_shared<Treasure>();
 	auto homes = std::make_shared<Homes>();
+	auto heat = std::make_shared<Heat>();
 	boatCamera = std::make_shared<BoatCamera>(boat);
 
 	auto root = std::make_shared<Object>();
-	root->setChildrenObjects({ground, rocks, boat, homes, tree, treasure, collisionWater});
+	root->setChildrenObjects({ground, boat, homes, heat, carretto, tree, treasure, collisionWater});
 
 	DirectionalLight dirLight(
 		glm::vec3(0.2f, 0.2f, 0.2f),
@@ -155,8 +157,9 @@ void NatureScene::update()
 
 	// update the camera and physics world
 	camera->update();
-    physicsWorld->stepSimulation(deltaT, 2, 1.0f / 120.0f);
+  physicsWorld->stepSimulation(deltaT, 2, 1.0f / 120.0f);
 	menu->update();
+	fencesObj->update();
 }
 
 void NatureScene::checkChangeCamera() {

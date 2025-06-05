@@ -8,6 +8,9 @@
 #include "scene/natureScene/mesh/Island.hpp"
 #include "scene/natureScene/mesh/Cavern.hpp"
 #include "scene/natureScene/mesh/Bridge.hpp"
+#include "scene/natureScene/object/Pozzo.hpp"
+#include "scene/natureScene/object/Mulino.hpp"
+
 
 class Grounds : public Object
 {
@@ -28,6 +31,11 @@ public:
     meshes.push_back(bridgeMesh);
 
     this->setMeshes(meshes);
+    auto objectschildren = std::vector<std::shared_ptr<Object>>();
+    objectschildren.push_back(std::make_shared<Pozzo>());
+    objectschildren.push_back(std::make_shared<Mulino>());
+
+    this->setChildrenObjects(objectschildren);
   }
 
 };

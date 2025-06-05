@@ -118,14 +118,9 @@ protected:
 		// window size, titile and initial background
 		windowWidth = 1024;
 		windowHeight = 768;
-		windowTitle = "VulkanApp - 3D Transformations";
+		windowTitle = "Medieval village";
 		windowResizable = GLFW_TRUE;
 		initialBackgroundColor = {0.0f, 0.0f, 0.0f, 1.0f};
-
-		// Descriptor pool sizes
-		// uniformBlocksInPool = 15 * 2 + 2;
-		// texturesInPool = 100;
-		// setsInPool = 15 + 1 + 1;
 
 		uniformBlocksInPool = 2000;
 		texturesInPool = 2000;

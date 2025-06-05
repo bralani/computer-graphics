@@ -1,6 +1,7 @@
 #ifndef TRANSFORM_HPP
 #define TRANSFORM_HPP
 
+#include <iostream>
 #include <vector>
 #include <string>
 
@@ -23,6 +24,7 @@ public:
 
   const glm::vec3 &getPosition() const { return position; }
   const glm::vec3 &getRotation() const { return rotation; }
+  const glm::quat &getRotationQuat() const { return rotationQuat; }
   const glm::vec3 &getScale() const { return scale; }
   glm::mat4 getTransform() { return updateTransform(); }
 
@@ -32,6 +34,12 @@ public:
   }
   void setRotation(const glm::vec3 &rot) { 
     rotation = rot; 
+    rotationQuat = glm::quat(1, 0, 0, 0); // Reset quaternion
+    dirty = true;
+  }
+  void setRotationQuat(const glm::quat &rot) { 
+    rotationQuat = rot;
+    rotation = glm::vec3(0.0f); // Reset Euler angles
     dirty = true;
   }
   void setScale(const glm::vec3 &scl) { 
@@ -63,7 +71,8 @@ public:
 
 private:
   glm::vec3 position;
-  glm::vec3 rotation;
+  glm::vec3 rotation = glm::vec3(0.0f); // Rotation in degrees
+  glm::quat rotationQuat = glm::quat(1, 0, 0, 0); // Default identity quaternion
   glm::vec3 scale;
 
   bool dirty = true;
@@ -79,9 +88,15 @@ private:
     transform = glm::translate(transform, position);
 
     // Rotation
-    transform = glm::rotate(transform, glm::radians(rotation.x), glm::vec3(1, 0, 0)); // X-axis
-    transform = glm::rotate(transform, glm::radians(rotation.y), glm::vec3(0, 1, 0)); // Y-axis
-    transform = glm::rotate(transform, glm::radians(rotation.z), glm::vec3(0, 0, 1)); // Z-axis
+
+    // If rotation quaternion is set, apply it
+    if (rotationQuat != glm::quat(1, 0, 0, 0)) {
+      transform = transform * glm::mat4_cast(rotationQuat);
+    } else {
+      transform = glm::rotate(transform, glm::radians(rotation.x), glm::vec3(1, 0, 0)); // X-axis
+      transform = glm::rotate(transform, glm::radians(rotation.y), glm::vec3(0, 1, 0)); // Y-axis
+      transform = glm::rotate(transform, glm::radians(rotation.z), glm::vec3(0, 0, 1)); // Z-axis
+    }
 
     // Scaling
     transform = glm::scale(transform, scale);
