@@ -166,7 +166,7 @@ void NatureScene::update()
 void NatureScene::checkChangeCamera() {
 	bool vpressedCurrent = Input::getKey(GLFW_KEY_V);
 	if (vpressedCurrent && !vPressedPrev) {
-		glm::vec3 spawn1 = glm::vec3(137.79, -5.71614, 24.1367); 
+		glm::vec3 spawn1 = glm::vec3(154.169, -8.70866, 81.3701); 
 		glm::vec3 spawn2 = glm::vec3(-199.512, -8.77594, -93.2629); 
 
 		if (cameraType == 0) {
