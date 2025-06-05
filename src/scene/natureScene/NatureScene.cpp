@@ -161,7 +161,6 @@ void NatureScene::update()
 	camera->update();
   physicsWorld->stepSimulation(deltaT, 2, 1.0f / 120.0f);
 	menu->update();
-	fencesObj->update();
 }
 
 void NatureScene::checkChangeCamera() {
