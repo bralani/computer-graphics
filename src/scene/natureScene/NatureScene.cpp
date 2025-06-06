@@ -107,7 +107,7 @@ std::shared_ptr<Object> NatureScene::createRoot()
 	boatCamera = std::make_shared<BoatCamera>(boat);
 
 	auto root = std::make_shared<Object>();
-	root->setChildrenObjects({ground, boat, homes, heat, carretto, tree, treasure, collisionWater});
+	root->setChildrenObjects({ground, boat, homes, carretto, heat, tree, treasure, collisionWater});
 
 	DirectionalLight dirLight(
 		glm::vec3(0.2f, 0.2f, 0.2f),

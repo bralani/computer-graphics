@@ -13,6 +13,7 @@
 #include "scene/natureScene/object/Pozzo.hpp"
 #include "scene/natureScene/object/Mulino.hpp"
 #include "scene/natureScene/object/Molo.hpp"
+#include "scene/natureScene/object/Fienile.hpp"
 
 class Grounds : public Object
 {
@@ -39,6 +40,7 @@ public:
     objectschildren.push_back(std::make_shared<Pozzo>());
     objectschildren.push_back(std::make_shared<Mulino>());
     objectschildren.push_back(std::make_shared<Molo>());
+    objectschildren.push_back(std::make_shared<Fienile>());
 
     this->setChildrenObjects(objectschildren);
   }

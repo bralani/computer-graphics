@@ -3,14 +3,14 @@
 
 #include <string>
 #include "objects/Mesh.hpp"
-#include "scene/natureScene/materials/HomeMaterial.hpp"
+#include "scene/natureScene/materials/HeatMaterial.hpp"
 
 class HeatMesh : public Mesh {
 public:
     HeatMesh() : Mesh("assets/models/heat.obj") {
       
-      HomeMaterial material;
-      this->setMaterial(std::make_shared<HomeMaterial>(material));
+      HeatMaterial material;
+      this->setMaterial(std::make_shared<HeatMaterial>(material));
       this->collision = std::make_shared<Collision>(filename, globalTransform);
       this->collision->setActive(true);
     }
