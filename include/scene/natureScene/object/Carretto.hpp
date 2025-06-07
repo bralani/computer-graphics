@@ -12,95 +12,45 @@
 class Carretto : public Object
 {
 public:
-  Carretto() : Object()
-  { 
-
-std::vector<glm::vec3> positions = {
-    { -88.6894f, -5.1454f, 107.5889f },
-    { -88.3334f, -6.7566f, 107.5615f },
-    { 60.0872f, -6.8003f, 126.8310f },
-    { 60.4174f, -8.4033f, 127.0432f },
-    { -77.1298f, -5.6590f, 22.6780f },
-    { -76.7012f, -7.2500f, 22.5850f },
-    { 77.3479f, -1.1143f, 7.6732f },
-    { 77.3017f, -2.7594f, 7.7949f }
-};
-
-std::vector<glm::vec3> rotations = {
-    { 92.2953f, -165.0858f, -9.8433f },
-    { 92.2953f, -165.0858f, -9.8433f },
-    { -85.0017f, -11.3826f, -169.6094f },
-    { -85.0017f, -11.3826f, -169.6094f },
-    { 83.6404f, 167.5108f, -11.5951f },
-    { 83.6405f, 167.5108f, -11.5951f },
-    { 93.3113f, 115.7217f, -0.6648f },
-    { 93.3113f, 115.7217f, -0.6648f }
-};
-
-std::vector<glm::vec3> scales = {
-    { 1.0000f, 1.0000f, 1.0000f },
-    { 1.0000f, 1.0000f, 1.0000f },
-    { 1.0000f, 1.0000f, 1.0000f },
-    { 1.0000f, 1.0000f, 1.0000f },
-    { 1.0000f, 1.0000f, 1.0000f },
-    { 1.0000f, 1.0000f, 1.0000f },
-    { 1.0000f, 1.0000f, 1.0000f },
-    { 1.0000f, 1.0000f, 1.0000f }
-};
-
-
-std::vector<glm::vec3> positionsWheels = {
-    { -88.3334f, -6.7566f, 107.5615f },
-    { 60.4174f, -8.4033f, 127.0432f },
-    { -76.7012f, -7.2500f, 22.5850f },
-    { 77.3017f, -2.7594f, 7.7949f }
-};
-
-std::vector<glm::vec3> rotationsWheels = {
-    { 92.2953f, -165.0858f, -9.8433f },
-    { -85.0017f, -11.3826f, -169.6094f },
-    { 83.6405f, 167.5108f, -11.5951f },
-    { 93.3113f, 115.7217f, -0.6648f }
-};
-
-std::vector<glm::vec3> scalesWheels = {
-    { 1.0000f, 1.0000f, 1.0000f },
-    { 1.0000f, 1.0000f, 1.0000f },
-    { 1.0000f, 1.0000f, 1.0000f },
-    { 1.0000f, 1.0000f, 1.0000f }
-};
-
-
-
-    auto meshes = std::vector<std::shared_ptr<Mesh>>();
-    meshes.reserve(positions.size());
-
-    for (size_t i = 0; i < positions.size(); ++i)
+    Carretto() : Object()
     {
-      auto carretto = std::make_shared<CarrettoMesh>();
-      auto carrettowheels = std::make_shared<CarrettoWheels>();
 
-      glm::vec3 pos = positions[i];
-      glm::vec3 rot = rotations[i];
-      glm::vec3 scale = scales[i];
+        std::vector<glm::vec3> positions = {
+            {-73.8280f, -6.9533f, 13.1550f},
+            {81.7730f, -3.8250f, 5.6644f},
+            {79.6695f, -3.4845f, 9.7679f},
+            {-29.2574f, -2.2422f, -0.0082f},
+            {-93.2699f, -7.3207f, 109.8316f},
+            {-116.0407f, -9.3167f, 93.8215f},
+            {103.1742f, -7.7211f, 153.4709f}};
 
-      carretto->transform.setPosition(pos);
-      carretto->transform.setRotation(rot);
-      carretto->transform.setScale(scale);
+        std::vector<glm::vec3> rotations = {
+            {-1.2770f, 167.2037f, -5.6324f},
+            {-1.2770f, 122.5920f, -5.6324f},
+            {-1.2770f, -90.7522f, -5.6324f},
+            {-1.2770f, 36.0092f, -5.6324f},
+            {2.7902f, -128.9688f, -5.1953f},
+            {7.8971f, -128.3259f, -9.2501f},
+            {4.7264f, -128.0032f, -8.0223f}};
 
-      pos = positionsWheels[i];
-      rot = rotationsWheels[i];
-      scale = scalesWheels[i];
-      carrettowheels->transform.setPosition(pos);
-      carrettowheels->transform.setRotation(rot);
-      carrettowheels->transform.setScale(scale);
+        auto meshes = std::vector<std::shared_ptr<Mesh>>();
+        meshes.reserve(positions.size());
 
-      meshes.push_back(carretto);
-      meshes.push_back(carrettowheels);
+        for (size_t i = 0; i < positions.size(); ++i)
+        {
+            auto carretto = std::make_shared<CarrettoMesh>();
+
+            glm::vec3 pos = positions[i];
+            glm::vec3 rot = rotations[i];
+
+            carretto->transform.setPosition(pos);
+            carretto->transform.setRotation(rot);
+            
+            meshes.push_back(carretto);
+        }
+
+        this->setMeshes(meshes);
     }
-
-    this->setMeshes(meshes);
-  }
 };
 
 #endif // CARRETTO_HPP
