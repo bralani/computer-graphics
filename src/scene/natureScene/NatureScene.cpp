@@ -159,7 +159,7 @@ void NatureScene::update()
 
 	// update the camera and physics world
 	camera->update();
-  physicsWorld->stepSimulation(deltaT, 2, 1.0f / 120.0f);
+  physicsWorld->stepSimulation(deltaT, 2, 1.0f / 60.0f);
 	menu->update();
 }
 
