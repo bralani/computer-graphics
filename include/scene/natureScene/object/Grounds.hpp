@@ -16,6 +16,7 @@
 #include "scene/natureScene/object/Fienile.hpp"
 #include "scene/natureScene/object/Fabbro.hpp"
 #include "scene/natureScene/object/House2.hpp"
+#include "scene/natureScene/object/Walls.hpp"
 
 class Grounds : public Object
 {
@@ -45,6 +46,7 @@ public:
     objectschildren.push_back(std::make_shared<Fienile>());
     objectschildren.push_back(std::make_shared<Fabbri>());
     objectschildren.push_back(std::make_shared<House2>());
+    objectschildren.push_back(std::make_shared<Walls>());
 
     this->setChildrenObjects(objectschildren);
   }
