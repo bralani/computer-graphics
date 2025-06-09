@@ -119,6 +119,10 @@ void main() {
     vec3 finalColor = vec3(0.0);
 
     vec3 reflected = reflectColor(V, N);
+    vec3 F0 = mix(vec3(0.04), albedo, metallic);
+    vec3 F = fresnelSchlick(max(dot(N, V), 0.0), F0);
+    float reflectionStrength = pow(1.0 - roughness, 4.0) * 0.15;
+    albedo = mix(albedo, reflected, reflectionStrength);
 
     float shadow = 0.0;
     vec2 texelSize = 1.0 / textureSize(shadowMap, 0); 
@@ -157,11 +161,14 @@ void main() {
     }
 
     // Metallic materials
-    vec3 F0 = mix(vec3(0.04), albedo, metallic);
-    vec3 F_env = fresnelSchlick(max(dot(N, V), 0.0), F0);
-    float reflectionStrength = pow(1.0 - roughness, 4.0) * 1.0;
-    vec3 envSpecular = reflected * F_env * reflectionStrength;
-    finalColor += envSpecular;
+    if (metallic > 0.8) {
+        F0 = mix(vec3(0.04), albedo, metallic);
+        vec3 F_env = fresnelSchlick(max(dot(N, V), 0.0), F0);
+        float reflectionStrength = pow(1.0 - roughness, 4.0) * 1.0;
+        vec3 envSpecular = reflected * F_env * reflectionStrength;
+        finalColor += envSpecular;
+    }
+
 
     float opacity_albedo = texture(textAlbedo, tiledTexCoord).a;
     float finalOpacity = ubo.opacity * opacity_albedo;
