@@ -11,11 +11,12 @@
 #include "scene/natureScene/mesh/Church.hpp"
 
 #include "scene/natureScene/object/Pozzo.hpp"
-#include "scene/natureScene/object/Mulino.hpp"
 #include "scene/natureScene/object/Molo.hpp"
 #include "scene/natureScene/object/Fienile.hpp"
 #include "scene/natureScene/object/Fabbro.hpp"
 #include "scene/natureScene/object/House2.hpp"
+#include "scene/natureScene/object/House3.hpp"
+#include "scene/natureScene/object/House4.hpp"
 #include "scene/natureScene/object/Walls.hpp"
 #include "scene/natureScene/object/Barrels.hpp"
 
@@ -42,11 +43,12 @@ public:
     this->setMeshes(meshes);
     auto objectschildren = std::vector<std::shared_ptr<Object>>();
     objectschildren.push_back(std::make_shared<Pozzo>());
-    objectschildren.push_back(std::make_shared<Mulino>());
     objectschildren.push_back(std::make_shared<Molo>());
     objectschildren.push_back(std::make_shared<Fienile>());
     objectschildren.push_back(std::make_shared<Fabbri>());
     objectschildren.push_back(std::make_shared<House2>());
+    objectschildren.push_back(std::make_shared<House3>());
+    objectschildren.push_back(std::make_shared<House4>());
     objectschildren.push_back(std::make_shared<Walls>());
     objectschildren.push_back(std::make_shared<Barrels>());
 

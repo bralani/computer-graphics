@@ -122,9 +122,9 @@ protected:
 		windowResizable = GLFW_TRUE;
 		initialBackgroundColor = {0.0f, 0.0f, 0.0f, 1.0f};
 
-		uniformBlocksInPool = 2000;
-		texturesInPool = 2000;
-		setsInPool = 2000;
+		uniformBlocksInPool = 8000;
+		texturesInPool = 8000;
+		setsInPool = 8000;
 
 		Ar = 4.0f / 3.0f;
 	}

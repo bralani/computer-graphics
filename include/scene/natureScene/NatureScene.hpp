@@ -5,6 +5,7 @@
 #include "camera/BoatCamera.hpp"
 #include "lights/DirectionalLight.hpp"
 #include "camera/FirstPersonCamera.hpp"
+#include "scene/natureScene/object/Mulino.hpp"
 #include <btBulletDynamicsCommon.h>
 
 class NatureScene : public Scene {
@@ -18,6 +19,7 @@ private:
     void checkChangeCamera();
     void update() override;
 
+    std::shared_ptr<Mulino> mulino = nullptr; // Mulino object
     std::shared_ptr<BoatCamera> boatCamera = nullptr; // Camera for the boat
     std::shared_ptr<FirstPersonCamera> firstPersonCamera = nullptr; // Camera for the first person
     int cameraType = 0; // 0 for first person, 1 for boat
