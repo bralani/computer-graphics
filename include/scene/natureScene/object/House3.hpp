@@ -41,11 +41,42 @@ std::vector<glm::vec3> scales = {
 
     for (size_t i = 0; i < positions.size(); ++i)
     {
-      auto house = std::make_shared<House3Mesh>();
+      auto house = std::make_shared<House3BrickMesh>();
       house->transform.setPosition(positions[i]);
       house->transform.setRotation(rotations[i]);
       house->transform.setScale(scales[i]);
       meshes.push_back(house);
+
+
+      auto house1 = std::make_shared<House3RoofMesh>();
+      house1->transform.setPosition(positions[i]);
+      house1->transform.setRotation(rotations[i]);
+      house1->transform.setScale(scales[i]);
+      meshes.push_back(house1);
+
+      auto house2 = std::make_shared<House3PlanksMesh>();
+      house2->transform.setPosition(positions[i]);
+      house2->transform.setRotation(rotations[i]);
+      house2->transform.setScale(scales[i]);
+      meshes.push_back(house2);
+
+      auto house3 = std::make_shared<House3ConcreteMesh>();
+      house3->transform.setPosition(positions[i]);
+      house3->transform.setRotation(rotations[i]);
+      house3->transform.setScale(scales[i]);
+      meshes.push_back(house3);
+
+      auto house4 = std::make_shared<House3SandstoneMesh>();
+      house4->transform.setPosition(positions[i]);
+      house4->transform.setRotation(rotations[i]);
+      house4->transform.setScale(scales[i]);
+      meshes.push_back(house4);
+
+      auto house5 = std::make_shared<House3RoughWoodMesh>();
+      house5->transform.setPosition(positions[i]);
+      house5->transform.setRotation(rotations[i]);
+      house5->transform.setScale(scales[i]);
+      meshes.push_back(house5);
     }
 
     this->setMeshes(meshes);
