@@ -268,7 +268,7 @@ std::vector<glm::vec3> positions = {
     { 45.6144f, -7.2078f, 45.9251f },
     { -31.3190f, -6.9736f, 114.4680f },
     { -36.5356f, -4.7282f, 21.9821f },
-    { -122.8112f, -9.6583f, 92.8925f },
+    { -122.8112f, -11.1874f, 92.8925f },
     { 132.7245f, -10.3265f, 29.5506f },
     { -116.6208f, -8.2219f, -16.3238f },
     { 194.6500f, -9.1623f, 6.2481f },
@@ -3041,14 +3041,35 @@ std::vector<glm::vec3> scales = {
     { 0.1764f, 0.1764f, 0.1764f },
     { 0.4345f, 0.4345f, 0.4345f }
 };
-    auto meshes = std::vector<std::shared_ptr<Mesh>>();
-    meshes.reserve(positions.size());
+    std::vector<glm::vec3> selectedPositions;
+    std::vector<glm::vec3> selectedRotations;
+    std::vector<glm::vec3> selectedScales;
 
-    for (int i = 0; i < positions.size(); ++i)
+    size_t N = positions.size();
+    size_t numToSelect = static_cast<size_t>(N * 0.3); // 0.3%
+
+    std::vector<size_t> indices(N);
+    for (size_t i = 0; i < N; ++i) indices[i] = i;
+
+    std::random_device rd;
+    std::mt19937 gen(rd());
+    std::shuffle(indices.begin(), indices.end(), gen);
+
+    for (size_t i = 0; i < numToSelect; ++i) {
+        size_t idx = indices[i];
+        selectedPositions.push_back(positions[idx]);
+        selectedRotations.push_back(rotations[idx]);
+        selectedScales.push_back(scales[idx]);
+    }
+
+    auto meshes = std::vector<std::shared_ptr<Mesh>>();
+    meshes.reserve(selectedPositions.size());
+
+    for (int i = 0; i < selectedPositions.size(); ++i)
     {
-      auto pos = positions[i];
-      auto rot = rotations[i];
-      auto scale = scales[i] * 0.7f;
+      auto pos = selectedPositions[i];
+      auto rot = selectedRotations[i];
+      auto scale = selectedScales[i] * 0.7f;
 
       auto rock = std::make_shared<RockMesh>();
 

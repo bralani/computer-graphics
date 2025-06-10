@@ -15,8 +15,6 @@ public:
   {
 
 std::vector<glm::vec3> positions = {
-    { 0.0000f, 0.0000f, -0.0000f },
-    { 0.0000f, 0.0000f, -0.0000f },
     { -17.2684f, -7.3808f, 173.0373f },
     { -18.1008f, -0.5465f, -16.1361f },
     { 48.6580f, -9.6761f, 191.2987f },
@@ -181,8 +179,6 @@ std::vector<glm::vec3> positions = {
 };
 
 std::vector<glm::vec3> rotations = {
-    { 0.0000f, 0.0000f, 0.0000f },
-    { 90.0000f, 0.0000f, 0.0000f },
     { 90.0000f, 0.0000f, 0.0000f },
     { 90.0000f, -0.0000f, 0.0000f },
     { 89.9999f, -0.0001f, 0.0000f },
@@ -347,8 +343,6 @@ std::vector<glm::vec3> rotations = {
 };
 
 std::vector<glm::vec3> scales = {
-    { 1.0000f, 1.0000f, 1.0000f },
-    { 1.0000f, 1.0000f, 1.0000f },
     { 0.6203f, 0.6203f, 0.6203f },
     { 0.5602f, 0.5602f, 0.5602f },
     { 0.7081f, 0.7081f, 0.7081f },
@@ -511,6 +505,7 @@ std::vector<glm::vec3> scales = {
     { 1.0296f, 1.0296f, 1.0296f },
     { 0.6203f, 0.6203f, 0.6203f }
 };
+
     auto meshes = std::vector<std::shared_ptr<Mesh>>();
     meshes.reserve(positions.size() * 2);
 

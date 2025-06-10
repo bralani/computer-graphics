@@ -108,7 +108,7 @@ std::shared_ptr<Object> NatureScene::createRoot()
 	mulino = std::make_shared<Mulino>();
 
 	auto root = std::make_shared<Object>();
-	root->setChildrenObjects({ground, boat, homes, carretto, mulino, heat, tree, rocks, treasure, collisionWater});
+	root->setChildrenObjects({ground, boat, homes, carretto, mulino, heat, rocks, tree, treasure, collisionWater});
 
 	DirectionalLight dirLight(
 		glm::vec3(0.2f, 0.2f, 0.2f),

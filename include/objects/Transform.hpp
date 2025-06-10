@@ -24,7 +24,6 @@ public:
 
   const glm::vec3 &getPosition() const { return position; }
   const glm::vec3 &getRotation() const { return rotation; }
-  const glm::quat &getRotationQuat() const { return rotationQuat; }
   const glm::vec3 &getScale() const { return scale; }
   glm::mat4 getTransform() { return updateTransform(); }
 
@@ -34,12 +33,6 @@ public:
   }
   void setRotation(const glm::vec3 &rot) { 
     rotation = rot; 
-    rotationQuat = glm::quat(1, 0, 0, 0); // Reset quaternion
-    dirty = true;
-  }
-  void setRotationQuat(const glm::quat &rot) { 
-    rotationQuat = rot;
-    rotation = glm::vec3(0.0f); // Reset Euler angles
     dirty = true;
   }
   void setScale(const glm::vec3 &scl) { 
@@ -72,7 +65,6 @@ public:
 private:
   glm::vec3 position;
   glm::vec3 rotation = glm::vec3(0.0f); // Rotation in degrees
-  glm::quat rotationQuat = glm::quat(1, 0, 0, 0); // Default identity quaternion
   glm::vec3 scale;
 
   bool dirty = true;
@@ -82,27 +74,17 @@ private:
   {
     if(!dirty) return transform;
 
-    transform = glm::mat4(1.0f);
+    glm::mat4 rot_matrix = glm::mat4(1.0f);
+    rot_matrix = glm::rotate(rot_matrix, glm::radians(rotation.x), glm::vec3(1.0f, 0.0f, 0.0f));
+    rot_matrix = glm::rotate(rot_matrix, glm::radians(rotation.y), glm::vec3(0.0f, 1.0, 0.0f));
+    rot_matrix = glm::rotate(rot_matrix, glm::radians(rotation.z), glm::vec3(0.0f, 0.0f, -1.0f));
 
-    // Translation
-    transform = glm::translate(transform, position);
+    glm::mat4 trans_final = glm::translate(glm::mat4(1.0f), position);
+    glm::mat4 scale_matrix = glm::scale(glm::mat4(1.0f), scale);
 
-    // Rotation
-
-    // If rotation quaternion is set, apply it
-    if (rotationQuat != glm::quat(1, 0, 0, 0)) {
-      transform = transform * glm::mat4_cast(rotationQuat);
-    } else {
-      transform = glm::rotate(transform, glm::radians(rotation.x), glm::vec3(1, 0, 0)); // X-axis
-      transform = glm::rotate(transform, glm::radians(rotation.y), glm::vec3(0, 1, 0)); // Y-axis
-      transform = glm::rotate(transform, glm::radians(rotation.z), glm::vec3(0, 0, 1)); // Z-axis
-    }
-
-    // Scaling
-    transform = glm::scale(transform, scale);
+    transform =  trans_final * rot_matrix *  scale_matrix;
 
     dirty = false;
-
     return transform;
   }
 };

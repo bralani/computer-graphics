@@ -169,6 +169,13 @@ void main() {
         finalColor += envSpecular;
     }
 
+    // indirect lighting
+    vec3 indirectDiffuse = texture(hdrEnvMap, normalMap).rgb;
+    vec3 kd = mix(vec3(1.0) - F, vec3(0.0), metallic);
+    vec3 indirectLight = kd * albedo * indirectDiffuse;
+    indirectLight *= ao;
+    finalColor += indirectLight;
+
 
     float opacity_albedo = texture(textAlbedo, tiledTexCoord).a;
     float finalOpacity = ubo.opacity * opacity_albedo;
