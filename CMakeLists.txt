@@ -143,6 +143,7 @@ if(APPLE)
     # Copy resources (textures, models, etc.) to the build directory
     file(COPY ${CMAKE_SOURCE_DIR}/assets/textures DESTINATION ${CMAKE_BINARY_DIR}/assets)
     file(COPY ${CMAKE_SOURCE_DIR}/assets/models DESTINATION ${CMAKE_BINARY_DIR}/assets)
+    file(COPY ${CMAKE_SOURCE_DIR}/assets/background.bmp DESTINATION ${CMAKE_BINARY_DIR})
 
     # Use GLOB to find files and only copy if any exist
     file(GLOB SHADER_FILES "${CMAKE_SOURCE_DIR}/assets/shaders/*.spv")
@@ -253,6 +254,8 @@ elseif(WIN32)
 
     file(COPY ${CMAKE_SOURCE_DIR}/assets/textures DESTINATION ${CMAKE_BINARY_DIR}/assets)
     file(COPY ${CMAKE_SOURCE_DIR}/assets/models DESTINATION ${CMAKE_BINARY_DIR}/assets)
+    file(COPY ${CMAKE_SOURCE_DIR}/assets/background.bmp DESTINATION ${CMAKE_BINARY_DIR})
+
     # Use GLOB to find files and only copy if any exist
     file(GLOB SHADER_FILES "${CMAKE_SOURCE_DIR}/assets/shaders/*.spv")
     if(SHADER_FILES)
@@ -352,6 +355,8 @@ elseif(UNIX AND NOT APPLE)
 
     file(COPY ${CMAKE_SOURCE_DIR}/assets/textures DESTINATION ${CMAKE_BINARY_DIR}/assets)
     file(COPY ${CMAKE_SOURCE_DIR}/assets/models DESTINATION ${CMAKE_BINARY_DIR}/assets)
+    file(COPY ${CMAKE_SOURCE_DIR}/assets/background.bmp DESTINATION ${CMAKE_BINARY_DIR})
+
 
     # Use GLOB to find files and only copy if any exist
     file(GLOB SHADER_FILES "${CMAKE_SOURCE_DIR}/assets/shaders/*.spv")
