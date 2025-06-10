@@ -20,7 +20,7 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/quaternion.hpp>
-
+#include "scene/natureScene/SplashScreen.hpp"
 
 #include <chrono>
 
@@ -28,7 +28,7 @@
 #include <tiny_obj_loader.h>
 
 #define STB_IMAGE_IMPLEMENTATION
-#include <stb_image.h>
+#include "stb_image.h"
 
 #define TINYGLTF_IMPLEMENTATION
 #define STB_IMAGE_WRITE_IMPLEMENTATION
@@ -341,15 +341,39 @@ class BaseProject {
 	friend class DescriptorSet;
 public:
 	virtual void setWindowParameters() = 0;
-    void run() {
-    	windowResizable = GLFW_FALSE;
 
-    	setWindowParameters();
-        initWindow();
-        initVulkan();
-        mainLoop();
-        cleanup();
-    }
+	void run() {
+			AppState currentState = AppState::SPLASH_SCREEN;
+
+			while (currentState != AppState::EXIT) {
+					switch (currentState) {
+							case AppState::SPLASH_SCREEN:
+									currentState = SplashScreen::run(); 
+									break;
+
+							case AppState::INITIALIZE_VULKAN:
+									windowResizable = GLFW_TRUE;
+									setWindowParameters();
+									initWindow();
+									initVulkan();
+									currentState = AppState::RUNNING_GAME;
+									break;
+
+							case AppState::RUNNING_GAME:
+									mainLoop();
+									currentState = AppState::CLEANUP;
+									break;
+
+							case AppState::CLEANUP:
+									cleanup();
+									currentState = AppState::EXIT;
+									break;
+							
+							case AppState::EXIT:
+									break;
+					}
+			}
+	}
 
 protected:
 	uint32_t windowWidth;

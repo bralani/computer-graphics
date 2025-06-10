@@ -17,6 +17,31 @@ enable_language(CXX)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
+# --- Libreria GLAD ---
+find_package(OpenGL REQUIRED)
+add_library(glad STATIC
+    third_party/glad/src/glad.c
+)
+target_include_directories(glad PUBLIC
+    ${CMAKE_CURRENT_SOURCE_DIR}/third_party/glad/include
+)
+target_link_libraries(glad PUBLIC OpenGL::GL)
+
+# --- Libreria ImGui ---
+# Creiamo un target "imgui" che compila tutti i suoi file sorgente.
+add_library(imgui STATIC
+    third_party/imgui/imgui.cpp
+    third_party/imgui/imgui_draw.cpp
+    third_party/imgui/imgui_tables.cpp
+    third_party/imgui/imgui_widgets.cpp
+    third_party/imgui/backends/imgui_impl_glfw.cpp
+    third_party/imgui/backends/imgui_impl_opengl3.cpp
+)
+target_include_directories(imgui PUBLIC
+    ${CMAKE_CURRENT_SOURCE_DIR}/third_party/imgui
+)
+target_link_libraries(imgui PUBLIC glad glfw)
+
 # Platform-specific settings
 if(APPLE)
     # macOS specific configurations
@@ -65,15 +90,14 @@ if(APPLE)
     target_include_directories(exe PRIVATE ${CMAKE_SOURCE_DIR}/third_party)
     target_include_directories(exe PUBLIC ${Vulkan_INCLUDE_DIR})
 
-
     target_include_directories(compute_shadows PRIVATE ${GLM_INCLUDE_DIRS})
     target_include_directories(compute_shadows PRIVATE ${CMAKE_SOURCE_DIR}/include)
     target_include_directories(compute_shadows PRIVATE ${CMAKE_SOURCE_DIR}/third_party)
     target_include_directories(compute_shadows PUBLIC ${Vulkan_INCLUDE_DIR})
 
     # Link libraries
-    target_link_libraries(exe PRIVATE Vulkan::Vulkan glfw Threads::Threads)
-    target_link_libraries(compute_shadows PRIVATE Vulkan::Vulkan glfw Threads::Threads)
+    target_link_libraries(exe PRIVATE Vulkan::Vulkan glfw Threads::Threads imgui)
+    target_link_libraries(compute_shadows PRIVATE Vulkan::Vulkan glfw Threads::Threads imgui)
     
     file(GLOB GLSL_SOURCE_FILES "${CMAKE_SOURCE_DIR}/assets/shaders/*.vert" "${CMAKE_SOURCE_DIR}/assets/shaders/*.frag")
 
@@ -158,9 +182,9 @@ elseif(WIN32)
         ${CMAKE_SOURCE_DIR}/third_party/bullet3/src
     )
     add_dependencies(exe Bullet3Common BulletDynamics BulletCollision LinearMath)
-    target_link_libraries(exe PRIVATE Bullet3Common BulletDynamics BulletCollision LinearMath)
+    target_link_libraries(exe PRIVATE Bullet3Common BulletDynamics BulletCollision LinearMath imgui)
     add_dependencies(compute_shadows Bullet3Common BulletDynamics BulletCollision LinearMath)
-    target_link_libraries(compute_shadows PRIVATE Bullet3Common BulletDynamics BulletCollision LinearMath)
+    target_link_libraries(compute_shadows PRIVATE Bullet3Common BulletDynamics BulletCollision LinearMath imgui)
 
     find_package(Vulkan REQUIRED)
 
@@ -263,8 +287,8 @@ elseif(UNIX AND NOT APPLE)
     target_include_directories(compute_shadows PRIVATE ${CMAKE_SOURCE_DIR}/include)
     target_include_directories(compute_shadows PRIVATE ${CMAKE_SOURCE_DIR}/third_party)
 
-    target_link_libraries(exe PRIVATE Vulkan::Vulkan glfw)
-    target_link_libraries(compute_shadows PRIVATE Vulkan::Vulkan glfw)
+    target_link_libraries(exe PRIVATE Vulkan::Vulkan glfw imgui)
+    target_link_libraries(compute_shadows PRIVATE Vulkan::Vulkan glfw imgui)
 
     foreach(dir IN LISTS Vulkan_INCLUDE_DIR INCLUDE_DIRS)
         target_include_directories(exe PUBLIC ${dir})

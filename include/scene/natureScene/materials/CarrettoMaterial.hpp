@@ -14,7 +14,7 @@ class CarrettoMaterial : public PBRMaterial
     CarrettoMaterial()
         : PBRMaterial(
           Texture ("assets/textures/carretto/albedo.jpg", TextureType::Diffuse), 
-          Texture ("assets/textures/carretto/roughness.jpg", TextureType::Roughness),
+          Texture ("assets/textures/carretto/roughness.png", TextureType::Roughness),
           Texture ("assets/textures/carretto/metallic.png", TextureType::Metallic),
           Texture ("assets/textures/carretto/normal.jpg", TextureType::Normal),
           Texture ("assets/textures/carretto/ao.png", TextureType::AmbientOcclusion)
