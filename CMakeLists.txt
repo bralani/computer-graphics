@@ -159,6 +159,12 @@ elseif(WIN32)
     # Set paths to libraries (modify these based on your SDK and library installation)
     set(GLFW "C:/VulkanSDK/libs/glfw-3.4.bin.WIN64")
     set(GLM "C:/VulkanSDK/libs/glm")
+    
+    add_library(glfw STATIC IMPORTED)
+    set_target_properties(glfw PROPERTIES
+        IMPORTED_LOCATION "${GLFW}/lib-vc2022/glfw3.lib"
+        INTERFACE_INCLUDE_DIRECTORIES "${GLFW}/include"
+    )
 
     # List of directories to add to the include path
     list(APPEND INCLUDE_DIRS "${GLFW}/include" ${GLM} headers)
