@@ -5,6 +5,7 @@
 #include <memory>
 #include <fstream>
 #include <random>
+#include <algorithm>
 #include "scene/natureScene/mesh/Rock.hpp"
 #include "objects/Object.hpp"
 #include "utilities/Input.hpp"
