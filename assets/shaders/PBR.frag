@@ -19,7 +19,7 @@ layout(binding = 0) uniform UniformBufferObject {
 } ubo;
 
 #define MAX_LIGHTS 20
-#define SAMPLE_COUNT 3
+#define SAMPLE_COUNT 2
 layout(binding = 1) uniform GlobalUniformBufferObject {
     vec3 lightDir[MAX_LIGHTS];
     vec4 lightColor[MAX_LIGHTS];
