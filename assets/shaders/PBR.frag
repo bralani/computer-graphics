@@ -18,7 +18,7 @@ layout(binding = 0) uniform UniformBufferObject {
     float opacity;
 } ubo;
 
-#define MAX_LIGHTS 20
+#define MAX_LIGHTS 40
 #define SAMPLE_COUNT 2
 layout(binding = 1) uniform GlobalUniformBufferObject {
     vec3 lightDir[MAX_LIGHTS];
@@ -90,6 +90,20 @@ vec3 CookTorranceBRDF(vec3 albedo, vec3 N, vec3 V, vec3 L, float roughness, floa
     return finalColor;
 }
 
+vec3 CookTorranceBRDFPoint(vec3 albedo, vec3 N, vec3 V, vec3 L, float roughness, float metallic) {
+    vec3 H = normalize(V + L);
+    vec3 F0 = mix(vec3(0.04), albedo, metallic);
+    vec3 F = fresnelSchlick(max(dot(H, V), 0.0), F0);
+    float NDF = DistributionGGX(N, H, roughness);
+    float G = GeometrySmith(N, V, L, roughness);
+    vec3 specular = (NDF * G * F) / max(4.0 * max(dot(N, V), 0.0) * max(dot(N, L), 0.0), 0.0001);
+    vec3 kd = mix(vec3(1.0) - F, vec3(0.0), metallic);
+    vec3 diffuse = kd * albedo / PI;
+    float NdotL = max(dot(N, L), 0.05);
+    vec3 finalColor = (diffuse + specular) * NdotL;
+    return finalColor;
+}
+
 vec3 reflectColor(vec3 viewDir, vec3 normal) {
     vec3 R = reflect(viewDir, normal);
     return texture(hdrEnvMap, R).rgb;
@@ -156,8 +170,8 @@ void main() {
         vec3 L = normalize(lightPos - fragPos);
         vec3 LC = gubo.lightColorPoint[i].rgb * gubo.lightColorPoint[i].a;
         float distance = length(lightPos - fragPos);
-        float attenuation = 1.0 / (distance * distance);
-        finalColor += CookTorranceBRDF(albedo, N, V, L, roughness, metallic, shadow) * LC * attenuation;
+        float attenuation = 5.0 / (distance * distance);
+        finalColor += CookTorranceBRDFPoint(albedo, N, V, L, roughness, metallic) * LC * attenuation;
     }
 
     // Metallic materials
@@ -166,7 +180,7 @@ void main() {
         vec3 F_env = fresnelSchlick(max(dot(N, V), 0.0), F0);
         float reflectionStrength = pow(1.0 - roughness, 4.0) * 1.0;
         vec3 envSpecular = reflected * F_env * reflectionStrength;
-        finalColor += envSpecular;
+        finalColor += (gubo.lightColor[0].a / 40) * envSpecular;
     }
 
     // indirect lighting
@@ -174,7 +188,7 @@ void main() {
     vec3 kd = mix(vec3(1.0) - F, vec3(0.0), metallic);
     vec3 indirectLight = kd * albedo * indirectDiffuse;
     indirectLight *= ao;
-    finalColor += indirectLight;
+    finalColor += (gubo.lightColor[0].a / 40) * indirectLight;
 
 
     float opacity_albedo = texture(textAlbedo, tiledTexCoord).a;

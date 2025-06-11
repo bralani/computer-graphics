@@ -19,10 +19,17 @@ class Light {
     glm::vec3 getColor() const { return color; }
     glm::vec3 getDirection() const { return transform.getRotation(); }
     glm::vec3 getPosition() const { return transform.getPosition(); }
+    Transform& getGlobalTransform() { return globalTransform; }
+    void setGlobalTransform(Transform& transform) { 
+      globalTransform = transform;
+    }
+
+
     float getIntensity() const { return intensity; }
     TypeLight getType() const { return type; }
 
   protected:
+    Transform globalTransform;
     // Light properties
     glm::vec3 color = glm::vec3(1.0f);
     float intensity = 1.0f;

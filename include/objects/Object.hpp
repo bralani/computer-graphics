@@ -54,6 +54,7 @@ public:
     // Collect all lights from the current node
     for (const auto& light : lights) {
         auto transformedLight = transform * light->transform;
+        light->setGlobalTransform(transformedLight);
         allLightsTransform.emplace_back(light, transformedLight);
     }
 

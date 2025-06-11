@@ -116,7 +116,7 @@ std::shared_ptr<Object> NatureScene::createRoot()
 	DirectionalLight dirLight(
 		glm::vec3(0.2f, 0.2f, 0.2f),
 		glm::vec3(0.0f, -1.0f, .0f),
-		40.0f);
+		0.5f);
 
 	root.get()->setLights({std::make_shared<DirectionalLight>(dirLight)});
 

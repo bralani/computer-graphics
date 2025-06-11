@@ -8,7 +8,7 @@
 
 #define GLM_ENABLE_EXPERIMENTAL
 #include <glm/gtx/transform2.hpp>
-#define MAX_LIGHTS 20
+#define MAX_LIGHTS 40
 
 
 struct UniformBufferObject
@@ -458,7 +458,7 @@ protected:
 				break;
 
 			case TypeLight::POINT_LIGHT:
-				gubo.lightPosPoint[numPoint].v = lights[i]->getPosition();
+				gubo.lightPosPoint[numPoint].v = lights[i]->getGlobalTransform().getPosition();
 				gubo.lightPosPoint[numPoint].v.y = -gubo.lightPosPoint[numPoint].v.y;
 				gubo.lightColorPoint[numPoint] = glm::vec4(lights[i]->getColor(), lights[i]->getIntensity());
 				numPoint++;
