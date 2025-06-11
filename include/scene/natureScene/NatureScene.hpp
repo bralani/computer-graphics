@@ -7,6 +7,7 @@
 #include "camera/FirstPersonCamera.hpp"
 #include "scene/natureScene/object/Mulino.hpp"
 #include <btBulletDynamicsCommon.h>
+#include "scene/natureScene/mesh/Barrel.hpp"
 
 class NatureScene : public Scene {
 public:
@@ -18,6 +19,7 @@ private:
     void addCollisions();
     void checkChangeCamera();
     void update() override;
+    void collectBarrels(const std::shared_ptr<Object>& node);
 
     std::shared_ptr<Mulino> mulino = nullptr; // Mulino object
     std::shared_ptr<BoatCamera> boatCamera = nullptr; // Camera for the boat
@@ -29,6 +31,20 @@ private:
     // commands
     inline static bool vPressedPrev = false;
     inline static bool fPressedPrev = false;
+
+    // gets all barrels in the scene
+    std::vector<std::shared_ptr<BarrelMesh>> allBarrels;
+
+    // pickup state
+    std::shared_ptr<BarrelMesh> heldBarrel = nullptr;
+    bool isHolding   = false;
+    bool gDebounce   = false;
+
+    // settings for the pickup/drop
+    float pickupRange = 10.0f;    // max distance to pick up a barrel
+    float dropDist    = 1.5f;     // distance to drop the barrel in front of the camera
+    glm::vec3 holdOffset = {0.1f, 0.0f, 1.0f};  // offset in camera‐space
+
 };
 
 #endif // NATURESCENE_HPP

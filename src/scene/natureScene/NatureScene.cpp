@@ -62,6 +62,7 @@ NatureScene::NatureScene()
 	// setup the scene
 	setup(root, camera, shader, hdri_textures);
 	addCollisions();
+	collectBarrels(root);
 }
 
 void NatureScene::initializePhysicsWorld()
@@ -156,11 +157,78 @@ void NatureScene::update()
 	if (isPaused)
 		return;
 
+	bool gPressed = Input::getKey(GLFW_KEY_G);
+	if (gPressed && !gDebounce) {
+		gDebounce = true;
+
+		if (!isHolding) {
+			// Find nearest barrel
+			glm::vec3 camPos = camera->getPosition();
+			float bestDist = pickupRange;
+			std::shared_ptr<BarrelMesh> nearest = nullptr;
+
+			for (auto& b : allBarrels) {
+				glm::vec3 bpos = b->transform.getPosition();
+				float d = glm::distance(camPos, bpos);
+				if (d < bestDist) {
+					bestDist = d;
+					nearest = b;
+				}
+				std::cout << std::endl;
+			}
+
+			if (nearest) {
+				// Grab barrel
+				heldBarrel = nearest;
+				isHolding   = true;
+			}
+		}
+		else {
+			// Drop barrel
+			glm::vec3 camPos  = camera->getPosition();
+			glm::vec3 forward = camera->getFront();
+			glm::vec3 dropPos = camPos + forward * dropDist;
+			dropPos.y -= 1.5f;
+
+			heldBarrel->transform.setPosition(dropPos);
+			heldBarrel->transform.setScale(glm::vec3(1.0f));
+			heldBarrel->transform.setRotation(glm::vec3(-7.6584f, -11.0591f, 74.6419f));
+			heldBarrel->setGlobalTransform(heldBarrel->transform);
+
+			heldBarrel = nullptr;
+			isHolding  = false;
+		}
+	}
+	else if (!gPressed) {
+		gDebounce = false;
+	}
+
 	checkChangeCamera();
 
-	// update the camera and physics world
 	camera->update();
-  physicsWorld->stepSimulation(deltaT, 2, 1.0f / 60.0f);
+
+	if (isHolding && heldBarrel) {
+		glm::vec3 camPos   = camera->getPosition();
+		glm::vec3 worldUp  = glm::vec3(0.0f, 1.0f, 0.0f);
+		glm::vec3 forward  = camera->getFront();
+		glm::vec3 right    = -camera->getRight();
+
+		glm::vec3 worldOff = right * holdOffset.x
+						   + worldUp	* holdOffset.y
+						   + forward	* holdOffset.z;
+
+		heldBarrel->transform.setPosition(camPos + worldOff);
+		heldBarrel->transform.setScale(glm::vec3(0.2f));
+		heldBarrel->transform.setRotation(glm::vec3(
+			camera->getYaw(),
+			camera->getPitch(),
+			camera->getRoll()
+		));
+		heldBarrel->setGlobalTransform(heldBarrel->transform);
+	}
+
+	// update the camera and physics world
+  	physicsWorld->stepSimulation(deltaT, 2, 1.0f / 60.0f);
 	menu->update();
 	mulino->update();
 }
@@ -207,4 +275,14 @@ void NatureScene::checkChangeCamera() {
 		}
 	}
 	vPressedPrev = vpressedCurrent;
+}
+
+void NatureScene::collectBarrels(const std::shared_ptr<Object>& node) {
+	for (auto& mesh : node->getMeshes()) {
+        if (auto b = std::dynamic_pointer_cast<BarrelMesh>(mesh))
+            allBarrels.push_back(b);
+    }
+    
+    for (auto& child : node->getChildrenObjects())
+        collectBarrels(child);
 }

@@ -23,6 +23,10 @@ public:
     float getPitch() const;
     float getRoll()  const;
 
+    virtual glm::vec3 getFront() const = 0;
+    virtual glm::vec3 getUp()    const = 0;
+    virtual glm::vec3 getRight() const = 0;
+
     virtual glm::mat4 getViewMatrix() const = 0;
 
 protected:

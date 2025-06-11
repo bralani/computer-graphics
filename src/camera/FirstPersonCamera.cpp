@@ -30,7 +30,8 @@ FirstPersonCamera::FirstPersonCamera(const glm::vec3& pos, float yaw, float pitc
       m_physicsWorld(physicsWorld),
       m_jumpForce(7.0f),
       m_moveForce(20.0f),
-      m_maxSpeed(4.0f) {
+      m_maxSpeed(4.0f),
+      m_worldUp(0.0f, 1.0f, 0.0f) {
     
     // Inizializzazione fisica
     m_collisionShape = new btCapsuleShape(0.5f, 4.0f);
@@ -117,6 +118,8 @@ void FirstPersonCamera::update() {
     glm::vec3 forward = glm::vec3(sin(this->getYaw()), 0, cos(this->getYaw()));
     glm::vec3 right = glm::vec3(sin(this->getYaw() + glm::half_pi<float>()), 0, cos(this->getYaw() + glm::half_pi<float>()));
 
+    updateCameraVectors();
+
     // Applica forze fisiche
     if(m_rigidBody) {
 
@@ -168,4 +171,17 @@ void FirstPersonCamera::jump() {
         m_rigidBody->applyCentralImpulse(btVector3(0, m_jumpForce, 0));
         timeJump = duration + 1000;             // 1 secondo di cooldown
     }
+}
+
+void FirstPersonCamera::updateCameraVectors(){
+    // Calculate the new front vector
+    glm::vec3 front;
+    front.x = cos(getYaw()) * cos(getPitch());
+    front.y = sin(getPitch());
+    front.z = sin(getYaw()) * cos(getPitch());
+    m_front = glm::normalize(front);
+
+    // Ortogonal vectors right and up
+    m_right = glm::normalize(glm::cross(m_front, m_worldUp));
+    m_up    = glm::normalize(glm::cross(m_right, m_front));
 }

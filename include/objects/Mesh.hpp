@@ -16,7 +16,7 @@ public:
         : filename(filename), transform(), globalTransform(), material(std::make_shared<Material>()) {
     }
 
-    ~Mesh() = default;
+    virtual ~Mesh() = default;
         
     const std::shared_ptr<Material>& getMaterial() const { return material; }
     void setMaterial(const std::shared_ptr<Material>& mat) { material = mat; }
