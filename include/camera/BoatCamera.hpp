@@ -21,6 +21,12 @@ public:
         return boatObject->getBoatMesh()->getGlobalTransform().getPosition();
     }
 
+    glm::vec3 getFront() const override { return glm::vec3(0.0f, 0.0f, 1.0f); }
+
+    glm::vec3 getUp() const override { return glm::vec3(0.0f, 1.0f, 0.0f); }
+
+    glm::vec3 getRight() const override { return glm::vec3(1.0f, 0.0f, 0.0f); }
+
 private:
     glm::vec3 calculateCameraPos();
     float distanceFromBoat;
