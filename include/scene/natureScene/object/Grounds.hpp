@@ -17,7 +17,6 @@
 #include "scene/natureScene/object/House2.hpp"
 #include "scene/natureScene/object/House3.hpp"
 #include "scene/natureScene/object/House4.hpp"
-#include "scene/natureScene/object/Walls.hpp"
 #include "scene/natureScene/object/Barrels.hpp"
 #include "scene/natureScene/object/Fences.hpp"
 #include "scene/natureScene/object/Fires.hpp"
@@ -51,7 +50,6 @@ public:
     objectschildren.push_back(std::make_shared<House2>());
     objectschildren.push_back(std::make_shared<House3>());
     objectschildren.push_back(std::make_shared<House4>());
-    objectschildren.push_back(std::make_shared<Walls>());
     objectschildren.push_back(std::make_shared<Barrels>());
     objectschildren.push_back(std::make_shared<Fences>());
     objectschildren.push_back(std::make_shared<Fires>());

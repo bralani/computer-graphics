@@ -20,6 +20,31 @@ public:
     this->setMeshes(meshes);
   }
 
+  void update(glm::vec3 currentPosition)
+  {	
+    glm::vec3 position_gate = meshes[1]->transform.getPosition();
+    glm::vec3 position_trigger = glm::vec3(-69.5164, 0.335829, -26.8611);
+
+    float distance = glm::distance(currentPosition, position_trigger);
+    bool openGate = distance < 15.0f;
+    bool update = false;
+    if (openGate) {
+      if (position_gate.y <= 9.0f) {
+        position_gate.y += 0.1f;
+        update = true;
+      }
+    } else {
+      if (position_gate.y > 0.0f) {
+        position_gate.y -= 0.1f;
+        update = true;
+      }
+    }
+
+    if (update) {
+      meshes[1]->transform.setPosition(position_gate);
+      this->getRecursiveMeshesTransform();
+    }
+  }
 };
 
 #endif // WALLSOBJECT_HPP

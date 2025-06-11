@@ -6,6 +6,7 @@
 #include "lights/DirectionalLight.hpp"
 #include "camera/FirstPersonCamera.hpp"
 #include "scene/natureScene/object/Mulino.hpp"
+#include "scene/natureScene/object/Walls.hpp"
 #include <btBulletDynamicsCommon.h>
 #include "scene/natureScene/mesh/Barrel.hpp"
 
@@ -22,6 +23,7 @@ private:
     void collectBarrels(const std::shared_ptr<Object>& node);
 
     std::shared_ptr<Mulino> mulino = nullptr; // Mulino object
+    std::shared_ptr<Walls> walls = nullptr; // Walls object
     std::shared_ptr<BoatCamera> boatCamera = nullptr; // Camera for the boat
     std::shared_ptr<FirstPersonCamera> firstPersonCamera = nullptr; // Camera for the first person
     int cameraType = 0; // 0 for first person, 1 for boat

@@ -106,10 +106,12 @@ std::shared_ptr<Object> NatureScene::createRoot()
 	auto heat = std::make_shared<Heat>();
 	auto carretto = std::make_shared<Carretto>();
 	boatCamera = std::make_shared<BoatCamera>(boat);
-	mulino = std::make_shared<Mulino>();
+	mulino = std::make_shared<Mulino>();	
+	walls = std::make_shared<Walls>();
+
 
 	auto root = std::make_shared<Object>();
-	root->setChildrenObjects({ground, boat, homes, carretto, mulino, heat, rocks, tree, treasure, collisionWater});
+	root->setChildrenObjects({ground, boat, homes, carretto, mulino, walls, heat, rocks, tree, treasure, collisionWater});
 
 	DirectionalLight dirLight(
 		glm::vec3(0.2f, 0.2f, 0.2f),
@@ -228,9 +230,10 @@ void NatureScene::update()
 	}
 
 	// update the camera and physics world
-  	physicsWorld->stepSimulation(deltaT, 2, 1.0f / 60.0f);
+  physicsWorld->stepSimulation(deltaT, 2, 1.0f / 60.0f);
 	menu->update();
 	mulino->update();
+	walls->update(camera->getPosition());
 }
 
 void NatureScene::checkChangeCamera() {

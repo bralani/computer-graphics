@@ -23,8 +23,6 @@ public:
       
       SpadeFabbroMaterial material;
       this->setMaterial(std::make_shared<SpadeFabbroMaterial>(material));
-      this->collision = std::make_shared<Collision>(filename, globalTransform);
-      this->collision->setActive(true);
     }
 };
 

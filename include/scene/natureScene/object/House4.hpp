@@ -47,11 +47,23 @@ std::vector<glm::vec3> scales = {
 
     for (size_t i = 0; i < positions.size(); ++i)
     {
-      auto house = std::make_shared<House4Mesh>();
-      house->transform.setPosition(positions[i]);
-      house->transform.setRotation(rotations[i]);
-      house->transform.setScale(scales[i]);
-      meshes.push_back(house);
+      auto roof = std::make_shared<House4RoofMesh>();
+      roof->transform.setPosition(positions[i]);
+      roof->transform.setRotation(rotations[i]);
+      roof->transform.setScale(scales[i]);
+      meshes.push_back(roof);
+
+      auto wood = std::make_shared<House4WoodMesh>();
+      wood->transform.setPosition(positions[i]);
+      wood->transform.setRotation(rotations[i]);
+      wood->transform.setScale(scales[i]);
+      meshes.push_back(wood);
+
+      auto wall = std::make_shared<House4WallMesh>();
+      wall->transform.setPosition(positions[i]);
+      wall->transform.setRotation(rotations[i]);
+      wall->transform.setScale(scales[i]);
+      meshes.push_back(wall);
     }
 
     this->setMeshes(meshes);
