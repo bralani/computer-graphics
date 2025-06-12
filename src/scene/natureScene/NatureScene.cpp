@@ -51,16 +51,25 @@ NatureScene::NatureScene()
 	auto root = createRoot();
 
 	const std::array<const char *, 6> &hdri_textures = {
-		"assets/textures/hdri/bluecloud_ft.jpg",
-		"assets/textures/hdri/bluecloud_bk.jpg",
-		"assets/textures/hdri/bluecloud_up.jpg",
-		"assets/textures/hdri/bluecloud_dn.jpg",
-		"assets/textures/hdri/bluecloud_rt.jpg",
-		"assets/textures/hdri/bluecloud_lf.jpg",
+		"assets/textures/hdri/sun/bluecloud_ft.jpg",
+		"assets/textures/hdri/sun/bluecloud_bk.jpg",
+		"assets/textures/hdri/sun/bluecloud_up.jpg",
+		"assets/textures/hdri/sun/bluecloud_dn.jpg",
+		"assets/textures/hdri/sun/bluecloud_rt.jpg",
+		"assets/textures/hdri/sun/bluecloud_lf.jpg",
+	};
+
+	const std::array<const char *, 6> &hdri_textures2 = {
+		"assets/textures/hdri/moon/left.png",
+		"assets/textures/hdri/moon/right.png",
+		"assets/textures/hdri/moon/top.png",
+		"assets/textures/hdri/moon/bottom.png",
+		"assets/textures/hdri/moon/back.png",
+		"assets/textures/hdri/moon/front.png",
 	};
 
 	// setup the scene
-	setup(root, camera, shader, hdri_textures);
+	setup(root, camera, shader, hdri_textures, hdri_textures2);
 	addCollisions();
 	collectBarrels(root);
 }
@@ -108,15 +117,16 @@ std::shared_ptr<Object> NatureScene::createRoot()
 	boatCamera = std::make_shared<BoatCamera>(boat);
 	mulino = std::make_shared<Mulino>();	
 	walls = std::make_shared<Walls>();
+	torchs = std::make_shared<Torchs>();
 
 
 	auto root = std::make_shared<Object>();
-	root->setChildrenObjects({ground, boat, homes, carretto, mulino, walls, heat, rocks, tree, treasure, collisionWater});
+	root->setChildrenObjects({ground, boat, homes, carretto, mulino, walls, heat, torchs, /*rocks,*/ tree, treasure, collisionWater});
 
 	DirectionalLight dirLight(
 		glm::vec3(0.2f, 0.2f, 0.2f),
 		glm::vec3(0.0f, -1.0f, .0f),
-		0.5f);
+		40.0f);
 
 	root.get()->setLights({std::make_shared<DirectionalLight>(dirLight)});
 
@@ -205,6 +215,16 @@ void NatureScene::update()
 		gDebounce = false;
 	}
 
+	bool hPressed = Input::getKey(GLFW_KEY_H);
+	if (hPressed && !hDebounce) {
+		hDebounce = true;
+		changeSky();
+	}
+	else if (!hPressed) {
+		hDebounce = false;
+	}
+
+
 	checkChangeCamera();
 
 	camera->update();
@@ -288,4 +308,31 @@ void NatureScene::collectBarrels(const std::shared_ptr<Object>& node) {
     
     for (auto& child : node->getChildrenObjects())
         collectBarrels(child);
+}
+
+
+void NatureScene::changeSky() {
+	bool isDay = !getIsDay();
+	auto sun = root->getLights()[0];
+
+	if(isDay) {
+		sun->setIntensity(40.0f);
+
+		auto allTorchs = torchs->getChildrenObjects();
+		for (const auto& torch : allTorchs) {
+			auto light = torch->getLights()[0];
+			light->setIntensity(0.0f);
+		}
+
+	} else {
+		sun->setIntensity(2.0f);
+
+		auto allTorchs = torchs->getChildrenObjects();
+		for (const auto& torch : allTorchs) {
+			auto light = torch->getLights()[0];
+			light->setIntensity(30.0f);
+		}
+	}
+
+	setIsDay(isDay);
 }

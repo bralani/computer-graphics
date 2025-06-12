@@ -107,6 +107,7 @@ protected:
 	std::vector<int> materials_tiling;
 	std::vector<float> materials_opacity;
 	TextureVulkan textures_hdri;
+	TextureVulkan textures_hdri2;
 	TextureVulkan texture_shadow;
 
 	// Other application parameters
@@ -163,9 +164,10 @@ protected:
 		DSL_P.init(this, B);
 
 		std::vector<DescriptorSetLayoutBinding> B_background;
-		B_background.resize(2);
+		B_background.resize(3);
 		B_background[0] = {0, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, VK_SHADER_STAGE_ALL_GRAPHICS};
 		B_background[1] = {1, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT};
+		B_background[2] = {2, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT};
 		DSL_P_background.init(this, B_background);
 
 		// Descriptor Layouts P_shadows
@@ -306,6 +308,9 @@ protected:
 		auto textures_hdri_string = this->scene->getHDRI();
 		textures_hdri.initCubic(this, textures_hdri_string.data());
 
+		auto textures_hdri_string2 = this->scene->getHDRI2();
+		textures_hdri2.initCubic(this, textures_hdri_string2.data());
+
 		// load shadow texture
 		if (!compute_shadows)
 		{
@@ -351,7 +356,11 @@ protected:
 				DS_P[i].init(this, &DSL_P, E);
 			}
 			txt.pipelinesAndDescriptorSetsInit();
-			DS_P_background.init(this, &DSL_P_background, {{0, UNIFORM, sizeof(UniformBufferObject), nullptr}, {1, TEXTURE, 0, &textures_hdri}});
+			DS_P_background.init(this, &DSL_P_background, {
+				{0, UNIFORM, sizeof(UniformBufferObject), nullptr}, 
+				{1, TEXTURE, 0, &textures_hdri},
+				{2, TEXTURE, 0, &textures_hdri2}
+			});
 		} else {
 			P_shadows.create();
 			// Models, textures and Descriptors (values assigned to the uniforms)
@@ -501,6 +510,7 @@ protected:
 		ubo.tilingFactor = 1;
 		ubo.opacity = 1.0f;
 		if(!compute_shadows) {
+			ubo.tilingFactor = scene->getIsDay();
 			DS_P_background.map(currentImage, &ubo, sizeof(ubo), 0);
 		}
 
@@ -585,6 +595,7 @@ protected:
 		}
 		textures_map.clear();
 		textures_hdri.cleanup();
+		textures_hdri2.cleanup();
 
 		// Cleanup models
 		for (int i = 0; i < M_string.size(); i++) {

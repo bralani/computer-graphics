@@ -21,7 +21,6 @@
 #include "scene/natureScene/object/Barrels.hpp"
 #include "scene/natureScene/object/Fences.hpp"
 #include "scene/natureScene/object/Fires.hpp"
-#include "scene/natureScene/object/Torch.hpp"
 
 
 class Grounds : public Object
@@ -56,7 +55,6 @@ public:
     objectschildren.push_back(std::make_shared<Barrels>());
     objectschildren.push_back(std::make_shared<Fences>());
     objectschildren.push_back(std::make_shared<Fires>());
-    objectschildren.push_back(std::make_shared<Torchs>());
 
     this->setChildrenObjects(objectschildren);
   }

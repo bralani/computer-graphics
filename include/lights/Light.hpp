@@ -26,6 +26,9 @@ class Light {
 
 
     float getIntensity() const { return intensity; }
+    void setIntensity(float intensity) { 
+      this->intensity = intensity;
+    }
     TypeLight getType() const { return type; }
 
   protected:

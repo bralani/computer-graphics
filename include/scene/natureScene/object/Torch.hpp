@@ -5,6 +5,7 @@
 #include <memory>
 #include <fstream>
 #include <random>
+#include "lights/PointLight.hpp"
 #include "scene/natureScene/mesh/Torch.hpp"
 #include "objects/Object.hpp"
 #include "utilities/Input.hpp"
@@ -28,7 +29,7 @@ public:
         PointLight pointLight(
             glm::vec3(1.0, 0.45, 0.1),
             glm::vec3(0.0f, 0.0f, 0.0f),
-            30.0f);
+            0.0f);
 
         this->setLights({std::make_shared<PointLight>(pointLight)});
     }
