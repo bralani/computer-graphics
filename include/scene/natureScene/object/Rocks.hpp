@@ -3047,7 +3047,7 @@ std::vector<glm::vec3> scales = {
     std::vector<glm::vec3> selectedScales;
 
     size_t N = positions.size();
-    size_t numToSelect = static_cast<size_t>(N * 0.1); // 0.3%
+    size_t numToSelect = static_cast<size_t>(N * 0.6);
 
     std::vector<size_t> indices(N);
     for (size_t i = 0; i < N; ++i) indices[i] = i;
