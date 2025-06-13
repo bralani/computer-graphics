@@ -23,7 +23,7 @@ public:
 
     this->setMeshes(meshes);
 
-    transform.setPosition(glm::vec3(0.0f, -0.5f, 0.0f));
+    transform.setPosition(glm::vec3(0.0f, -1.2f, 0.0f));
   }
 
 };
