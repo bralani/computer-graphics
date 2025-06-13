@@ -3043,7 +3043,7 @@ public:
     std::vector<glm::vec3> selectedScales;
 
     size_t N = positions.size();
-    size_t numToSelect = static_cast<size_t>(N * 0.6);
+    size_t numToSelect = static_cast<size_t>(N * 0.9);
 
     std::vector<size_t> indices(N);
     for (size_t i = 0; i < N; ++i)

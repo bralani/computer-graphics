@@ -17,12 +17,6 @@ public:
     tenda->transform.setRotation(glm::vec3(90.0f, -5.14, 0.0f));
     meshes.push_back(tenda);
 
-    auto tenda2 = std::make_shared<TendaMesh>();
-    tenda2->transform.setPosition(glm::vec3(13.5176, -4.13593, 14.1644));
-    tenda2->transform.setRotation(glm::vec3(90.0f, -16.6, 0.0f));
-    meshes.push_back(tenda2);
-
-
     this->setMeshes(meshes);
   }
 
