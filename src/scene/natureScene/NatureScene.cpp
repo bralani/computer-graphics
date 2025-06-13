@@ -22,6 +22,7 @@
 #include <iostream>
 #include <GLFW/glfw3.h>
 #include "scene/natureScene/mesh/Ground.hpp"
+#include <glm/gtx/euler_angles.hpp>
 
 // constructor
 NatureScene::NatureScene()
@@ -190,13 +191,19 @@ void NatureScene::update()
 			}
 
 			if (nearest) {
-				// Grab barrel
+				// Grab object
 				heldObject = nearest;
 				isHolding   = true;
+				heldObject->transform.setScale(glm::vec3(0.2f));
+				heldObject->transform.setRotation(glm::vec3(
+					camera->getPitch(),
+					camera->getYaw(),
+					camera->getRoll()
+				));
 			}
 		}
 		else {
-			// Drop barrel
+			// Drop object
 			glm::vec3 camPos  = camera->getPosition();
 			glm::vec3 forward = camera->getFront();
 			glm::vec3 dropPos = camPos + forward * dropDist;
@@ -231,21 +238,13 @@ void NatureScene::update()
 
 	if (isHolding && heldObject) {
 		glm::vec3 camPos   = camera->getPosition();
-		glm::vec3 worldUp  = glm::vec3(0.0f, 1.0f, 0.0f);
-		glm::vec3 forward  = camera->getFront();
-		glm::vec3 right    = -camera->getRight();
-
-		glm::vec3 worldOff = right * holdOffset.x
-						   + worldUp	* holdOffset.y
-						   + forward	* holdOffset.z;
+		glm::vec3 camOffset = holdOffset;
+		glm::mat4 R = glm::yawPitchRoll(camera->getYaw(),
+                                camera->getPitch(),
+                                camera->getRoll());
+		glm::vec3 worldOff = glm::vec3(R * glm::vec4(camOffset, 0.0f));
 
 		heldObject->transform.setPosition(camPos + worldOff);
-		heldObject->transform.setScale(glm::vec3(0.2f));
-		heldObject->transform.setRotation(glm::vec3(
-			camera->getYaw(),
-			camera->getPitch(),
-			camera->getRoll()
-		));
 		heldObject->setGlobalTransform(heldObject->transform);
 	}
 

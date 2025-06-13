@@ -1,6 +1,7 @@
 #include "camera/FirstPersonCamera.hpp"
 #include "utilities/Input.hpp"
 #include <GLFW/glfw3.h>
+#include <iomanip>
 
 // Classe helper per il motion state
 class CameraMotionState : public btMotionState {
@@ -176,12 +177,8 @@ void FirstPersonCamera::jump() {
 void FirstPersonCamera::updateCameraVectors(){
     // Calculate the new front vector
     glm::vec3 front;
-    front.x = cos(getYaw()) * cos(getPitch());
-    front.y = sin(getPitch());
-    front.z = sin(getYaw()) * cos(getPitch());
+    front.x = -sin(getYaw());
+    front.y =  0;
+    front.z = -cos(getYaw());
     m_front = glm::normalize(front);
-
-    // Ortogonal vectors right and up
-    m_right = glm::normalize(glm::cross(m_front, m_worldUp));
-    m_up    = glm::normalize(glm::cross(m_right, m_front));
 }

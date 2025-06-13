@@ -24,8 +24,6 @@ public:
     void jump();
 
     glm::vec3 getFront() const override { return m_front; }
-    glm::vec3 getUp()    const override { return m_up;    }
-    glm::vec3 getRight() const override { return m_right; }
 
 private:
 
@@ -42,9 +40,6 @@ private:
     float m_maxSpeed;
 
     glm::vec3 m_front;
-    glm::vec3 m_up;
-    glm::vec3 m_right;
-    glm::vec3 m_worldUp;
 
     float timeJump = 0.0f;
 };

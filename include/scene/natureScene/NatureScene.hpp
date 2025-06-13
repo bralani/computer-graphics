@@ -50,8 +50,8 @@ private:
 
     // settings for the pickup/drop
     float pickupRange = 10.0f;    // max distance to pick up an object
-    float dropDist    = 1.5f;     // distance to drop the object in front of the camera
-    glm::vec3 holdOffset = {0.1f, 0.0f, 1.0f};  // offset in camera‐space
+    float dropDist    = 4.0f;     // distance to drop the object in front of the camera
+    glm::vec3 holdOffset = {0.0f, 0.0f, -2.0f};  // offset in camera‐space
 
 };
 
