@@ -21,7 +21,7 @@ private:
     void addCollisions();
     void checkChangeCamera();
     void update() override;
-    void collectBarrels(const std::shared_ptr<Object>& node);
+    void collectObjects(const std::shared_ptr<Object>& node);
     void changeSky();
 
     std::shared_ptr<Mulino> mulino = nullptr; // Mulino object
@@ -38,19 +38,19 @@ private:
     inline static bool vPressedPrev = false;
     inline static bool fPressedPrev = false;
 
-    // gets all barrels in the scene
-    std::vector<std::shared_ptr<BarrelMesh>> allBarrels;
+    // gets all objects in the scene
+    std::vector<std::shared_ptr<Mesh>> allObjects;
 
     // pickup state
-    std::shared_ptr<BarrelMesh> heldBarrel = nullptr;
+    std::shared_ptr<Mesh> heldObject = nullptr;
     bool isHolding   = false;
     bool gDebounce   = false;
 
     bool hDebounce   = false;
 
     // settings for the pickup/drop
-    float pickupRange = 10.0f;    // max distance to pick up a barrel
-    float dropDist    = 1.5f;     // distance to drop the barrel in front of the camera
+    float pickupRange = 10.0f;    // max distance to pick up an object
+    float dropDist    = 1.5f;     // distance to drop the object in front of the camera
     glm::vec3 holdOffset = {0.1f, 0.0f, 1.0f};  // offset in camera‐space
 
 };
