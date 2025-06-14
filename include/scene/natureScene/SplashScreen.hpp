@@ -5,6 +5,7 @@ enum class AppState {
     SPLASH_SCREEN,
     INITIALIZE_VULKAN,
     RUNNING_GAME,
+    CONTROLS_SCREEN,
     CLEANUP,
     EXIT
 };
