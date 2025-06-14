@@ -27,11 +27,22 @@ public:
 
     virtual glm::mat4 getViewMatrix() const = 0;
 
+    glm::mat4 getProjectionMatrix() const;
+
+    void setPerspective(float fovDeg, float aspect, float nearPlane, float farPlane);
+
+    void setOrthographic(float left, float right,
+                         float bottom, float top,
+                         float nearPlane, float farPlane);
+
 protected:
+    float getWindowAspect() const;
+
     glm::vec3 position;
     float yaw;
     float pitch;
     float roll;
+    glm::mat4 projection {1.0f};
 };
 
 #endif

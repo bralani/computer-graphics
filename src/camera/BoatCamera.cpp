@@ -8,9 +8,48 @@ BoatCamera::BoatCamera(const std::shared_ptr<Boat>& boatObject)
     distanceFromBoat = 8.0f;  // Initial follow distance
     yaw = 0.0f;
     pitch = glm::radians(20.0f);  // Initial camera angle
+    switchTo(ViewMode::NORMAL);
 }
 
 BoatCamera::~BoatCamera() {}
+
+void BoatCamera::switchTo(ViewMode m) {
+    if (mode == m) return;
+    mode = m;
+    applyViewMode();
+}
+
+void BoatCamera::applyViewMode() {
+    float asp = getWindowAspect();
+    switch (mode) {
+        case ViewMode::NORMAL: {            // classic third-person view
+            setPerspective(60.0f, asp, 0.1f, 500.0f);
+            distanceFromBoat = 8.0f;
+            break;
+        }
+        case ViewMode::ISO: {
+            setOrthographic(-20, 20, -20, 20, -100, 100);
+            pitch = glm::radians(35.264f);
+            yaw   = glm::radians(45.0f);
+            distanceFromBoat = 40.0f;
+            break;
+        }
+        case ViewMode::DIME: {
+            setOrthographic(-20, 20, -20, 20, -100, 100);
+            pitch = glm::radians(20.0f);
+            yaw   = glm::radians(45.0f);
+            distanceFromBoat = 40.0f;
+            break;
+        }
+        case ViewMode::TRIME: {
+            setOrthographic(-20, 20, -20, 20, -100, 100);
+            pitch = glm::radians(23.0f);
+            yaw   = glm::radians(48.0f);
+            distanceFromBoat = 40.0f;
+            break;
+        }
+    }
+}
 
 glm::mat4 BoatCamera::getViewMatrix() const {
     return glm::lookAt(position, followPoint, glm::vec3(0, 1, 0));
@@ -20,12 +59,14 @@ glm::vec3 BoatCamera::calculateCameraPos() {
     // Get boat's forward direction from its rotation
     glm::vec3 boatRotation = boatObject->getBoatMesh()->getGlobalTransform().getRotation();
     float boatYaw = glm::radians(boatRotation.y);
+
+    float theta = (mode == ViewMode::NORMAL ? yaw + boatYaw : yaw);
     
     // Calculate offset based on current camera angles and boat rotation
     glm::vec3 offset(
-        distanceFromBoat * sin(yaw + boatYaw) * cos(pitch),
+        distanceFromBoat * sin(theta) * cos(pitch),
         -distanceFromBoat * sin(pitch),
-        distanceFromBoat * cos(yaw + boatYaw) * cos(pitch)
+        distanceFromBoat * cos(theta) * cos(pitch)
     );
 
     // Get boat position and calculate follow point
@@ -54,11 +95,17 @@ void BoatCamera::update() {
     glfwSetCursorPos(window, centerX, centerY);
 
     const float MOUSE_SENSITIVITY = 0.1f;
-    yaw -= static_cast<float>(m_dx) * MOUSE_SENSITIVITY * deltaT;
-    pitch -= static_cast<float>(m_dy) * MOUSE_SENSITIVITY * deltaT;
+    
+    float yawOffset   = static_cast<float>(m_dx) * MOUSE_SENSITIVITY * deltaT;
+    float pitchOffset = static_cast<float>(m_dy) * MOUSE_SENSITIVITY * deltaT;
 
-    // Clamp pitch to prevent flipping
-    pitch = glm::clamp(pitch, glm::radians(10.0f), glm::radians(80.0f));
+    if (mode == ViewMode::NORMAL) {
+        yaw   -= yawOffset;
+        pitch -= pitchOffset;
+        pitch = glm::clamp(pitch, glm::radians(10.0f), glm::radians(80.0f));
+    } else {
+        yaw -= yawOffset;
+    }
 
     if (Input::getKey(GLFW_KEY_E)) {
 		scroll += 2.0f * deltaT;
@@ -71,12 +118,28 @@ void BoatCamera::update() {
         processMouseScroll(static_cast<float>(yoff));
     }
 
+    bool one   = Input::getKey(GLFW_KEY_1);
+    bool two   = Input::getKey(GLFW_KEY_2);
+    bool three = Input::getKey(GLFW_KEY_3);
+    bool zero  = Input::getKey(GLFW_KEY_0);
+
+    static bool debounce = false;
+    if (!debounce && (one || two || three || zero)) {
+        if (one)   switchTo(ViewMode::ISO);
+        if (two)   switchTo(ViewMode::DIME);
+        if (three) switchTo(ViewMode::TRIME);
+        if (zero)  switchTo(ViewMode::NORMAL);
+        debounce = true;
+    }
+    if (!one && !two && !three && !zero) debounce = false;
+
+    clampDistance();
+
     // Update camera position
     position = calculateCameraPos();
 
     boatObject->update();
 }
-
 
 void BoatCamera::processMouseScroll(float yoffset) {
     const float zoomSpeed = 1.0f;
@@ -84,4 +147,11 @@ void BoatCamera::processMouseScroll(float yoffset) {
     distanceFromBoat -= yoffset * zoomSpeed;
 
     distanceFromBoat = glm::clamp(distanceFromBoat, 4.0f, 50.0f);
+}
+
+void BoatCamera::clampDistance() {
+    if (mode == ViewMode::NORMAL)
+        distanceFromBoat = glm::clamp(distanceFromBoat, 4.0f, 20.0f);
+    else
+        distanceFromBoat = glm::clamp(distanceFromBoat, 20.0f, 60.0f);
 }

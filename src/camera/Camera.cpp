@@ -106,3 +106,25 @@ void Camera::update() {
 	this->setPitch(newPitch);
 	this->setPosition(newPos);
 }
+
+glm::mat4 Camera::getProjectionMatrix() const {
+    return projection;
+}
+
+void Camera::setPerspective(float fovDeg, float aspect, float n, float f) {
+    projection = glm::perspective(glm::radians(fovDeg), aspect, n, f);
+}
+
+void Camera::setOrthographic(float left, float right,
+                             float bottom, float top,
+                             float n, float f) {
+    projection = glm::ortho(left, right, bottom, top, n, f);
+}
+
+float Camera::getWindowAspect() const {
+    int w = 1, h = 1;
+    if (auto win = Input::getWindow()) {
+        glfwGetFramebufferSize(win, &w, &h);
+    }
+    return (h == 0) ? 1.0f : static_cast<float>(w) / h;
+}

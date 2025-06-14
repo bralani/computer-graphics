@@ -4,6 +4,8 @@
 #include "camera/Camera.hpp"
 #include "scene/natureScene/object/Boat.hpp"
 
+enum class ViewMode { NORMAL, ISO, DIME, TRIME };
+
 class BoatCamera : public Camera {
 public:
 
@@ -23,11 +25,17 @@ public:
 
     glm::vec3 getFront() const override { return glm::vec3(0.0f, 0.0f, 1.0f); }
 
+    void switchTo(ViewMode m);
+
 private:
     glm::vec3 calculateCameraPos();
+    void applyViewMode();
+    void clampDistance();
+
     float distanceFromBoat;
     glm::vec3 followPoint;
     float scroll = 8.0f;
+    ViewMode mode { ViewMode::NORMAL };
 
     std::shared_ptr<Boat> boatObject;
 };
