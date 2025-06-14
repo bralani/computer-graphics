@@ -371,7 +371,7 @@ namespace SplashScreen
             {
                 ImGui::SetNextWindowPos({screenWidth / 2.f, screenHeight / 2.f},
                                         ImGuiCond_Always, {0.5f, 0.5f});
-                ImGui::SetNextWindowSize({600, 350});
+                ImGui::SetNextWindowSize({600, 500});
                 ImGui::PushStyleColor(ImGuiCol_WindowBg, ImVec4(0,0,0,0.6f));
                 ImGui::Begin("Controls", nullptr,
                              ImGuiWindowFlags_NoDecoration |
@@ -387,6 +387,10 @@ namespace SplashScreen
                 ImGui::Text("G        -  Grab / release object");
                 ImGui::Text("H        -  Day / Night");
                 ImGui::Text("V        -  Enter / Exit the boat");
+                ImGui::Text("1        -  Switch to ISO view");
+                ImGui::Text("2        -  Switch to DIME view");
+                ImGui::Text("3        -  Switch to TRIME view");
+                ImGui::Text("0        -  Switch to NORMAL view");
 
                 ImGui::Dummy({0, 15});
                 ImGui::SetCursorPosX(ImGui::GetWindowWidth() / 2.f - 80);
