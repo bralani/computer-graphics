@@ -276,7 +276,7 @@ void NatureScene::grabObject() {
 
 				isHolding   = true;
 				std::cout << "Picked up: " << label << '\n';
-				if (label == "Barrel") T.setScale(glm::vec3(0.2f));
+				T.setScale(glm::vec3(0.2f));
 				T.setRotation(glm::vec3(
 					camera->getPitch(),
 					camera->getYaw(),
