@@ -39,11 +39,11 @@ NatureScene::NatureScene()
 
 	// create the camera
 	auto camera = std::make_shared<FirstPersonCamera>(
-		position, // Posizione iniziale
-		yaw,			 // Yaw iniziale (in radianti)
-		pitch,			 // Pitch iniziale (in radianti)
-		roll,			 // Roll iniziale (in radianti)
-		physicsWorld 	 // Passa il mondo fisico alla camera
+		position, // Initial position of the camera
+		yaw,			 // Initial yaw (in radiant)
+		pitch,			 // Initial pitch (in radiant)
+		roll,			 // Initial roll (in radiant)
+		physicsWorld 	 // Physics world for collision detection
 	);
 	firstPersonCamera = camera;
 
@@ -292,6 +292,8 @@ void NatureScene::grabObject() {
 		}
 		else {
 			// Drop object
+			label = heldRoot ? heldRoot->getDebugName()
+                             : heldMesh->getDebugName();
 			glm::vec3 camPos  = camera->getPosition();
 			glm::vec3 forward = camera->getFront();
 			glm::vec3 dropPos = camPos + forward * dropDist;
@@ -347,7 +349,7 @@ void NatureScene::grabObject() {
 
 void NatureScene::collectObjects(const std::shared_ptr<Object>& node) {
 	if (auto torch = dynamic_cast<Torch*>(node.get())) {
-        // Usa la prima mesh come riferimento (tanto la torcia ne ha 2)
+        // Use the Torch object directly
         if (!torch->getMeshes().empty()) {
             pickables.push_back({ torch->getMeshes()[0], torch });
         }

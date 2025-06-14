@@ -41,14 +41,14 @@ private:
 
     // gets all objects in the scene
     struct PickEntry {
-        std::shared_ptr<Mesh>   mesh;   // sempre valido
-        Object*                 root;   // può essere nullptr
+        std::shared_ptr<Mesh>   mesh;
+        Object*                 root;
     };
     std::vector<PickEntry> pickables;
 
     // pickup state
     Object*                heldRoot = nullptr;
-    std::shared_ptr<Mesh>  heldMesh;    // valido solo quando heldRoot == nullptr
+    std::shared_ptr<Mesh>  heldMesh;
     bool isHolding   = false;
     bool gDebounce   = false;
 
