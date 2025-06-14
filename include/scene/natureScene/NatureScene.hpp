@@ -39,10 +39,15 @@ private:
     inline static bool fPressedPrev = false;
 
     // gets all objects in the scene
-    std::vector<std::shared_ptr<Mesh>> allObjects;
+    struct PickEntry {
+        std::shared_ptr<Mesh>   mesh;   // sempre valido
+        Object*                 root;   // può essere nullptr
+    };
+    std::vector<PickEntry> pickables;
 
     // pickup state
-    std::shared_ptr<Mesh> heldObject = nullptr;
+    Object*                heldRoot = nullptr;
+    std::shared_ptr<Mesh>  heldMesh;    // valido solo quando heldRoot == nullptr
     bool isHolding   = false;
     bool gDebounce   = false;
 

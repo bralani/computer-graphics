@@ -12,6 +12,8 @@ public:
       BoardsFienileMaterial material;
       this->setMaterial(std::make_shared<BoardsFienileMaterial>(material));
     }
+
+    const char* getDebugName() const override { return "Barrel"; }
 };
 
 

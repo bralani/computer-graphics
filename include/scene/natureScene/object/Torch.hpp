@@ -33,6 +33,8 @@ public:
 
         this->setLights({std::make_shared<PointLight>(pointLight)});
     }
+    
+    const char* getDebugName()      const override { return "Torch"; }
 };
 
 class Torchs : public Object

@@ -26,7 +26,10 @@ public:
   const std::vector<std::shared_ptr<Light>> &getLights() const { return lights; }
 
   void setChildrenObjects(const std::vector<std::shared_ptr<Object>> &childrenObjects) { this->childrenObjects = childrenObjects; }
-  void setMeshes(const std::vector<std::shared_ptr<Mesh>> &meshes) { this->meshes = meshes; }
+  virtual void setMeshes(const std::vector<std::shared_ptr<Mesh>> &meshes) {
+    this->meshes = meshes;
+    for (auto& m : meshes) m->setPickRoot(this);
+  }
   void setLights(const std::vector<std::shared_ptr<Light>> &lights) { this->lights = lights; }
 
   std::vector<std::shared_ptr<Mesh>> getRecursiveMeshesTransform() {
@@ -66,6 +69,8 @@ public:
 
     return allLightsTransform;
   }
+
+  virtual const char* getDebugName() const { return "Object"; } // in Object
 
 
 protected:

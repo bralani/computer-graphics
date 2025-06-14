@@ -23,6 +23,7 @@
 #include <GLFW/glfw3.h>
 #include "scene/natureScene/mesh/Ground.hpp"
 #include <glm/gtx/euler_angles.hpp>
+#include <iomanip>
 
 // constructor
 NatureScene::NatureScene()
@@ -171,35 +172,54 @@ void NatureScene::update()
 		return;
 
 	bool gPressed = Input::getKey(GLFW_KEY_G);
+	std::string label;
 	if (gPressed && !gDebounce) {
 		gDebounce = true;
 
 		if (!isHolding) {
-			// Find nearest barrel
+			// Find nearest object
 			glm::vec3 camPos = camera->getPosition();
 			float bestDist = pickupRange;
-			std::shared_ptr<Mesh> nearest = nullptr;
+			PickEntry* nearest = nullptr;
 
-			for (auto& b : allObjects) {
-				glm::vec3 bpos = b->transform.getPosition();
-				float d = glm::distance(camPos, bpos);
+			for (auto& entry : pickables) {
+				glm::vec3 p = entry.root
+                	? entry.root->transform.getPosition()
+                	: entry.mesh->transform.getPosition();
+
+				float d = glm::distance(camPos, p);
+
 				if (d < bestDist) {
 					bestDist = d;
-					nearest = b;
+					nearest = &entry;
 				}
-				std::cout << std::endl;
 			}
 
 			if (nearest) {
+
+				label = nearest->root ? nearest->root->getDebugName()
+                   : nearest->mesh->getDebugName();
 				// Grab object
-				heldObject = nearest;
+				heldRoot = nearest->root;
+				heldMesh = nearest->mesh; 
+
+				Transform& T = heldRoot ? heldRoot->transform
+                                    : heldMesh->transform;
+
 				isHolding   = true;
-				heldObject->transform.setScale(glm::vec3(0.2f));
-				heldObject->transform.setRotation(glm::vec3(
+				std::cout << "Picked up: " << label << '\n';
+				if (label == "Barrel") T.setScale(glm::vec3(0.2f));
+				T.setRotation(glm::vec3(
 					camera->getPitch(),
 					camera->getYaw(),
 					camera->getRoll()
 				));
+				if (heldRoot) {
+        			heldRoot->getRecursiveMeshesTransform();
+					heldRoot->getRecursiveLightsTransform();
+				} else {
+					heldMesh->setGlobalTransform(T);
+				}
 			}
 		}
 		else {
@@ -207,14 +227,25 @@ void NatureScene::update()
 			glm::vec3 camPos  = camera->getPosition();
 			glm::vec3 forward = camera->getFront();
 			glm::vec3 dropPos = camPos + forward * dropDist;
-			dropPos.y -= 1.5f;
+			label == "Torch" ? dropPos.y -= 2.0f : dropPos.y -= 1.5f;
 
-			heldObject->transform.setPosition(dropPos);
-			heldObject->transform.setScale(glm::vec3(1.0f));
-			heldObject->transform.setRotation(glm::vec3(-7.6584f, -11.0591f, 74.6419f));
-			heldObject->setGlobalTransform(heldObject->transform);
+			Transform& T = heldRoot ? heldRoot->transform
+                                : heldMesh->transform;
 
-			heldObject = nullptr;
+			T.setPosition(dropPos);
+			T.setScale(glm::vec3(1.0f));
+			if (heldRoot) {
+				heldRoot->getRecursiveMeshesTransform();
+				heldRoot->getRecursiveLightsTransform();
+			}
+			else {
+				T.setRotation(glm::vec3(-7.6584f, -11.0591f, 74.6419f));
+				// If we are holding a mesh, we need to set its global transform
+				heldMesh->setGlobalTransform(T);
+			}
+
+			heldRoot  = nullptr;
+        	heldMesh.reset();
 			isHolding  = false;
 		}
 	}
@@ -236,7 +267,7 @@ void NatureScene::update()
 
 	camera->update();
 
-	if (isHolding && heldObject) {
+	if (isHolding && (heldRoot || heldMesh)) {
 		glm::vec3 camPos   = camera->getPosition();
 		glm::vec3 camOffset = holdOffset;
 		glm::mat4 R = glm::yawPitchRoll(camera->getYaw(),
@@ -244,8 +275,19 @@ void NatureScene::update()
                                 camera->getRoll());
 		glm::vec3 worldOff = glm::vec3(R * glm::vec4(camOffset, 0.0f));
 
-		heldObject->transform.setPosition(camPos + worldOff);
-		heldObject->setGlobalTransform(heldObject->transform);
+		Transform& T = heldRoot ? heldRoot->transform
+                            : heldMesh->transform;
+
+    	T.setPosition(camPos + worldOff);
+
+		if (heldRoot) {
+			auto L   = heldRoot->getLights()[0];
+			auto pos = L->getGlobalTransform().getPosition();
+			heldRoot->getRecursiveMeshesTransform();
+			heldRoot->getRecursiveLightsTransform();
+		}
+		else
+			heldMesh->setGlobalTransform(T);
 	}
 
 	// update the camera and physics world
@@ -300,11 +342,22 @@ void NatureScene::checkChangeCamera() {
 }
 
 void NatureScene::collectObjects(const std::shared_ptr<Object>& node) {
-	for (auto& mesh : node->getMeshes()) {
-        if (auto b = std::dynamic_pointer_cast<BarrelMesh>(mesh))
-            allObjects.push_back(b);
+	if (auto torch = dynamic_cast<Torch*>(node.get())) {     // <-- test RTTI
+        // Usa la prima mesh come riferimento (tanto la torcia ne ha 2)
+        if (!torch->getMeshes().empty()) {
+            pickables.push_back({ torch->getMeshes()[0], torch });
+        }
+        // NON scendo nelle sue mesh per evitare duplicati
+        return;                                            // <-- esco dalla funzione
     }
-    
+
+    for (auto& m : node->getMeshes()) {
+        if (std::dynamic_pointer_cast<BarrelMesh>(m))
+        {
+            pickables.push_back({m, nullptr});
+        }
+    }
+
     for (auto& child : node->getChildrenObjects())
         collectObjects(child);
 }

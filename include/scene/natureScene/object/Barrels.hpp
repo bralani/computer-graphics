@@ -57,6 +57,12 @@ public:
     }
     this->setMeshes(meshes);
   }
+
+  void setMeshes(const std::vector<std::shared_ptr<Mesh>> &meshes) override
+  {
+    this->meshes = meshes;
+    for (auto& m : meshes) m->setPickRoot(nullptr);
+  }
 };
 
 #endif // BARRELOBJECT_HPP

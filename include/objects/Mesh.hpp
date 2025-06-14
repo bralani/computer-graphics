@@ -1,6 +1,8 @@
 #ifndef MESH_HPP
 #define MESH_HPP
 
+class Object; 
+
 #include <string>
 #include <memory>
 #include "objects/Transform.hpp"
@@ -39,12 +41,18 @@ public:
 
     void setComputeShadows(bool compute) { computeShadows = compute; }
     bool getComputeShadows() const { return computeShadows; }
+
+    Object* getPickRoot() const { return pickRoot; }
+    void    setPickRoot(Object* o) { pickRoot = o; }
+
+    virtual const char* getDebugName() const { return "Mesh"; }   // 
 protected:
     Transform globalTransform;
     std::shared_ptr<Material> material;
     std::string filename;
     std::shared_ptr<Collision> collision = nullptr;
     bool computeShadows = true;
+    Object* pickRoot = nullptr;
 };
 
 #endif // MESH_HPP
