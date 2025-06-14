@@ -468,7 +468,6 @@ protected:
 
 			case TypeLight::POINT_LIGHT:
 				gubo.lightPosPoint[numPoint].v = lights[i]->getGlobalTransform().getPosition();
-				gubo.lightPosPoint[numPoint].v.y = -gubo.lightPosPoint[numPoint].v.y;
 				gubo.lightColorPoint[numPoint] = glm::vec4(lights[i]->getColor(), lights[i]->getIntensity());
 				numPoint++;
 				break;

@@ -28,13 +28,13 @@ public:
 
         PointLight pointLight(
             glm::vec3(1.0, 0.45, 0.1),
-            glm::vec3(0.0f, 0.0f, 0.0f),
+            glm::vec3(0.0f, 1.5f, 0.0f),
             0.0f);
 
         this->setLights({std::make_shared<PointLight>(pointLight)});
     }
-    
-    const char* getDebugName()      const override { return "Torch"; }
+
+    const char *getDebugName() const override { return "Torch"; }
 };
 
 class Torchs : public Object
@@ -43,25 +43,20 @@ public:
     Torchs() : Object()
     {
 
-std::vector<glm::vec3> positions = {
-    { -27.4105f, -0.8761f, 13.8795f },
-    { -10.9688f, -0.5361f, 15.8891f },
-    { 89.5666f, -1.2068f, 14.1494f },
-};
+        std::vector<glm::vec3> positions = {
+            {-10.9688f, -0.5361f, 15.8891f},
+            {89.5666f, -1.2068f, 14.1494f},
+            {26.8758f, -5.4684f, 148.4068f}};
 
-std::vector<glm::vec3> rotations = {
-    { 0.0000f, -16.9992f, 0.0000f },
-    { 0.0000f, -16.7304f, 0.0000f },
-    { 0.0000f, -16.7304f, 0.0000f },
-};
+        std::vector<glm::vec3> rotations = {
+            {0.0000f, -16.7304f, 0.0000f},
+            {0.0000f, -16.7304f, 0.0000f},
+            {0.0000f, 163.0008f, 0.0000f}};
 
-std::vector<glm::vec3> scales = {
-    { 1.0000f, 1.0000f, 1.0000f },
-    { 1.0000f, 1.0000f, 1.0000f },
-    { 1.0000f, 1.0000f, 1.0000f },
-};
-
-
+        std::vector<glm::vec3> scales = {
+            {1.0000f, 1.0000f, 1.0000f},
+            {1.0000f, 1.0000f, 1.0000f},
+            {1.0000f, 1.0000f, 1.0000f}};
 
         auto torchchildren = std::vector<std::shared_ptr<Object>>();
 

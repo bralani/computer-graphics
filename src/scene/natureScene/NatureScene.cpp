@@ -171,6 +171,74 @@ void NatureScene::update()
 	if (isPaused)
 		return;
 
+
+	// logic for grab and drop objects
+	grabObject();
+
+	// check if the user wants to change the sky
+	bool hPressed = Input::getKey(GLFW_KEY_H);
+	if (hPressed && !hDebounce) {
+		hDebounce = true;
+		changeSky();
+	}
+	else if (!hPressed) {
+		hDebounce = false;
+	}
+
+	// update the camera and physics world
+	checkChangeCamera();
+	camera->update();
+  physicsWorld->stepSimulation(deltaT, 2, 1.0f / 60.0f);
+	menu->update();
+	mulino->update();
+	walls->update(camera->getPosition());
+}
+
+void NatureScene::checkChangeCamera() {
+	bool vpressedCurrent = Input::getKey(GLFW_KEY_V);
+	if (vpressedCurrent && !vPressedPrev) {
+		glm::vec3 spawn1 = glm::vec3(154.169, -8.70866, 81.3701); 
+		glm::vec3 spawn2 = glm::vec3(-199.512, -8.77594, -93.2629); 
+
+		if (cameraType == 0) {
+
+			glm::vec3 cameraPos = camera->getPosition();
+
+			// check if the distance to the boat is small enough to switch to boat camera
+			auto dist = glm::distance(cameraPos, spawn1);
+			if (dist < 20.0f) {
+				cameraType = 1;
+				setCamera(boatCamera);
+			}
+
+			dist = glm::distance(cameraPos, spawn2);
+			if (dist < 20.0f) {
+				cameraType = 1;
+				setCamera(boatCamera);
+			}
+
+		} else {
+			glm::vec3 cameraPos = boatCamera->getBoatPosition();
+			auto dist = glm::distance(cameraPos, spawn1);
+
+			if (dist < 40.0f) {
+				cameraType = 0;
+				firstPersonCamera->setPositionRigidBody(spawn1);
+				setCamera(firstPersonCamera);
+			}
+
+			dist = glm::distance(cameraPos, spawn2);
+			if (dist < 40.0f) {
+				cameraType = 0;
+				firstPersonCamera->setPositionRigidBody(spawn2);
+				setCamera(firstPersonCamera);
+			}
+		}
+	}
+	vPressedPrev = vpressedCurrent;
+}
+
+void NatureScene::grabObject() {
 	bool gPressed = Input::getKey(GLFW_KEY_G);
 	std::string label;
 	if (gPressed && !gDebounce) {
@@ -252,21 +320,7 @@ void NatureScene::update()
 	else if (!gPressed) {
 		gDebounce = false;
 	}
-
-	bool hPressed = Input::getKey(GLFW_KEY_H);
-	if (hPressed && !hDebounce) {
-		hDebounce = true;
-		changeSky();
-	}
-	else if (!hPressed) {
-		hDebounce = false;
-	}
-
-
-	checkChangeCamera();
-
-	camera->update();
-
+	
 	if (isHolding && (heldRoot || heldMesh)) {
 		glm::vec3 camPos   = camera->getPosition();
 		glm::vec3 camOffset = holdOffset;
@@ -289,66 +343,15 @@ void NatureScene::update()
 		else
 			heldMesh->setGlobalTransform(T);
 	}
-
-	// update the camera and physics world
-    physicsWorld->stepSimulation(deltaT, 2, 1.0f / 60.0f);
-	menu->update();
-	mulino->update();
-	walls->update(camera->getPosition());
-}
-
-void NatureScene::checkChangeCamera() {
-	bool vpressedCurrent = Input::getKey(GLFW_KEY_V);
-	if (vpressedCurrent && !vPressedPrev) {
-		glm::vec3 spawn1 = glm::vec3(154.169, -8.70866, 81.3701); 
-		glm::vec3 spawn2 = glm::vec3(-199.512, -8.77594, -93.2629); 
-
-		if (cameraType == 0) {
-
-			glm::vec3 cameraPos = camera->getPosition();
-
-			// check if the distance to the boat is small enough to switch to boat camera
-			auto dist = glm::distance(cameraPos, spawn1);
-			if (dist < 20.0f) {
-				cameraType = 1;
-				setCamera(boatCamera);
-			}
-
-			dist = glm::distance(cameraPos, spawn2);
-			if (dist < 20.0f) {
-				cameraType = 1;
-				setCamera(boatCamera);
-			}
-
-		} else {
-			glm::vec3 cameraPos = boatCamera->getBoatPosition();
-			auto dist = glm::distance(cameraPos, spawn1);
-
-			if (dist < 40.0f) {
-				cameraType = 0;
-				firstPersonCamera->setPositionRigidBody(spawn1);
-				setCamera(firstPersonCamera);
-			}
-
-			dist = glm::distance(cameraPos, spawn2);
-			if (dist < 40.0f) {
-				cameraType = 0;
-				firstPersonCamera->setPositionRigidBody(spawn2);
-				setCamera(firstPersonCamera);
-			}
-		}
-	}
-	vPressedPrev = vpressedCurrent;
 }
 
 void NatureScene::collectObjects(const std::shared_ptr<Object>& node) {
-	if (auto torch = dynamic_cast<Torch*>(node.get())) {     // <-- test RTTI
+	if (auto torch = dynamic_cast<Torch*>(node.get())) {
         // Usa la prima mesh come riferimento (tanto la torcia ne ha 2)
         if (!torch->getMeshes().empty()) {
             pickables.push_back({ torch->getMeshes()[0], torch });
         }
-        // NON scendo nelle sue mesh per evitare duplicati
-        return;                                            // <-- esco dalla funzione
+        return;
     }
 
     for (auto& m : node->getMeshes()) {

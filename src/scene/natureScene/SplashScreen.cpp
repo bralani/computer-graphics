@@ -317,15 +317,18 @@ namespace SplashScreen
             glBindVertexArray(quadVAO);
             glDrawArrays(GL_TRIANGLES, 0, 6);
 
-            // --- Inizia la parte di ImGui ---
             ImGui_ImplOpenGL3_NewFrame();
             ImGui_ImplGlfw_NewFrame();
             ImGui::NewFrame();
 
-            // --- START: MODIFICATION FOR LARGER UI ---
-            // Creazione della finestra ImGui per i pulsanti (made larger)
             switch (nextState)
             {
+            /* ---------- Initialize Page ---------- */
+            case AppState::INITIALIZE_VULKAN:
+                glfwSetWindowShouldClose(window, true);
+                break;
+
+
             /* ---------- SPLASH SCREEN ---------- */
             case AppState::SPLASH_SCREEN:
             {

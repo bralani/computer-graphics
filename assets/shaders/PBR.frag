@@ -165,13 +165,16 @@ void main() {
         finalColor += CookTorranceBRDF(albedo, N, V, L, roughness, metallic, shadow) * LC;
     }
 
-    for (int i = 0; i < gubo.numLightsPoint; i++) {
-        vec3 lightPos = gubo.lightPosPoint[i];
-        vec3 L = normalize(lightPos - fragPos);
-        vec3 LC = gubo.lightColorPoint[i].rgb * gubo.lightColorPoint[i].a;
-        float distance = length(lightPos - fragPos);
-        float attenuation = 5.0 / (distance * distance);
-        finalColor += CookTorranceBRDFPoint(albedo, N, V, L, roughness, metallic) * LC * attenuation;
+
+    if (gubo.lightColorPoint[0].a > 0.01) {
+        for (int i = 0; i < gubo.numLightsPoint; i++) {
+            vec3 lightPos = gubo.lightPosPoint[i];
+            vec3 L = normalize(lightPos - fragPos);
+            vec3 LC = gubo.lightColorPoint[i].rgb * gubo.lightColorPoint[i].a;
+            float distance = length(lightPos - fragPos);
+            float attenuation = 15.0 / (distance * distance);
+            finalColor += CookTorranceBRDFPoint(albedo, N, V, L, roughness, metallic) * LC * attenuation;
+        }
     }
 
     // Metallic materials

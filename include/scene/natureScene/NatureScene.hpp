@@ -23,6 +23,7 @@ private:
     void update() override;
     void collectObjects(const std::shared_ptr<Object>& node);
     void changeSky();
+    void grabObject();
 
     std::shared_ptr<Mulino> mulino = nullptr; // Mulino object
     std::shared_ptr<Walls> walls = nullptr; // Walls object
