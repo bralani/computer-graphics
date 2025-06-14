@@ -302,12 +302,12 @@ void NatureScene::grabObject() {
 
 			T.setPosition(dropPos);
 			T.setScale(glm::vec3(1.0f));
+			if (label == "Barrel") T.setRotation(glm::vec3(-7.6584f, -11.0591f, 74.6419f));
 			if (heldRoot) {
 				heldRoot->getRecursiveMeshesTransform();
 				heldRoot->getRecursiveLightsTransform();
 			}
 			else {
-				T.setRotation(glm::vec3(-7.6584f, -11.0591f, 74.6419f));
 				// If we are holding a mesh, we need to set its global transform
 				heldMesh->setGlobalTransform(T);
 			}
