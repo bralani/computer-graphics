@@ -103,8 +103,6 @@ void BoatCamera::update() {
         yaw   -= yawOffset;
         pitch -= pitchOffset;
         pitch = glm::clamp(pitch, glm::radians(10.0f), glm::radians(80.0f));
-    } else {
-        yaw -= yawOffset;
     }
 
     if (Input::getKey(GLFW_KEY_E)) {
