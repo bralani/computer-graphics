@@ -36,15 +36,15 @@ void BoatCamera::applyViewMode() {
         }
         case ViewMode::DIME: {
             setOrthographic(-20, 20, -20, 20, -100, 100);
-            pitch = glm::radians(20.0f);
+            pitch = glm::radians(45.0f);
             yaw   = glm::radians(45.0f);
             distanceFromBoat = 40.0f;
             break;
         }
         case ViewMode::TRIME: {
             setOrthographic(-20, 20, -20, 20, -100, 100);
-            pitch = glm::radians(23.0f);
-            yaw   = glm::radians(48.0f);
+            pitch = glm::radians(15.0f);
+            yaw   = glm::radians(60.0f);
             distanceFromBoat = 40.0f;
             break;
         }
