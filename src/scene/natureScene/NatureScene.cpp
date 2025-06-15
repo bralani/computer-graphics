@@ -12,7 +12,6 @@
 #include "materials/Texture.hpp"
 #include "materials/BasicMaterial.hpp"
 #include "materials/PBRMaterial.hpp"
-#include "shaders/PhongShader.hpp"
 #include "shaders/PBRShader.hpp"
 #include "lights/PointLight.hpp"
 #include "lights/SpotLight.hpp"
@@ -263,8 +262,6 @@ void NatureScene::grabObject() {
 
 			if (nearest) {
 
-				label = nearest->root ? nearest->root->getDebugName()
-                   : nearest->mesh->getDebugName();
 				// Grab object
 				heldRoot = nearest->root;
 				heldMesh = nearest->mesh; 
@@ -273,7 +270,6 @@ void NatureScene::grabObject() {
                                     : heldMesh->transform;
 
 				isHolding   = true;
-				std::cout << "Picked up: " << label << '\n';
 				T.setScale(glm::vec3(0.2f));
 				T.setRotation(glm::vec3(
 					camera->getPitch(),
@@ -281,7 +277,7 @@ void NatureScene::grabObject() {
 					0.0f
 				));
 				if (heldRoot) {
-        			heldRoot->getRecursiveMeshesTransform();
+        	heldRoot->getRecursiveMeshesTransform();
 					heldRoot->getRecursiveLightsTransform();
 				} else {
 					heldMesh->setGlobalTransform(T);
@@ -313,7 +309,7 @@ void NatureScene::grabObject() {
 			}
 
 			heldRoot  = nullptr;
-        	heldMesh.reset();
+      heldMesh.reset();
 			isHolding  = false;
 		}
 	}
@@ -331,11 +327,9 @@ void NatureScene::grabObject() {
 		Transform& T = heldRoot ? heldRoot->transform
                             : heldMesh->transform;
 
-    	T.setPosition(camPos + worldOff);
+    T.setPosition(camPos + worldOff);
 
 		if (heldRoot) {
-			auto L   = heldRoot->getLights()[0];
-			auto pos = L->getGlobalTransform().getPosition();
 			heldRoot->getRecursiveMeshesTransform();
 			heldRoot->getRecursiveLightsTransform();
 		}
@@ -348,7 +342,7 @@ void NatureScene::collectObjects(const std::shared_ptr<Object>& node) {
 	if (auto torch = dynamic_cast<Torch*>(node.get())) {
         // Use the Torch object directly
         if (!torch->getMeshes().empty()) {
-            pickables.push_back({ torch->getMeshes()[0], torch });
+            pickables.push_back({ nullptr, torch });
         }
         return;
     }

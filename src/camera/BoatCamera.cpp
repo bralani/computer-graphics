@@ -56,17 +56,12 @@ glm::mat4 BoatCamera::getViewMatrix() const {
 }
 
 glm::vec3 BoatCamera::calculateCameraPos() {
-    // Get boat's forward direction from its rotation
-    glm::vec3 boatRotation = boatObject->getBoatMesh()->getGlobalTransform().getRotation();
-    float boatYaw = glm::radians(boatRotation.y);
-
-    float theta = (mode == ViewMode::NORMAL ? yaw + boatYaw : yaw);
     
     // Calculate offset based on current camera angles and boat rotation
     glm::vec3 offset(
-        distanceFromBoat * sin(theta) * cos(pitch),
+        distanceFromBoat * sin(yaw) * cos(pitch),
         -distanceFromBoat * sin(pitch),
-        distanceFromBoat * cos(theta) * cos(pitch)
+        distanceFromBoat * cos(yaw) * cos(pitch)
     );
 
     // Get boat position and calculate follow point
@@ -105,12 +100,6 @@ void BoatCamera::update() {
         pitch = glm::clamp(pitch, glm::radians(10.0f), glm::radians(80.0f));
     }
 
-    if (Input::getKey(GLFW_KEY_E)) {
-		scroll += 2.0f * deltaT;
-	} else if (Input::getKey(GLFW_KEY_Q)) {
-		scroll -= 2.0f * deltaT;
-	}
-	
 	double yoff = Input::getScrollOffset();
     if (yoff != 0.0) {
         processMouseScroll(static_cast<float>(yoff));

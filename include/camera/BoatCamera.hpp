@@ -34,7 +34,6 @@ private:
 
     float distanceFromBoat;
     glm::vec3 followPoint;
-    float scroll = 8.0f;
     ViewMode mode { ViewMode::NORMAL };
 
     std::shared_ptr<Boat> boatObject;

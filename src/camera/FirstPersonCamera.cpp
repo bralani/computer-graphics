@@ -105,8 +105,8 @@ void FirstPersonCamera::update() {
     float moveForce = m_moveForce;
     float maxSpeed = m_maxSpeed;
     if (shift) {
-        moveForce *= 2.0f;
-        maxSpeed *= 2.0f;
+        moveForce *= 3.0f;
+        maxSpeed *= 3.0f;
     }
     
     // Salto

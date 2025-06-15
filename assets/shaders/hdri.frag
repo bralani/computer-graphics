@@ -9,7 +9,7 @@ layout(binding = 0) uniform UniformBufferObject {
     mat4 mMat;
     mat4 nMat;
     mat4 lightSpaceMatrix;
-    int tilingFactor;
+    int isDay;
 } ubo;
 
 layout(binding = 1) uniform samplerCube hdrEnvMap;
@@ -17,7 +17,7 @@ layout(binding = 2) uniform samplerCube hdrEnvMapNight;
 
 void main() {
     vec3 viewDir = normalize(fragPosOut);
-    if (ubo.tilingFactor == 0) {
+    if (ubo.isDay == 0) {
         outColor = texture(hdrEnvMapNight, viewDir);
     } else {
         outColor = texture(hdrEnvMap, viewDir);

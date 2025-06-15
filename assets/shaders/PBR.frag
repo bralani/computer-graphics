@@ -83,7 +83,6 @@ vec3 CookTorranceBRDF(vec3 albedo, vec3 N, vec3 V, vec3 L, float roughness, floa
     vec3 finalColor = (diffuse + specular) * NdotL;
 
     if(shadow > 0.0 && ubo.opacity > 0.9) {
-
         shadow /= pow(float(SAMPLE_COUNT + 1), 2.0);
         finalColor *= (1.0 - shadow);
     }
