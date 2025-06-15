@@ -2,7 +2,7 @@
 #include "utilities/Input.hpp"
 
 BoatCamera::BoatCamera(const std::shared_ptr<Boat>& boatObject)
-    : Camera(glm::vec3(0.0f), 0.0f, 0.0f, 0.0f) {
+    : Camera(glm::vec3(0.0f), 0.0f, 0.0f) {
     this->boatObject = boatObject;
     position = calculateCameraPos();
     distanceFromBoat = 8.0f;  // Initial follow distance

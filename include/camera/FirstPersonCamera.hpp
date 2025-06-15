@@ -9,7 +9,6 @@ public:
     FirstPersonCamera(const glm::vec3& pos = glm::vec3(0.0f),
                      float yaw = 0.0f,
                      float pitch = 0.0f,
-                     float roll = 0.0f,
                      btDynamicsWorld* physicsWorld = nullptr);
     
     virtual ~FirstPersonCamera();

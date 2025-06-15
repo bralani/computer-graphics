@@ -33,7 +33,6 @@ NatureScene::NatureScene()
 	glm::vec3 direction = glm::normalize(target - position);
 	float yaw = atan2(direction.z, direction.x);
 	float pitch = asin(direction.y);
-	float roll = 0.0f;
 
 	initializePhysicsWorld();
 
@@ -42,7 +41,6 @@ NatureScene::NatureScene()
 		position, // Initial position of the camera
 		yaw,			 // Initial yaw (in radiant)
 		pitch,			 // Initial pitch (in radiant)
-		roll,			 // Initial roll (in radiant)
 		physicsWorld 	 // Physics world for collision detection
 	);
 	firstPersonCamera = camera;
@@ -280,7 +278,7 @@ void NatureScene::grabObject() {
 				T.setRotation(glm::vec3(
 					camera->getPitch(),
 					camera->getYaw(),
-					camera->getRoll()
+					0.0f
 				));
 				if (heldRoot) {
         			heldRoot->getRecursiveMeshesTransform();
@@ -327,8 +325,7 @@ void NatureScene::grabObject() {
 		glm::vec3 camPos   = camera->getPosition();
 		glm::vec3 camOffset = holdOffset;
 		glm::mat4 R = glm::yawPitchRoll(camera->getYaw(),
-                                camera->getPitch(),
-                                camera->getRoll());
+                                camera->getPitch(), 0.0f);
 		glm::vec3 worldOff = glm::vec3(R * glm::vec4(camOffset, 0.0f));
 
 		Transform& T = heldRoot ? heldRoot->transform

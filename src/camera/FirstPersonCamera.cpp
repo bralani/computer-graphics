@@ -23,8 +23,8 @@ private:
     FirstPersonCamera* m_camera;
 };
 
-FirstPersonCamera::FirstPersonCamera(const glm::vec3& pos, float yaw, float pitch, float roll, btDynamicsWorld* physicsWorld)
-    : Camera(pos, yaw, pitch, roll),
+FirstPersonCamera::FirstPersonCamera(const glm::vec3& pos, float yaw, float pitch, btDynamicsWorld* physicsWorld)
+    : Camera(pos, yaw, pitch),
       m_rigidBody(nullptr),
       m_collisionShape(nullptr),
       m_motionState(nullptr),

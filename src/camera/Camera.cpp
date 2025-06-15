@@ -1,8 +1,8 @@
 #include "camera/Camera.hpp"
 #include "utilities/Input.hpp"
 
-Camera::Camera(const glm::vec3& pos, float yaw, float pitch, float roll)
-    : position(pos), yaw(yaw), pitch(pitch), roll(roll) {}
+Camera::Camera(const glm::vec3& pos, float yaw, float pitch)
+    : position(pos), yaw(yaw), pitch(pitch) {}
 
 Camera::~Camera() {}
 
@@ -18,10 +18,6 @@ void Camera::setPitch(float newPitch) {
     pitch = newPitch; 
 }
 
-void Camera::setRoll(float newRoll) { 
-    roll = newRoll; 
-}
-
 const glm::vec3& Camera::getPosition() const { 
     return position; 
 }
@@ -32,10 +28,6 @@ float Camera::getYaw() const {
 
 float Camera::getPitch() const { 
     return pitch; 
-}
-
-float Camera::getRoll() const { 
-    return roll; 
 }
 
 void Camera::update() {
