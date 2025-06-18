@@ -14,8 +14,6 @@
 #include <memory>
 
 // --- Custom Image Loading Implementation ---
-
-// A simple struct to hold image data and properties
 struct ImageData
 {
     int width = 0;
@@ -61,13 +59,11 @@ ImageData loadBMP(const char *filePath)
         return imageData;
     }
 
-    // DIB (Device-Independent Bitmap) Header (we assume BITMAPINFOHEADER - 40 bytes)
     char dibHeader[40];
     file.read(dibHeader, 40);
 
     // Get image dimensions
     int width = *reinterpret_cast<int *>(&dibHeader[4]);
-    // A negative height in BMP means the image is stored top-down. We'll handle the common positive case.
     int height = *reinterpret_cast<int *>(&dibHeader[8]);
     short bitsPerPixel = *reinterpret_cast<short *>(&dibHeader[14]);
 
@@ -93,14 +89,9 @@ ImageData loadBMP(const char *filePath)
     // Allocate final buffer for color-swizzled data
     unsigned char *finalData = new unsigned char[width * height * channels];
 
-    // --- CORRECTED LOGIC ---
-    // The BMP data is already bottom-up, which is what OpenGL expects.
-    // We just need to copy it, handle row padding, and convert from BGR(A) to RGB(A).
     for (int y = 0; y < height; y++)
     {
-        // Point to the source row (with padding)
         char *sourceRow = rawData.data() + y * rowPadded;
-        // Point to the destination row (no padding)
         unsigned char *destRow = finalData + y * width * channels;
 
         for (int x = 0; x < width; x++)
@@ -288,16 +279,13 @@ namespace SplashScreen
         (void)io;
         ImGui::StyleColorsDark();
 
-        // --- START: MODIFICATION FOR LARGER FONT ---
-        // We load the default font, but at a larger size. You can adjust the pixel size.
         ImFont *largeFont = nullptr;
         ImFontConfig font_config;
         font_config.SizePixels = 32.0f; // Set desired font size
         largeFont = io.Fonts->AddFontDefault(&font_config);
-        // --- END: MODIFICATION FOR LARGER FONT ---
 
         ImGui_ImplGlfw_InitForOpenGL(window, true);
-        ImGui_ImplOpenGL3_Init("#version 330"); // This will also build the new font atlas
+        ImGui_ImplOpenGL3_Init("#version 330");
 
         AppState nextState = AppState::SPLASH_SCREEN;
 
@@ -402,10 +390,9 @@ namespace SplashScreen
                 break;
             }
 
-            default: /* INITIALIZE_VULKAN o altro */
+            default:
                 break;
             }
-            // --- END: MODIFICATION FOR LARGER UI ---
 
             // Rendering di ImGui
             ImGui::Render();
@@ -415,7 +402,6 @@ namespace SplashScreen
         }
 
         // --- 4. Cleanup ---
-        // Cleanup delle risorse di sfondo
         glDeleteVertexArrays(1, &quadVAO);
         glDeleteBuffers(1, &quadVBO);
         glDeleteProgram(backgroundShader);

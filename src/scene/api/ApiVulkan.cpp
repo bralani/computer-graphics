@@ -500,7 +500,6 @@ protected:
 		M_light[1][1] *= -1;
 		glm::mat4 lightSpaceMatrix = M_light * lightView;
 
-		// scale the background by 100
 		glm::mat4 trans_mat_background = glm::scale(glm::mat4(1.0f), glm::vec3(10000.0f));
 		ubo.mMat = trans_mat_background;
 		ubo.mvpMat = ViewPrj * ubo.mMat;
