@@ -13,11 +13,11 @@ Authors:
 
 ---
 
-## 🛠️ Build Instructions
+## Build Instructions
 
 This project uses CMake for cross-platform compilation.
 
-### 🏗️ Build Steps
+### Build Steps
 
 Open a terminal in the project root and run the following:
 
@@ -32,7 +32,7 @@ This will generate the executables needed to run the simulation.
 
 ---
 
-## 🚀 Run Instructions
+## Run Instructions
 
 ### Step 1 – Generate Shadow Maps
 
@@ -58,7 +58,7 @@ Enjoy exploring the medieval village with realistic lighting and shadows!
 
 ---
 
-## 🧩 Features
+## Features
 
 * **Shadow mapping**
 * Collision detection with the environment
